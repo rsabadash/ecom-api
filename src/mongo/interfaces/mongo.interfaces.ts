@@ -7,8 +7,8 @@ import {
   PartialEntity,
   PartialEntityUpdate,
   PartialEntityRemoveFields,
-  PartialEntityUpdateArray,
-  UpdateOneArrayOptions,
+  // PartialEntityUpdateArray,
+  // UpdateOneArrayOptions,
 } from '../types/mongo-query.types';
 
 export interface MongoModuleOptions {
@@ -58,11 +58,11 @@ export interface ICollectionModel<Entity> {
     updateData: PartialEntityUpdate<Entity>,
   ): Promise<boolean>;
 
-  updateOneArray(
-    entityQuery: PartialEntity<Entity>,
-    updateData: PartialEntityUpdateArray<Entity>,
-    options: UpdateOneArrayOptions,
-  ): Promise<EntityWithId<Entity> | null>;
+  // updateOneArray(
+  //   entityQuery: PartialEntity<Entity>,
+  //   updateData: PartialEntityUpdateArray<Entity>,
+  //   options: UpdateOneArrayOptions,
+  // ): Promise<EntityWithId<Entity> | null>;
 
   removeField(
     entityQuery: PartialEntity<Entity>,

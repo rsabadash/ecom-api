@@ -5,9 +5,9 @@ import {
   NewEntity,
   PartialEntity,
   PartialEntityUpdate,
-  PartialEntityUpdateArray,
+  // PartialEntityUpdateArray,
   PartialEntityRemoveFields,
-  UpdateOneArrayOptions,
+  // UpdateOneArrayOptions,
 } from '../types/mongo-query.types';
 import { DEFAULT_FIND_OPTIONS } from '../constants/mongo-query.constants';
 import {
@@ -61,19 +61,33 @@ export class CollectionModel<CollectionEntity>
     return updatedEntity.modifiedCount > 0 && updatedEntity.acknowledged;
   }
 
-  async updateOneArray(
-    entityQuery: PartialEntity<CollectionEntity>,
-    setData: PartialEntityUpdateArray<CollectionEntity>,
-    options?: UpdateOneArrayOptions,
-  ): Promise<EntityWithId<CollectionEntity> | null> {
-    const updateMethod = options?.isUnique ? '$addToSet' : '$push';
-
-    const updatedEntity = await this.collection.findOneAndUpdate(entityQuery, {
-      [updateMethod]: setData,
-    });
-
-    return updatedEntity.value;
-  }
+  // async updateOneArray(
+  //   entityQuery: PartialEntity<CollectionEntity>,
+  //   setData: PartialEntityUpdateArray<CollectionEntity>,
+  //   options?: UpdateOneArrayOptions,
+  //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //   // @ts-ignore
+  // ): Promise<EntityWithId<CollectionEntity> | null> {
+  //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //   // @ts-ignore
+  //   const t = await this.collection.findOne({ key: 'year' });
+  //   console.log(t);
+  //   await this.collection.updateOne(
+  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //     // @ts-ignore
+  //     { key: 'year' },
+  //     {
+  //       $push: {
+  //         cases: {
+  //           $each: [1985],
+  //           $sort: -1,
+  //         },
+  //       },
+  //     },
+  //   );
+  //
+  //   // return updatedEntity.value;
+  // }
 
   async removeField(
     entityQuery: PartialEntity<CollectionEntity>,

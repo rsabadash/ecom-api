@@ -30,7 +30,7 @@ export class ProductService {
         return field.map((product) => product[language]);
       }
 
-      if (field[language]) {
+      if (typeof field === 'object' && field !== null && language in field) {
         return field[language];
       }
     }
@@ -101,9 +101,8 @@ export class ProductService {
       const product = await this.getProduct({ productId: data._id });
 
       let updatedFields: Partial<ProductEntity> = {};
-      //TODO temporary do not update the title and description
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { _id, title, description, ...productWithoutId } = product;
+
+      const { _id, ...productWithoutId } = product;
       const productKeys = Object.keys(productWithoutId) as ProductKeys;
 
       productKeys.forEach((key) => {
@@ -117,7 +116,7 @@ export class ProductService {
         }
       });
 
-      return await this.productCollection.updateOne({ _id }, updatedFields);
+      return this.productCollection.updateOne({ _id }, updatedFields);
     }
   }
 }
