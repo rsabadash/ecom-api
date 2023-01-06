@@ -1,5 +1,6 @@
 import { registerAs } from '@nestjs/config';
 
+//TODO: deprecate config
 export default registerAs('database', () => ({
   user: 'r_sabadash',
   password: 'comics_db',
