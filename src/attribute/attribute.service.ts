@@ -15,6 +15,18 @@ export class AttributeService {
     private readonly attributeCollection: ICollectionModel<IAttribute>,
   ) {}
 
+  async getAttributes(): Promise<AttributeByCategory> {
+    const attributes = await this.attributeCollection.find();
+
+    const result: AttributeByCategory = {};
+
+    attributes.forEach((attribute: EntityWithId<IAttribute>) => {
+      result[attribute.key] = attribute.cases;
+    });
+
+    return result;
+  }
+
   async getAttributesByCategory(
     category: string,
   ): Promise<AttributeByCategory> {

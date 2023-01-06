@@ -8,8 +8,13 @@ export class AttributeController {
   constructor(private readonly attributeService: AttributeService) {}
 
   @Get()
+  async getAttributes(): Promise<AttributeByCategory> {
+    return await this.attributeService.getAttributes();
+  }
+
+  @Get('/getAttributesByCategory')
   getAttributesByCategory(
-    @Query('category') category: string,
+    @Query('category') category,
     // @Headers('accept-language') language,
   ): Promise<AttributeByCategory> {
     return this.attributeService.getAttributesByCategory(category);
