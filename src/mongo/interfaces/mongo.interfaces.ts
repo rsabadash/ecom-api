@@ -1,5 +1,5 @@
 import { ModuleMetadata, Type } from '@nestjs/common';
-import { Collection, MongoClientOptions } from 'mongodb';
+import { Collection, MongoClientOptions, UpdateResult } from 'mongodb';
 import {
   EntityWithId,
   FindEntityOptions,
@@ -56,7 +56,7 @@ export interface ICollectionModel<Entity> {
   updateOne(
     entityQuery: PartialEntity<Entity>,
     updateData: PartialEntityUpdate<Entity>,
-  ): Promise<boolean>;
+  ): Promise<UpdateResult>;
 
   // updateOneArray(
   //   entityQuery: PartialEntity<Entity>,

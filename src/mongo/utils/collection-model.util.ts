@@ -1,4 +1,4 @@
-import { Collection, EnhancedOmit } from 'mongodb';
+import { Collection, EnhancedOmit, UpdateResult } from 'mongodb';
 import {
   EntityWithId,
   FindEntityOptions,
@@ -53,12 +53,10 @@ export class CollectionModel<CollectionEntity>
   async updateOne(
     entityQuery: PartialEntity<CollectionEntity>,
     setData: PartialEntityUpdate<CollectionEntity>,
-  ): Promise<boolean> {
-    const updatedEntity = await this.collection.updateOne(entityQuery, {
+  ): Promise<UpdateResult> {
+    return await this.collection.updateOne(entityQuery, {
       $set: setData,
     });
-
-    return updatedEntity.modifiedCount > 0 && updatedEntity.acknowledged;
   }
 
   // async updateOneArray(
