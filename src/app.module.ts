@@ -10,7 +10,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ envFilePath, isGlobal: true }),
+    ConfigModule.forRoot({ envFilePath }),
     DatabaseModule,
     ProductModule,
     CategoryModule,

@@ -1,19 +1,24 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigType } from '@nestjs/config';
 import { MongoModule } from '../mongo/mongo.module';
+import databaseConfig from '../common/config/database.config';
 
 @Module({
   imports: [
     MongoModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => {
+      imports: [ConfigModule.forFeature(databaseConfig)],
+      useFactory: (
+        databaseConfiguration: ConfigType<typeof databaseConfig>,
+      ) => {
+        const { user, host, name, scheme, password, query } =
+          databaseConfiguration;
+
         return {
-          uri: `${configService.get<string>('DATABASE_CONNECTION_SCHEME')}${configService.get<string>('DATABASE_HOST')}:${configService.get<string>('DATABASE_PORT')}`,
-          //uri: `${configService.get<string>('DATABASE_CONNECTION_SCHEME')}${configService.get<string>('DATABASE_USER')}:${configService.get<string>('DATABASE_PASSWORD')}@${configService.get<string>('DATABASE_HOST')}`,
-          dbName: configService.get<string>('DATABASE_NAME'),
+          uri: `${scheme}${user}:${password}@${host}/${query}`,
+          dbName: name,
         };
       },
-      inject: [ConfigService],
+      inject: [databaseConfig.KEY],
     }),
   ],
 })
