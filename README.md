@@ -24,7 +24,7 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+The API for the e-commerce project.
 
 ## Installation
 
@@ -58,16 +58,21 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Support
+## End of Line issue (LF/CRLF)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+To avoid the issue LF is defined as the default end of the line. To add or remove files that either should or should not be modified using the ` .gitattributes` file.
 
-## Stay in touch
+>Bellow the comment `# Declare files that will always have CRLF line endings on checkout.` define a file format and type of line ending:
+>
+>`*.{extension}    eol=lf`
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+If the issue already exists follow the next steps:
+1. Use `git status` to determine whether your repo is clean. If you still have files to push or commit, please make sure that these actions are performed or the files are stashed before you perform the next commands.
+2. Run the commands below which will update the files for the repo using the newly defined line ending as specified in the `.gitattributes`
+    ```text
+    git rm --cached -r .
+    git reset --hard
+    ```
+3. In the setting of the code editor or IDE set the option that new files are created with LF end of the line.
 
-## License
-
-Nest is [MIT licensed](LICENSE).
+For more information check the [Link 1](https://dev.to/deadlybyte/please-add-gitattributes-to-your-git-repository-1jld) or [Link 2](https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings).
