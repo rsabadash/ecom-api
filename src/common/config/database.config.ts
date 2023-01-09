@@ -1,9 +1,11 @@
 import { registerAs } from '@nestjs/config';
+import { DATABASE_CONFIG_KEY } from '../constants/config.constants';
 
-//TODO: deprecate config
-export default registerAs('database', () => ({
-  user: 'r_sabadash',
-  password: 'comics_db',
-  name: 'Leisure',
-  host: 'cluster0.yfpvwip.mongodb.net',
+export default registerAs(DATABASE_CONFIG_KEY, () => ({
+  user: process.env.DATABASE_USER,
+  password: process.env.DATABASE_PASSWORD,
+  name: process.env.DATABASE_NAME,
+  host: process.env.DATABASE_HOST,
+  scheme: process.env.DATABASE_CONNECTION_SCHEME,
+  query: process.env.DATABASE_QUERY,
 }));
