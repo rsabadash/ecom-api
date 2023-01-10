@@ -14,7 +14,7 @@ import databaseConfig from '../common/config/database.config';
           databaseConfiguration;
 
         return {
-          uri: `${scheme}${user}:${password}@${host}/${query}`,
+          uri: `${scheme}${user}:${password}@${host}/?${query}`,
           dbName: name,
         };
       },
