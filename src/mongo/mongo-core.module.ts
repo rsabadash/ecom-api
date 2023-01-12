@@ -15,14 +15,19 @@ import {
 } from './constants/mongo.constants';
 import {
   getConnectionToken,
-  getConnectionContainerToken,
+  getClientToken,
   getDbToken,
-} from './utils/mongo.util';
+} from './utils/mongo.utils';
 import {
   MongoModuleOptions,
   MongoModuleAsyncOptions,
   MongoOptionsFactory,
-} from './interfaces/mongo.interfaces';
+} from './interfaces/mongo-module.interfaces';
+import {
+  ClientMapKey,
+  ClientMapValue,
+  ClientsMap,
+} from './types/mongo-query.types';
 
 @Global()
 @Module({})
@@ -42,26 +47,25 @@ export class MongoCoreModule implements OnModuleDestroy {
       useValue: connectionName,
     };
 
-    const connectionContainerProvider = {
-      provide: getConnectionContainerToken(connectionName),
-      useFactory: () => new Map<string, MongoClient>(),
+    const clientProvider = {
+      provide: getClientToken(connectionName),
+      useFactory: () => new Map<ClientMapKey, ClientMapValue>(),
     };
 
     const connectionProvider = {
       provide: getConnectionToken(connectionName),
-      useFactory: async (connections: Map<string, MongoClient>) => {
-        if (connections.has(connectionName)) {
-          return connections.get(connectionName);
+      useFactory: async (clients: ClientsMap) => {
+        if (clients.has(connectionName)) {
+          return clients.get(connectionName);
         }
-
         const { uri, connectionOptions } = options;
 
         const client = new MongoClient(uri, connectionOptions);
-        connections.set(connectionName, client);
+        clients.set(connectionName, client);
 
         return await client.connect();
       },
-      inject: [getConnectionContainerToken(connectionName)],
+      inject: [getClientToken(connectionName)],
     };
 
     const dbProvider = {
@@ -74,7 +78,7 @@ export class MongoCoreModule implements OnModuleDestroy {
       module: MongoCoreModule,
       providers: [
         containerNameProvider,
-        connectionContainerProvider,
+        clientProvider,
         connectionProvider,
         dbProvider,
       ],
@@ -91,32 +95,29 @@ export class MongoCoreModule implements OnModuleDestroy {
       useValue: connectionName,
     };
 
-    const connectionContainerProvider = {
-      provide: getConnectionContainerToken(connectionName),
-      useFactory: () => new Map<string, MongoClient>(),
+    const clientProvider = {
+      provide: getClientToken(connectionName),
+      useFactory: () => new Map<ClientMapKey, ClientMapValue>(),
     };
 
     const connectionProvider = {
       provide: getConnectionToken(connectionName),
       useFactory: async (
-        connections: Map<string, MongoClient>,
+        clients: ClientsMap,
         mongoModuleOptions: MongoModuleOptions,
       ) => {
-        if (connections.has(connectionName)) {
-          return connections.get(connectionName);
+        if (clients.has(connectionName)) {
+          return clients.get(connectionName);
         }
 
         const { uri, connectionOptions } = mongoModuleOptions;
 
         const client = new MongoClient(uri, connectionOptions);
-        connections.set(connectionName, client);
+        clients.set(connectionName, client);
 
         return await client.connect();
       },
-      inject: [
-        getConnectionContainerToken(connectionName),
-        MONGO_MODULE_OPTIONS,
-      ],
+      inject: [getClientToken(connectionName), MONGO_MODULE_OPTIONS],
     };
 
     const dbProvider = {
@@ -138,9 +139,9 @@ export class MongoCoreModule implements OnModuleDestroy {
         connectionProvider,
         dbProvider,
         containerNameProvider,
-        connectionContainerProvider,
+        clientProvider,
       ],
-      exports: [connectionProvider, dbProvider],
+      exports: [clientProvider, connectionProvider, dbProvider],
     };
   }
 
@@ -199,9 +200,9 @@ export class MongoCoreModule implements OnModuleDestroy {
   }
 
   async onModuleDestroy(): Promise<void> {
-    const clientsMap: Map<string, MongoClient> = this.moduleRef.get<
-      Map<string, MongoClient>
-    >(getConnectionContainerToken(this.containerName));
+    const clientsMap: ClientsMap = this.moduleRef.get<ClientsMap>(
+      getClientToken(this.containerName),
+    );
 
     if (clientsMap) {
       await Promise.all(

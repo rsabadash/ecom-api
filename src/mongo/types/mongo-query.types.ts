@@ -2,8 +2,8 @@ import {
   Filter,
   FindOptions,
   MatchKeysAndValues,
+  MongoClient,
   OnlyFieldsOfType,
-  OptionalUnlessRequiredId,
   PushOperator,
   WithId,
 } from 'mongodb';
@@ -20,8 +20,8 @@ export type PartialEntityRemoveFields<Entity> = OnlyFieldsOfType<Entity>;
 
 export type FindEntityOptions<Entity> = FindOptions<Entity>;
 
-export type NewEntity<Entity> = OptionalUnlessRequiredId<Entity>;
+export type ClientMapKey = string;
 
-export type UpdateOneArrayOptions = {
-  isUnique?: boolean;
-};
+export type ClientMapValue = MongoClient;
+
+export type ClientsMap = Map<ClientMapKey, ClientMapValue>;
