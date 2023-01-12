@@ -1,10 +1,13 @@
-export type Translation = {
+export type TranslationRequired = {
   uk: string;
-  en: string;
 };
 
-export type Translatable<T = undefined> = T extends undefined
-  ? string
-  : Translation;
+export type TranslationsOptional = {
+  en?: string | null;
+};
 
-export type Language = keyof Translation;
+export type Translations = TranslationRequired & TranslationsOptional;
+
+export type TranslationsAllRequired = Required<Translations>;
+
+export type Language = keyof Translations;

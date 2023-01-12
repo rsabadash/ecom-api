@@ -1,27 +1,27 @@
 import { DEFAULT_MONGO_CONNECTION_NAME } from '../constants/mongo.constants';
 
-export const getConnectionContainerToken = (
+export const getClientToken = (
   connectionName: string = DEFAULT_MONGO_CONNECTION_NAME,
-) => {
-  return `${connectionName}Container`;
+): string => {
+  return `${connectionName}Client`;
 };
 
 export const getConnectionToken = (
   connectionName: string = DEFAULT_MONGO_CONNECTION_NAME,
-) => {
+): string => {
   return `${connectionName}Connection`;
 };
 
 export const getDbToken = (
   connectionName: string = DEFAULT_MONGO_CONNECTION_NAME,
-) => {
+): string => {
   return `${connectionName}Db`;
 };
 
-export const getCollectionToken = (collectionName: string) => {
+export const getCollectionToken = (collectionName: string): string => {
   return `${collectionName}Collection`;
 };
 
-export const getCollectionModelToken = (collectionName: string) => {
+export const getCollectionModelToken = (collectionName: string): string => {
   return `${collectionName}CollectionModel`;
 };

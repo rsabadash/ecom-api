@@ -4,14 +4,14 @@ import {
   MongoModuleOptions,
   MongoModuleAsyncOptions,
   MongoModuleFeatureOptions,
-} from './interfaces/mongo.interfaces';
+} from './interfaces/mongo-module.interfaces';
 import { MongoCoreModule } from './mongo-core.module';
 import {
   getCollectionModelToken,
   getCollectionToken,
   getDbToken,
-} from './utils/mongo.util';
-import { CollectionModel } from './utils/collection-model.util';
+} from './utils/mongo.utils';
+import { CollectionModel } from './classes/collection-model.class';
 
 @Module({})
 export class MongoModule {
