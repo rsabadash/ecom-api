@@ -16,7 +16,7 @@ import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
             databaseConfiguration;
 
           return {
-            uri: `${scheme}${user}:${password}@${host}/${query}`,
+            uri: `${scheme}${user}:${password}@${host}/?${query}`,
             dbName: name,
           };
         },
