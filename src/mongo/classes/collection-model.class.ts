@@ -1,8 +1,14 @@
-import { Collection, EnhancedOmit, UpdateResult } from 'mongodb';
+import {
+  AggregateOptions,
+  Collection,
+  Filter,
+  OptionalId,
+  OptionalUnlessRequiredId,
+  UpdateFilter,
+} from 'mongodb';
 import {
   EntityWithId,
   FindEntityOptions,
-  NewEntity,
   PartialEntity,
   PartialEntityUpdate,
   // PartialEntityUpdateArray,
@@ -11,16 +17,10 @@ import {
 } from '../types/mongo-query.types';
 import { DEFAULT_FIND_OPTIONS } from '../constants/mongo-query.constants';
 import {
-  CollectionModelConstructor,
-  ICollectionModel,
-} from '../interfaces/mongo.interfaces';
-
-export const createCollectionModel = <Entity>(
-  ctor: CollectionModelConstructor<Entity>,
-  collection: Collection<Entity>,
-): ICollectionModel<Entity> => {
-  return new ctor(collection);
-};
+  UpdateOneResult,
+  DeleteOneResult,
+} from '../interfaces/colection-model.interfaces';
+import { ICollectionModel } from '../interfaces/colection-model.interfaces';
 
 export class CollectionModel<CollectionEntity>
   implements ICollectionModel<CollectionEntity>
@@ -33,7 +33,7 @@ export class CollectionModel<CollectionEntity>
   ): Promise<EntityWithId<CollectionEntity> | null> {
     const findOptions = options || {};
 
-    return this.collection.findOne(entityQuery, findOptions);
+    return await this.collection.findOne(entityQuery, findOptions);
   }
 
   async find(
@@ -53,12 +53,23 @@ export class CollectionModel<CollectionEntity>
   async updateOne(
     entityQuery: PartialEntity<CollectionEntity>,
     setData: PartialEntityUpdate<CollectionEntity>,
-  ): Promise<UpdateResult> {
-    return await this.collection.updateOne(entityQuery, {
+  ): Promise<UpdateOneResult> {
+    const updatedEntity = await this.collection.updateOne(entityQuery, {
       $set: setData,
     });
+
+    return {
+      isUpdated: updatedEntity.modifiedCount > 0 && updatedEntity.acknowledged,
+      isFound: updatedEntity.matchedCount > 0,
+    };
   }
 
+  async updateMany(
+    filter: Filter<CollectionEntity>,
+    update: UpdateFilter<CollectionEntity>,
+  ) {
+    return await this.collection.updateMany(filter, update);
+  }
   // async updateOneArray(
   //   entityQuery: PartialEntity<CollectionEntity>,
   //   setData: PartialEntityUpdateArray<CollectionEntity>,
@@ -110,15 +121,14 @@ export class CollectionModel<CollectionEntity>
   }
 
   async create(
-    entity: NewEntity<CollectionEntity>,
+    entity: OptionalId<CollectionEntity>,
   ): Promise<EntityWithId<CollectionEntity> | null> {
-    const createdEntity = await this.collection.insertOne(entity);
+    const typedEntity = entity as OptionalUnlessRequiredId<CollectionEntity>;
+    const createdEntity = await this.collection.insertOne(typedEntity);
 
     if (createdEntity.insertedId) {
-      const restProperties = entity as EnhancedOmit<CollectionEntity, '_id'>;
-
       return {
-        ...restProperties,
+        ...entity,
         _id: createdEntity.insertedId,
       };
     }
@@ -128,9 +138,18 @@ export class CollectionModel<CollectionEntity>
 
   async deleteOne(
     entityQuery: PartialEntity<CollectionEntity>,
-  ): Promise<EntityWithId<CollectionEntity> | null> {
-    const deletedEntity = await this.collection.findOneAndDelete(entityQuery);
+  ): Promise<DeleteOneResult> {
+    const deletedEntity = await this.collection.deleteOne(entityQuery);
 
-    return deletedEntity.value;
+    return {
+      isDeleted: deletedEntity.deletedCount > 0,
+    };
+  }
+
+  async aggregate<Result>(
+    pipeline,
+    options?: AggregateOptions,
+  ): Promise<Result[]> {
+    return await this.collection.aggregate<Result>(pipeline, options).toArray();
   }
 }

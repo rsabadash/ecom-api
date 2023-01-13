@@ -4,7 +4,11 @@ import {
   getCollectionToken,
   getDbToken,
   getCollectionModelToken,
-} from '../utils/mongo.util';
+  getClientToken,
+} from '../utils/mongo.utils';
+
+export const InjectClients = (connectionName?: string) =>
+  Inject(getClientToken(connectionName));
 
 export const InjectConnection = (connectionName?: string) =>
   Inject(getConnectionToken(connectionName));
