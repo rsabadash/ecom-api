@@ -1,4 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import {
   InjectClients,
   InjectCollectionModel,
@@ -79,7 +83,7 @@ export class CategoriesService {
     const category = categoryDetailArray[0];
 
     if (!category) {
-      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      throw new NotFoundException('Not found');
     }
 
     return category;
@@ -97,10 +101,7 @@ export class CategoriesService {
     });
 
     if (!category) {
-      throw new HttpException(
-        'Unprocessable entity',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+      throw new UnprocessableEntityException('Unprocessable entity');
     }
 
     let updatedFields: Partial<ICategory> = {};
@@ -125,10 +126,7 @@ export class CategoriesService {
     );
 
     if (!updateResult.isFound) {
-      throw new HttpException(
-        'Unprocessable entity',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+      throw new UnprocessableEntityException('Unprocessable entity');
     }
   }
 
@@ -138,10 +136,7 @@ export class CategoriesService {
     });
 
     if (!category) {
-      throw new HttpException(
-        'Unprocessable entity',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+      throw new UnprocessableEntityException('Unprocessable entity');
     }
 
     const session = this.client.startSession();
@@ -153,10 +148,7 @@ export class CategoriesService {
         });
 
         if (!deleteResult.isDeleted) {
-          throw new HttpException(
-            'Unprocessable entity',
-            HttpStatus.UNPROCESSABLE_ENTITY,
-          );
+          throw new UnprocessableEntityException('Unprocessable entity');
         }
 
         await this.categoryCollection.updateMany(

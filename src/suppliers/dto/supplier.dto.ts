@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import {
   IsString,
   MinLength,
@@ -15,7 +16,7 @@ export class SupplierDto {
   @ApiProperty({
     description: 'Supplier objectId',
   })
-  readonly _id: string;
+  readonly _id: ObjectId;
 
   @IsString()
   @MinLength(3, {
