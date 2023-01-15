@@ -9,3 +9,10 @@ export default registerAs(DATABASE_CONFIG_KEY, () => ({
   scheme: process.env.DATABASE_CONNECTION_SCHEME,
   query: process.env.DATABASE_QUERY,
 }));
+
+// export default registerAs('database', () => ({
+//   user: 'r_sabadash',
+//   password: 'commerce_db',
+//   name: 'commerce',
+//   host: 'cluster0.zblgqd0.mongodb.net',
+// }));
