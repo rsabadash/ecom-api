@@ -31,11 +31,14 @@ import { Language } from '../common/types/i18n.types';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 import { DROPDOWN_LIST_PATH } from '../common/constants/path.constants';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+// import { Roles } from '../iam/decorators/roles.decorator';
+// import { Role } from '../iam/enums/role.enum';
 
 @Controller(CATEGORIES_ROUTE)
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
+  // @Roles(Role.Admin)
   @Get()
   async getCategories(): Promise<ICategory[]> {
     return await this.categoriesService.getCategories();

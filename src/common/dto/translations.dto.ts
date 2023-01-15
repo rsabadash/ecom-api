@@ -2,9 +2,9 @@ import { IsOptional, IsString } from 'class-validator';
 
 export class TranslationsDto {
   @IsString()
-  uk: string;
+  readonly uk: string;
 
   @IsString()
   @IsOptional()
-  en: string | null;
+  readonly en: string | null;
 }
