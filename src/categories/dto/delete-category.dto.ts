@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
-import { IsMongoObjectId } from '../../common/decorators/is-mongo-objectId.decorator';
+import { IsMongoId } from 'class-validator';
 
 export class DeleteCategoryDto {
-  @IsMongoObjectId()
+  @IsMongoId()
   readonly id: ObjectId;
 }

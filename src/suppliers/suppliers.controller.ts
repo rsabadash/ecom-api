@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpStatus,
   Param,
   Patch,
@@ -12,28 +13,30 @@ import {
 } from '@nestjs/common';
 import { SUPPLIERS_ROUTE } from '../common/constants/routes.constants';
 import { SuppliersService } from './suppliers.service';
-import { SuppliersEntity } from './types/suppliers.types';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { SupplierDto } from './dto/supplier.dto';
 import {
   ApiCreatedResponse,
-  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiUnauthorizedResponse,
   ApiOkResponse,
-  ApiResponse,
   ApiTags,
+  ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
-import {
-  GET_SUPPLIER_BY_ID_PATH,
-  SUPPLIERS_ID_PARAM,
-  SUPPLIERS_MODULE_NAME,
-} from './suppliers.constants';
+import { SUPPLIERS_MODULE_NAME } from './constants/swagger.constants';
+import { GET_SUPPLIER_BY_ID_PATH } from './constants/path.constants';
+import { SUPPLIERS_ID_PARAM } from './constants/param.constants';
 import { ApiNoContentResponse } from '@nestjs/swagger/dist/decorators/api-response.decorator';
 import { HttpStatusMessage } from '../common/constants/swagger.constants';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { DeleteSupplierDto } from './dto/delete-supplier.dto';
-import { ParseBodyObjectIdsPipe } from '../common/pipes/parse-body-objectId.pipe';
+import { ParseObjectIdsPipe } from '../common/pipes/parse-body-objectId.pipe';
 import { ParseObjectIdPipe } from '../common/pipes/parse-objectId.pipe';
-import { IDeleteSupplier } from './interface/suppliers.interface';
+import {
+  IDeleteSupplier,
+  ISupplier,
+  IUpdateSupplier,
+} from './interface/suppliers.interfaces';
 
 @ApiTags(SUPPLIERS_MODULE_NAME)
 @Controller(SUPPLIERS_ROUTE)
@@ -43,21 +46,29 @@ export class SuppliersController {
   @Get()
   @ApiOkResponse({
     description: 'Suppliers were retrieved',
+    type: [SupplierDto],
   })
-  async getSuppliers() {
+  @ApiUnauthorizedResponse({
+    description: HttpStatusMessage[HttpStatus.UNAUTHORIZED],
+  })
+  async getSuppliers(): Promise<ISupplier[]> {
     return await this.suppliersService.getSuppliers();
   }
 
   @Get(GET_SUPPLIER_BY_ID_PATH)
   @ApiOkResponse({
-    description: 'Supplier was retrieved',
+    description: 'The supplier was retrieved',
+    type: SupplierDto,
   })
-  @ApiForbiddenResponse({
-    description: HttpStatusMessage[HttpStatus.NOT_MODIFIED],
+  @ApiNotFoundResponse({
+    description: HttpStatusMessage[HttpStatus.NOT_FOUND],
+  })
+  @ApiUnauthorizedResponse({
+    description: HttpStatusMessage[HttpStatus.UNAUTHORIZED],
   })
   async getSupplier(
     @Param(SUPPLIERS_ID_PARAM, ParseObjectIdPipe) supplierId: ObjectId,
-  ): Promise<SuppliersEntity | null> {
+  ): Promise<ISupplier> {
     return await this.suppliersService.getSupplier({ supplierId });
   }
 
@@ -66,54 +77,49 @@ export class SuppliersController {
     description: 'The supplier has been successfully created',
     type: SupplierDto,
   })
-  @ApiForbiddenResponse({
-    description: HttpStatusMessage[HttpStatus.NOT_MODIFIED],
+  @ApiNotFoundResponse({
+    description: HttpStatusMessage[HttpStatus.NOT_FOUND],
+  })
+  @ApiUnauthorizedResponse({
+    description: HttpStatusMessage[HttpStatus.UNAUTHORIZED],
   })
   async createSupplier(
     @Body() createSupplierDto: CreateSupplierDto,
-  ): Promise<SuppliersEntity | null> {
+  ): Promise<ISupplier> {
     return await this.suppliersService.createSupplier(createSupplierDto);
   }
 
-  @UsePipes(
-    new ParseBodyObjectIdsPipe<IDeleteSupplier, DeleteSupplierDto>(
-      'id',
-      'string',
-    ),
-  )
+  @UsePipes(new ParseObjectIdsPipe<IUpdateSupplier>('id', 'string'))
   @Patch()
-  @ApiOkResponse({
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
     description: 'The supplier has been successfully updated',
-    type: SupplierDto,
   })
-  @ApiResponse({
-    status: HttpStatus.NOT_MODIFIED,
-    description: HttpStatusMessage[HttpStatus.NOT_MODIFIED],
+  @ApiNotFoundResponse({
+    description: HttpStatusMessage[HttpStatus.NOT_FOUND],
   })
-  @ApiForbiddenResponse({
-    description: HttpStatusMessage[HttpStatus.FORBIDDEN],
+  @ApiUnauthorizedResponse({
+    description: HttpStatusMessage[HttpStatus.UNAUTHORIZED],
   })
   async updateSupplier(
     @Body() updateSupplierDto: UpdateSupplierDto,
-  ): Promise<SuppliersEntity> {
-    return await this.suppliersService.updateSupplier(updateSupplierDto);
+  ): Promise<void> {
+    await this.suppliersService.updateSupplier(updateSupplierDto);
   }
 
-  @UsePipes(
-    new ParseBodyObjectIdsPipe<IDeleteSupplier, DeleteSupplierDto>(
-      'id',
-      'string',
-    ),
-  )
+  @UsePipes(new ParseObjectIdsPipe<IDeleteSupplier>('id', 'string'))
   @Delete()
-  @ApiOkResponse({ description: 'The supplier has been deleted' })
-  @ApiNoContentResponse({ description: 'The supplier does not exit' })
-  @ApiForbiddenResponse({
-    description: HttpStatusMessage[HttpStatus.FORBIDDEN],
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({ description: 'The supplier has been deleted' })
+  @ApiUnauthorizedResponse({
+    description: HttpStatusMessage[HttpStatus.UNAUTHORIZED],
+  })
+  @ApiUnprocessableEntityResponse({
+    description: HttpStatusMessage[HttpStatus.UNPROCESSABLE_ENTITY],
   })
   async deleteSupplier(
     @Body() deleteSupplierDto: DeleteSupplierDto,
   ): Promise<void> {
-    return await this.suppliersService.deleteSupplier(deleteSupplierDto);
+    await this.suppliersService.deleteSupplier(deleteSupplierDto);
   }
 }

@@ -10,10 +10,8 @@ type ParseValueArgs<I> = {
 };
 
 @Injectable()
-export class ParseBodyObjectIdsPipe<
-  I extends { [k: string]: any },
-  O extends { [k: string]: any },
-> implements PipeTransform
+export class ParseObjectIdsPipe<I extends { [k: string]: any }>
+  implements PipeTransform
 {
   constructor(
     private key: keyof I | Array<keyof I>,
@@ -38,7 +36,7 @@ export class ParseBodyObjectIdsPipe<
     }
   }
 
-  transform(value: I): O {
+  transform(value: I): Record<string, any> {
     if (Array.isArray(this.key) && Array.isArray(this.valueType)) {
       if (this.key.length === this.valueType.length) {
         const parsedValues = this.key.reduce((acc, k, index) => {
@@ -49,7 +47,7 @@ export class ParseBodyObjectIdsPipe<
             ...acc,
             [k]: parsedValue,
           };
-        }, {}) as unknown as O;
+        }, {});
 
         return {
           ...value,
@@ -72,7 +70,7 @@ export class ParseBodyObjectIdsPipe<
       return {
         ...value,
         [this.key]: parsedValue,
-      } as unknown as O;
+      };
     }
 
     throw new Error('Type of "key" and "valueType" doesn\'t match');

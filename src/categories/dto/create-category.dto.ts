@@ -1,9 +1,8 @@
 import { ObjectId } from 'mongodb';
-import { IsBoolean, ValidateNested } from 'class-validator';
+import { IsBoolean, IsMongoId, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Translations } from '../../common/types/i18n.types';
 import { TranslationsDto } from '../../common/dto/translations.dto';
-import { IsMongoObjectId } from '../../common/decorators/is-mongo-objectId.decorator';
 
 export class CreateCategoryDto {
   @ValidateNested()
@@ -13,6 +12,6 @@ export class CreateCategoryDto {
   @IsBoolean()
   readonly isActive: boolean;
 
-  @IsMongoObjectId({ each: true })
+  @IsMongoId({ each: true })
   readonly parentIds: ObjectId[];
 }

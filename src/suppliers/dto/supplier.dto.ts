@@ -11,10 +11,10 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class SupplierDto {
   @IsString()
-  @IsOptional()
   @IsMongoId()
   @ApiProperty({
-    description: 'Supplier objectId',
+    type: 'string',
+    description: 'Supplier identifier',
   })
   readonly _id: ObjectId;
 
@@ -45,9 +45,10 @@ export class SupplierDto {
   @IsOptional()
   @IsMongoId()
   @ApiPropertyOptional({
+    type: 'string',
     description: 'Supplier account id / bank id (to retrieve account data)',
   })
-  readonly accountId: string;
+  readonly accountId: ObjectId;
 
   @IsString()
   @IsOptional()

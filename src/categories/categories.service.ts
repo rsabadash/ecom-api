@@ -50,19 +50,6 @@ export class CategoriesService {
     return await this.categoryCollection.find({});
   }
 
-  async getCategoriesDropdownList(
-    language: Language,
-  ): Promise<DropdownListItem[]> {
-    const categories = await this.getCategories();
-
-    return categories.map((category) => {
-      return {
-        id: category._id,
-        value: category.name[language],
-      };
-    });
-  }
-
   async getCategory(
     parameters: GetCategoryParameters,
   ): Promise<ICategoryDetail> {
@@ -89,9 +76,22 @@ export class CategoriesService {
     return category;
   }
 
+  async getCategoriesDropdownList(
+    language: Language,
+  ): Promise<DropdownListItem[]> {
+    const categories = await this.getCategories();
+
+    return categories.map((category) => {
+      return {
+        id: category._id,
+        value: category.name[language],
+      };
+    });
+  }
+
   async createCategory(
     createCategoryDto: CreateCategoryDto,
-  ): Promise<ICategory | null> {
+  ): Promise<ICategory> {
     return await this.categoryCollection.create(createCategoryDto);
   }
 
@@ -101,7 +101,7 @@ export class CategoriesService {
     });
 
     if (!category) {
-      throw new UnprocessableEntityException('Unprocessable entity');
+      throw new NotFoundException();
     }
 
     let updatedFields: Partial<ICategory> = {};
@@ -126,7 +126,7 @@ export class CategoriesService {
     );
 
     if (!updateResult.isFound) {
-      throw new UnprocessableEntityException('Unprocessable entity');
+      throw new NotFoundException();
     }
   }
 
@@ -136,7 +136,7 @@ export class CategoriesService {
     });
 
     if (!category) {
-      throw new UnprocessableEntityException('Unprocessable entity');
+      throw new NotFoundException();
     }
 
     const session = this.client.startSession();
@@ -148,7 +148,7 @@ export class CategoriesService {
         });
 
         if (!deleteResult.isDeleted) {
-          throw new UnprocessableEntityException('Unprocessable entity');
+          throw new UnprocessableEntityException();
         }
 
         await this.categoryCollection.updateMany(
