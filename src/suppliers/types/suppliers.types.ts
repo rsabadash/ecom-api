@@ -1,8 +1,8 @@
-import { SuppliersInterface } from '../interface/suppliers.interface';
+import { ISuppliers } from '../interface/suppliers.interface';
 import { ObjectId } from 'mongodb';
 
-export type SuppliersEntity = SuppliersInterface;
+export type SuppliersEntity = ISuppliers;
 
-export type GetSupplierOpts = {
-  supplierId: ObjectId | string;
+export type GetSupplierParameters = {
+  supplierId: ObjectId;
 };

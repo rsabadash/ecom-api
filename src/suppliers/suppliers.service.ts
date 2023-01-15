@@ -1,32 +1,43 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
 import { SUPPLIER_COLLECTION } from '../common/constants/collections.constants';
-import { ICollectionModel } from '../mongo/interfaces/mongo.interfaces';
-import { SuppliersInterface } from './interface/suppliers.interface';
-import { ObjectId } from 'mongodb';
-import { GetSupplierOpts, SuppliersEntity } from './types/suppliers.types';
-import { isValidObjectId } from '../common/utils/mongoObjectId.utils';
+import { ISuppliers } from './interface/suppliers.interface';
+import {
+  GetSupplierParameters,
+  SuppliersEntity,
+} from './types/suppliers.types';
 import { EntityWithId } from '../mongo/types/mongo-query.types';
+import { DeleteSupplierDto } from './dto/delete-supplier.dto';
+import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
+import { UpdateSupplierDto } from './dto/update-supplier.dto';
 
 @Injectable()
 export class SuppliersService {
   constructor(
     @InjectCollectionModel(SUPPLIER_COLLECTION)
-    private readonly supplierCollection: ICollectionModel<SuppliersInterface>,
+    private readonly supplierCollection: ICollectionModel<ISuppliers>,
   ) {}
 
-  async getSuppliers(): Promise<
-    EntityWithId<SuppliersInterface>[] | HttpException
-  > {
-    return this.supplierCollection.find();
+  async getSuppliers(): Promise<EntityWithId<ISuppliers>[]> {
+    return await this.supplierCollection.find();
   }
 
   async getSupplier(
-    opts: GetSupplierOpts,
-  ): Promise<EntityWithId<SuppliersInterface> | HttpException> {
-    return this.supplierCollection.findOne({
-      _id: new ObjectId(opts.supplierId),
+    parameters: GetSupplierParameters,
+  ): Promise<EntityWithId<ISuppliers>> {
+    const supplier = await this.supplierCollection.findOne({
+      _id: parameters.supplierId,
     });
+
+    if (!supplier) {
+      throw new NotFoundException('Not found');
+    }
+
+    return supplier;
   }
 
   async createSupplier(supplier: SuppliersEntity) {
@@ -34,27 +45,34 @@ export class SuppliersService {
   }
 
   async updateSupplier(
-    data: SuppliersEntity,
-  ): Promise<EntityWithId<SuppliersInterface> | HttpException> {
-    if (isValidObjectId(data._id)) {
-      const { _id, ...rest } = data;
+    updateSupplierDto: UpdateSupplierDto,
+  ): Promise<EntityWithId<ISuppliers>> {
+    const supplier = await this.getSupplier({
+      supplierId: updateSupplierDto.id,
+    });
 
-      //handle result
-      const result = await this.supplierCollection.updateOne(
-        { _id: new ObjectId(_id) },
-        rest,
-      );
-
-      return this.getSupplier({ supplierId: _id });
+    if (!supplier) {
+      throw new UnprocessableEntityException('Unprocessable entity');
     }
+
+    const { id, ...rest } = updateSupplierDto;
+
+    await this.supplierCollection.updateOne({ _id: id }, rest);
+
+    return supplier;
   }
 
-  async deleteSupplier(opts: GetSupplierOpts): Promise<void> {
-    if (isValidObjectId(opts.supplierId)) {
-      //handle result
-      const result = await this.supplierCollection.deleteOne({
-        _id: new ObjectId(opts.supplierId),
-      });
+  async deleteSupplier(deleteSupplierDto: DeleteSupplierDto): Promise<void> {
+    const supplier = await this.getSupplier({
+      supplierId: deleteSupplierDto.id,
+    });
+
+    if (!supplier) {
+      throw new UnprocessableEntityException('Unprocessable entity');
     }
+
+    await this.supplierCollection.deleteOne({
+      _id: deleteSupplierDto.id,
+    });
   }
 }
