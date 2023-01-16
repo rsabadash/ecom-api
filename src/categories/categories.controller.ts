@@ -22,7 +22,7 @@ import {
   IUpdateCategory,
 } from './interfaces/categories.interfaces';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { ParseBodyObjectIdsPipe } from '../common/pipes/parse-body-objectId.pipe';
+import { ParseObjectIdsPipe } from '../common/pipes/parse-body-objectId.pipe';
 import { GET_CATEGORY_BY_ID_PATH } from './constants/path.constants';
 import { CATEGORY_ID_PARAM } from './constants/param.constants';
 import { ParseObjectIdPipe } from '../common/pipes/parse-objectId.pipe';
@@ -54,25 +54,20 @@ export class CategoriesController {
   @Get(GET_CATEGORY_BY_ID_PATH)
   async getProduct(
     @Param(CATEGORY_ID_PARAM, ParseObjectIdPipe) categoryId: ObjectId,
-  ): Promise<ICategoryDetail | null> {
+  ): Promise<ICategoryDetail> {
     return await this.categoriesService.getCategory({ categoryId });
   }
 
-  @UsePipes(
-    new ParseBodyObjectIdsPipe<ICreateCategory, CreateCategoryDto>(
-      'parentIds',
-      'array',
-    ),
-  )
+  @UsePipes(new ParseObjectIdsPipe<ICreateCategory>('parentIds', 'array'))
   @Post()
   async createCategory(
     @Body() createCategoryDto: CreateCategoryDto,
-  ): Promise<ICategory | null> {
+  ): Promise<ICategory> {
     return await this.categoriesService.createCategory(createCategoryDto);
   }
 
   @UsePipes(
-    new ParseBodyObjectIdsPipe<IUpdateCategory, UpdateCategoryDto>(
+    new ParseObjectIdsPipe<IUpdateCategory>(
       ['id', 'parentIds'],
       ['string', 'array'],
     ),
@@ -82,20 +77,15 @@ export class CategoriesController {
   async updateCategory(
     @Body() updateCategoryDto: UpdateCategoryDto,
   ): Promise<void> {
-    return await this.categoriesService.updateCategory(updateCategoryDto);
+    await this.categoriesService.updateCategory(updateCategoryDto);
   }
 
-  @UsePipes(
-    new ParseBodyObjectIdsPipe<IDeleteCategory, DeleteCategoryDto>(
-      'id',
-      'string',
-    ),
-  )
+  @UsePipes(new ParseObjectIdsPipe<IDeleteCategory>('id', 'string'))
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteCategory(
     @Body() deleteCategoryDto: DeleteCategoryDto,
   ): Promise<void> {
-    return await this.categoriesService.deleteCategory(deleteCategoryDto);
+    await this.categoriesService.deleteCategory(deleteCategoryDto);
   }
 }
