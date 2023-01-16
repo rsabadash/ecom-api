@@ -36,7 +36,7 @@ import {
   IDeleteSupplier,
   ISupplier,
   IUpdateSupplier,
-} from './interface/suppliers.interfaces';
+} from './interfaces/suppliers.interfaces';
 
 @ApiTags(SUPPLIERS_MODULE_NAME)
 @Controller(SUPPLIERS_ROUTE)
