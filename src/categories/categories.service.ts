@@ -50,6 +50,19 @@ export class CategoriesService {
     return await this.categoryCollection.find({});
   }
 
+  async getCategoriesDropdownList(
+    language: Language,
+  ): Promise<DropdownListItem[]> {
+    const categories = await this.getCategories();
+
+    return categories.map((category) => {
+      return {
+        id: category._id,
+        value: category.name[language],
+      };
+    });
+  }
+
   async getCategory(
     parameters: GetCategoryParameters,
   ): Promise<ICategoryDetail> {
@@ -74,19 +87,6 @@ export class CategoriesService {
     }
 
     return category;
-  }
-
-  async getCategoriesDropdownList(
-    language: Language,
-  ): Promise<DropdownListItem[]> {
-    const categories = await this.getCategories();
-
-    return categories.map((category) => {
-      return {
-        id: category._id,
-        value: category.name[language],
-      };
-    });
   }
 
   async createCategory(

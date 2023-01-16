@@ -41,18 +41,18 @@ export class CategoriesController {
     return await this.categoriesService.getCategories();
   }
 
-  @Get(GET_CATEGORY_BY_ID_PATH)
-  async getProduct(
-    @Param(CATEGORY_ID_PARAM, ParseObjectIdPipe) categoryId: ObjectId,
-  ): Promise<ICategoryDetail> {
-    return await this.categoriesService.getCategory({ categoryId });
-  }
-
   @Get(DROPDOWN_LIST_PATH)
   async getCategoriesDropdownList(
     @Headers('accept-language') language: Language,
   ): Promise<DropdownListItem[]> {
     return this.categoriesService.getCategoriesDropdownList(language);
+  }
+
+  @Get(GET_CATEGORY_BY_ID_PATH)
+  async getProduct(
+    @Param(CATEGORY_ID_PARAM, ParseObjectIdPipe) categoryId: ObjectId,
+  ): Promise<ICategoryDetail> {
+    return await this.categoriesService.getCategory({ categoryId });
   }
 
   @UsePipes(new ParseObjectIdsPipe<ICreateCategory>('parentIds', 'array'))
