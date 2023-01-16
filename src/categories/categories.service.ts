@@ -1,4 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import {
   InjectClients,
   InjectCollectionModel,
@@ -46,19 +50,6 @@ export class CategoriesService {
     return await this.categoryCollection.find({});
   }
 
-  async getCategoriesDropdownList(
-    language: Language,
-  ): Promise<DropdownListItem[]> {
-    const categories = await this.getCategories();
-
-    return categories.map((category) => {
-      return {
-        id: category._id,
-        value: category.name[language],
-      };
-    });
-  }
-
   async getCategory(
     parameters: GetCategoryParameters,
   ): Promise<ICategoryDetail> {
@@ -79,15 +70,28 @@ export class CategoriesService {
     const category = categoryDetailArray[0];
 
     if (!category) {
-      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      throw new NotFoundException('Not found');
     }
 
     return category;
   }
 
+  async getCategoriesDropdownList(
+    language: Language,
+  ): Promise<DropdownListItem[]> {
+    const categories = await this.getCategories();
+
+    return categories.map((category) => {
+      return {
+        id: category._id,
+        value: category.name[language],
+      };
+    });
+  }
+
   async createCategory(
     createCategoryDto: CreateCategoryDto,
-  ): Promise<ICategory | null> {
+  ): Promise<ICategory> {
     return await this.categoryCollection.create(createCategoryDto);
   }
 
@@ -97,10 +101,7 @@ export class CategoriesService {
     });
 
     if (!category) {
-      throw new HttpException(
-        'Unprocessable entity',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+      throw new NotFoundException();
     }
 
     let updatedFields: Partial<ICategory> = {};
@@ -125,10 +126,7 @@ export class CategoriesService {
     );
 
     if (!updateResult.isFound) {
-      throw new HttpException(
-        'Unprocessable entity',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+      throw new NotFoundException();
     }
   }
 
@@ -138,10 +136,7 @@ export class CategoriesService {
     });
 
     if (!category) {
-      throw new HttpException(
-        'Unprocessable entity',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+      throw new NotFoundException();
     }
 
     const session = this.client.startSession();
@@ -153,10 +148,7 @@ export class CategoriesService {
         });
 
         if (!deleteResult.isDeleted) {
-          throw new HttpException(
-            'Unprocessable entity',
-            HttpStatus.UNPROCESSABLE_ENTITY,
-          );
+          throw new UnprocessableEntityException();
         }
 
         await this.categoryCollection.updateMany(
