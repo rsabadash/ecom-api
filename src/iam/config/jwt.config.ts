@@ -3,7 +3,7 @@ import {
   DEFAULT_JWT_ACCESS_TOKEN_TTL,
   DEFAULT_JWT_REFRESH_TOKEN_TTL,
   JWT_CONFIG_KEY,
-} from '../constants/jwt.contants';
+} from '../constants/config.contants';
 
 export default registerAs(JWT_CONFIG_KEY, () => ({
   secret: process.env.JWT_SECRET,

@@ -9,15 +9,26 @@ import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import jwtConfig from '../config/jwt.config';
-import { REQUEST_USER_KEY } from '../constants/iam.constants';
+import { JwtDecoded } from '../interfaces/jwt.interfaces';
 
 @Injectable()
 export class AccessTokenGuard implements CanActivate {
+  private _decodedToken: JwtDecoded | null;
   constructor(
     private readonly jwtService: JwtService,
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
-  ) {}
+  ) {
+    this._decodedToken = null;
+  }
+
+  get decodedToken() {
+    return this._decodedToken;
+  }
+
+  set decodedToken(data) {
+    this._decodedToken = data;
+  }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -28,7 +39,7 @@ export class AccessTokenGuard implements CanActivate {
     }
 
     try {
-      request[REQUEST_USER_KEY] = await this.jwtService.verifyAsync(
+      this.decodedToken = await this.jwtService.verifyAsync<JwtDecoded>(
         token,
         this.jwtConfiguration,
       );

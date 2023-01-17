@@ -7,50 +7,41 @@ import {
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { ObjectId } from 'mongodb';
-import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
-import { USERS_COLLECTION } from '../common/constants/collections.constants';
-import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
-import { IUser } from './interfaces/user.interfaces';
 import { SignUpDto } from './dto/sign-up.dto';
 import { HashingService } from './hashing.service';
 import { SignInDto } from './dto/sign-in.dto';
 import jwtConfig from './config/jwt.config';
-import { ActiveUserData } from './interfaces/active-user-data.interfaces';
+import { Tokens, JwtDecoded } from './interfaces/jwt.interfaces';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { Role } from './enums/role.enum';
-import { Tokens } from './interfaces/authentication.interface';
+import { UsersService } from '../users/users.service';
+import { IUserCreate, IUserPublic } from '../users/interfaces/users.interfaces';
 
 @Injectable()
 export class AuthenticationService {
   constructor(
-    @InjectCollectionModel(USERS_COLLECTION)
-    private readonly usersCollection: ICollectionModel<IUser>,
     private readonly hashingService: HashingService,
     private readonly jwtService: JwtService,
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
+    private readonly usersService: UsersService,
   ) {}
 
-  async signUp(signUpDto: SignUpDto) {
-    // TODO Check if user with the email exists
+  async signUp(signUpDto: SignUpDto): Promise<IUserPublic> {
     const hashedPassword = await this.hashingService.hash(signUpDto.password);
 
-    const user: Omit<IUser, '_id'> = {
+    const user: IUserCreate = {
       ...signUpDto,
       password: hashedPassword,
-      role: Role.ContentManager,
     };
 
-    return await this.usersCollection.create(user);
+    return await this.usersService.createUser(user);
   }
 
   async signIn(signInDto: SignInDto): Promise<Tokens> {
-    const user = await this.usersCollection.findOne({
-      email: signInDto.email,
-    });
+    const user = await this.usersService.getUserByEmail(signInDto.email);
 
     if (!user) {
-      throw new UnauthorizedException('User does not exists');
+      throw new UnauthorizedException('Email or password do not match');
     }
 
     const isEqual = await this.hashingService.compare(
@@ -59,26 +50,40 @@ export class AuthenticationService {
     );
 
     if (!isEqual) {
-      throw new UnauthorizedException('Password does not match');
+      throw new UnauthorizedException('Email or password do not match');
     }
 
     return await this.generateTokens(user);
   }
 
-  async generateTokens(user: IUser): Promise<Tokens> {
+  async refreshToken(
+    @Body() refreshTokenDto: RefreshTokenDto,
+  ): Promise<Tokens> {
+    const { secret, audience, issuer } = this.jwtConfiguration;
+    const { sub } = await this.jwtService.verifyAsync<Pick<JwtDecoded, 'sub'>>(
+      refreshTokenDto.refreshToken,
+      {
+        secret,
+        audience,
+        issuer,
+      },
+    );
+
+    const user = await this.usersService.getUser({ userId: new ObjectId(sub) });
+
+    if (!user) {
+      throw new UnauthorizedException('The user does not exist');
+    }
+
+    return await this.generateTokens(user);
+  }
+
+  async generateTokens(user: IUserPublic): Promise<Tokens> {
     try {
       const { accessTokenTtl, refreshTokenTtl } = this.jwtConfiguration;
 
-      const aToken = this.signToken<Partial<ActiveUserData>>(
-        String(user._id),
-        accessTokenTtl,
-        { email: user.email, role: user.role },
-      );
-
-      const rToken = this.signToken<Partial<ActiveUserData>>(
-        String(user._id),
-        refreshTokenTtl,
-      );
+      const aToken = this.signToken(String(user._id), accessTokenTtl);
+      const rToken = this.signToken(String(user._id), refreshTokenTtl);
 
       const [accessToken, refreshToken] = await Promise.all([aToken, rToken]);
 
@@ -88,30 +93,9 @@ export class AuthenticationService {
       };
     } catch {
       if (!user) {
-        throw new UnauthorizedException('User does not exists');
+        throw new UnauthorizedException('The user does not exist');
       }
     }
-  }
-
-  async refreshToken(
-    @Body() refreshTokenDto: RefreshTokenDto,
-  ): Promise<Tokens> {
-    const { secret, audience, issuer } = this.jwtConfiguration;
-    const { sub } = await this.jwtService.verifyAsync<
-      Pick<ActiveUserData, 'sub'>
-    >(refreshTokenDto.refreshToken, {
-      secret,
-      audience,
-      issuer,
-    });
-
-    const user = await this.usersCollection.findOne({ _id: new ObjectId(sub) });
-
-    if (!user) {
-      throw new UnauthorizedException('User does not exists');
-    }
-
-    return await this.generateTokens(user);
   }
 
   private async signToken<T extends Record<string, any>>(

@@ -1,36 +1,73 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { AuthenticationService } from './authentication.service';
-import { AUTHENTICATION_ROUTE } from '../common/constants/routes.constants';
 import {
+  ApiBadRequestResponse,
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { AuthenticationService } from './authentication.service';
+import {
+  AUTHENTICATION_ROUTE,
   REFRESH_TOKEN_PATH,
   SIGN_IN_PATH,
   SIGN_UP_PATH,
-} from './constants/path.constants';
+} from './constants/route.constants';
 import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import { Auth } from './decorators/auth.decorator';
 import { AuthType } from './enums/auth-type.enum';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { IUserPublic } from '../users/interfaces/users.interfaces';
+import { Tokens } from './interfaces/jwt.interfaces';
+import { PublicUserDto } from '../users/dto/public-user.dto';
+import { TokensDto } from './dto/tokens-dto';
+import { AUTH_MODULE_NAME } from './constants/swagger.constants';
 
 @Auth(AuthType.None)
+@ApiTags(AUTH_MODULE_NAME)
 @Controller(AUTHENTICATION_ROUTE)
 export class AuthenticationController {
   constructor(private readonly authService: AuthenticationService) {}
 
   @Post(SIGN_UP_PATH)
-  signUp(@Body() signUpDto: SignUpDto) {
+  @ApiCreatedResponse({
+    description: 'The user has been successfully signed up',
+    type: PublicUserDto,
+  })
+  @ApiConflictResponse({
+    description: 'User with the email already exists',
+  })
+  signUp(@Body() signUpDto: SignUpDto): Promise<IUserPublic> {
     return this.authService.signUp(signUpDto);
   }
 
-  @HttpCode(HttpStatus.OK)
   @Post(SIGN_IN_PATH)
-  signIn(@Body() signInDto: SignInDto) {
+  @HttpCode(HttpStatus.OK)
+  @ApiCreatedResponse({
+    description: 'The user has been successfully signed in',
+    type: TokensDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Email or password do not match',
+  })
+  signIn(@Body() signInDto: SignInDto): Promise<Tokens> {
     return this.authService.signIn(signInDto);
   }
 
-  @HttpCode(HttpStatus.OK)
   @Post(REFRESH_TOKEN_PATH)
-  refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
+  @HttpCode(HttpStatus.OK)
+  @ApiCreatedResponse({
+    description: 'The user successfully got a new pair of tokens',
+    type: TokensDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Unexpected token',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'The user does not exist',
+  })
+  refreshToken(@Body() refreshTokenDto: RefreshTokenDto): Promise<Tokens> {
     return this.authService.refreshToken(refreshTokenDto);
   }
 }

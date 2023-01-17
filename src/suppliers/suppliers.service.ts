@@ -1,12 +1,10 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
 import { SUPPLIER_COLLECTION } from '../common/constants/collections.constants';
-import { ISupplier } from './interfaces/suppliers.interfaces';
-import { GetSupplierParameters } from './types/suppliers.types';
+import {
+  ISupplier,
+  GetSupplierParameters,
+} from './interfaces/suppliers.interfaces';
 import { DeleteSupplierDto } from './dto/delete-supplier.dto';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
@@ -69,7 +67,7 @@ export class SuppliersService {
     });
 
     if (!deleteResult.isDeleted) {
-      throw new UnprocessableEntityException();
+      throw new NotFoundException();
     }
   }
 }

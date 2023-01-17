@@ -3,47 +3,38 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { MongoClient } from 'mongodb';
 import {
   InjectClients,
   InjectCollectionModel,
 } from '../mongo/decorators/mongo.decorators';
 import { CATEGORIES_COLLECTION } from '../common/constants/collections.constants';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
-import { ICategory, ICategoryDetail } from './interfaces/categories.interfaces';
+import {
+  ICategory,
+  ICategoryDetail,
+  GetCategoryParameters,
+} from './interfaces/categories.interfaces';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { CategoryKeys, GetCategoryParameters } from './types/categories.types';
 import { DeleteCategoryDto } from './dto/delete-category.dto';
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
 import { ClientsMap } from '../mongo/types/mongo-query.types';
-import { MongoClient } from 'mongodb';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 import { Language } from '../common/types/i18n.types';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { equalObjectsValue, isObjects } from '../common/utils/object.utils';
-import { equalArrays, isArrays } from '../common/utils/arrays.utils';
+import { CompareFieldsService } from '../common/services/compare-fields.service';
 
 @Injectable()
 export class CategoriesService {
   private client: MongoClient;
   constructor(
+    private readonly compareFieldsService: CompareFieldsService,
     @InjectCollectionModel(CATEGORIES_COLLECTION)
     private readonly categoryCollection: ICollectionModel<ICategory>,
     @InjectClients(CONNECTION_DB_NAME)
     private readonly clients: ClientsMap,
   ) {
     this.client = this.clients.get(CONNECTION_DB_NAME);
-  }
-
-  static isFieldsEqual(fieldA: any, fieldB: any): boolean {
-    if (isObjects(fieldA, fieldB)) {
-      return equalObjectsValue(fieldA, fieldB);
-    }
-
-    if (isArrays(fieldA, fieldB)) {
-      return equalArrays(fieldA, fieldB);
-    }
-
-    return String(fieldA) === String(fieldB);
   }
 
   async getCategories(): Promise<ICategory[]> {
@@ -104,21 +95,10 @@ export class CategoriesService {
       throw new NotFoundException();
     }
 
-    let updatedFields: Partial<ICategory> = {};
-
-    const { _id, ...rest } = category;
-    const categoryKeys = Object.keys(rest) as CategoryKeys;
-
-    categoryKeys.forEach((key) => {
-      const dataValue = updateCategoryDto[key];
-
-      if (!CategoriesService.isFieldsEqual(dataValue, category[key])) {
-        updatedFields = {
-          ...updatedFields,
-          [key]: dataValue,
-        };
-      }
-    });
+    const { _id, updatedFields } = this.compareFieldsService.compare<ICategory>(
+      updateCategoryDto,
+      category,
+    );
 
     const updateResult = await this.categoryCollection.updateOne(
       { _id },

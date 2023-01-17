@@ -11,7 +11,6 @@ import {
   Post,
   UsePipes,
 } from '@nestjs/common';
-import { SUPPLIERS_ROUTE } from '../common/constants/routes.constants';
 import { SuppliersService } from './suppliers.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { SupplierDto } from './dto/supplier.dto';
@@ -21,12 +20,14 @@ import {
   ApiUnauthorizedResponse,
   ApiOkResponse,
   ApiTags,
-  ApiUnprocessableEntityResponse,
+  ApiNoContentResponse,
 } from '@nestjs/swagger';
 import { SUPPLIERS_MODULE_NAME } from './constants/swagger.constants';
-import { GET_SUPPLIER_BY_ID_PATH } from './constants/path.constants';
+import {
+  GET_SUPPLIER_BY_ID_PATH,
+  SUPPLIERS_ROUTE,
+} from './constants/route.constants';
 import { SUPPLIERS_ID_PARAM } from './constants/param.constants';
-import { ApiNoContentResponse } from '@nestjs/swagger/dist/decorators/api-response.decorator';
 import { HttpStatusMessage } from '../common/constants/swagger.constants';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { DeleteSupplierDto } from './dto/delete-supplier.dto';
@@ -37,6 +38,8 @@ import {
   ISupplier,
   IUpdateSupplier,
 } from './interfaces/suppliers.interfaces';
+import { Roles } from '../iam/decorators/roles.decorator';
+import { Role } from '../users/enums/role.enums';
 
 @ApiTags(SUPPLIERS_MODULE_NAME)
 @Controller(SUPPLIERS_ROUTE)
@@ -45,7 +48,7 @@ export class SuppliersController {
 
   @Get()
   @ApiOkResponse({
-    description: 'Suppliers were retrieved',
+    description: 'List of suppliers were retrieved',
     type: [SupplierDto],
   })
   @ApiUnauthorizedResponse({
@@ -72,13 +75,11 @@ export class SuppliersController {
     return await this.suppliersService.getSupplier({ supplierId });
   }
 
+  @Roles(Role.Admin)
   @Post()
   @ApiCreatedResponse({
     description: 'The supplier has been successfully created',
     type: SupplierDto,
-  })
-  @ApiNotFoundResponse({
-    description: HttpStatusMessage[HttpStatus.NOT_FOUND],
   })
   @ApiUnauthorizedResponse({
     description: HttpStatusMessage[HttpStatus.UNAUTHORIZED],
@@ -110,12 +111,11 @@ export class SuppliersController {
   @UsePipes(new ParseObjectIdsPipe<IDeleteSupplier>('id', 'string'))
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiNoContentResponse({ description: 'The supplier has been deleted' })
+  @ApiNoContentResponse({
+    description: 'The supplier has been successfully deleted',
+  })
   @ApiUnauthorizedResponse({
     description: HttpStatusMessage[HttpStatus.UNAUTHORIZED],
-  })
-  @ApiUnprocessableEntityResponse({
-    description: HttpStatusMessage[HttpStatus.UNPROCESSABLE_ENTITY],
   })
   async deleteSupplier(
     @Body() deleteSupplierDto: DeleteSupplierDto,

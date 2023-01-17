@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import { MongoModule } from '../mongo/mongo.module';
-import databaseConfig from '../common/config/database.config';
+import databaseConfig from './config/database.config';
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
 
 @Module({

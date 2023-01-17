@@ -13,6 +13,7 @@ import jwtConfig from './config/jwt.config';
 import { AccessTokenGuard } from './guards/access-token.guard';
 import { AuthenticationGuard } from './guards/authentication.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { RolesGuard } from './guards/roles.guard';
     ),
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
+    UsersModule,
   ],
   providers: [
     {
