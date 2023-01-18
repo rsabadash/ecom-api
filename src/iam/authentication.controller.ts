@@ -3,6 +3,8 @@ import {
   ApiBadRequestResponse,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -23,50 +25,63 @@ import { Tokens } from './interfaces/jwt.interfaces';
 import { PublicUserDto } from '../users/dto/public-user.dto';
 import { TokensDto } from './dto/tokens-dto';
 import { AUTH_MODULE_NAME } from './constants/swagger.constants';
+import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
+import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
 
-@Auth(AuthType.None)
 @ApiTags(AUTH_MODULE_NAME)
 @Controller(AUTHENTICATION_ROUTE)
 export class AuthenticationController {
   constructor(private readonly authService: AuthenticationService) {}
 
+  @Auth(AuthType.None)
   @Post(SIGN_UP_PATH)
   @ApiCreatedResponse({
-    description: 'The user has been successfully signed up',
+    description: 'The user has been signed up',
     type: PublicUserDto,
   })
   @ApiConflictResponse({
     description: 'User with the email already exists',
+    type: HttpErrorDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'The user has not been created',
+    type: HttpErrorDto,
   })
   signUp(@Body() signUpDto: SignUpDto): Promise<IUserPublic> {
     return this.authService.signUp(signUpDto);
   }
 
+  @Auth(AuthType.None)
   @Post(SIGN_IN_PATH)
   @HttpCode(HttpStatus.OK)
-  @ApiCreatedResponse({
-    description: 'The user has been successfully signed in',
+  @ApiOkResponse({
+    description: 'The user has been signed in',
     type: TokensDto,
   })
   @ApiUnauthorizedResponse({
     description: 'Email or password do not match',
+    type: HttpErrorDto,
   })
   signIn(@Body() signInDto: SignInDto): Promise<Tokens> {
     return this.authService.signIn(signInDto);
   }
 
+  @Auth(AuthType.Bearer)
   @Post(REFRESH_TOKEN_PATH)
   @HttpCode(HttpStatus.OK)
-  @ApiCreatedResponse({
-    description: 'The user successfully got a new pair of tokens',
+  @ApiOkResponse({
+    description: 'The user got a new pair of tokens',
     type: TokensDto,
   })
   @ApiBadRequestResponse({
-    description: 'Unexpected token',
+    description: 'JWT malformed or invalid JWT options',
+    type: HttpErrorDto,
   })
-  @ApiUnauthorizedResponse({
-    description: 'The user does not exist',
+  @ApiNotFoundResponse({
+    description: 'The user has not been found',
+    type: HttpErrorDto,
   })
+  @ApiNoAccessResponse()
   refreshToken(@Body() refreshTokenDto: RefreshTokenDto): Promise<Tokens> {
     return this.authService.refreshToken(refreshTokenDto);
   }

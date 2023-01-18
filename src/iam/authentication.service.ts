@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Inject,
   Injectable,
@@ -60,42 +61,41 @@ export class AuthenticationService {
     @Body() refreshTokenDto: RefreshTokenDto,
   ): Promise<Tokens> {
     const { secret, audience, issuer } = this.jwtConfiguration;
-    const { sub } = await this.jwtService.verifyAsync<Pick<JwtDecoded, 'sub'>>(
-      refreshTokenDto.refreshToken,
-      {
+    let userId: string | null = null;
+
+    try {
+      const decoded = await this.jwtService.verifyAsync<
+        Pick<JwtDecoded, 'sub'>
+      >(refreshTokenDto.refreshToken, {
         secret,
         audience,
         issuer,
-      },
-    );
+      });
 
-    const user = await this.usersService.getUser({ userId: new ObjectId(sub) });
-
-    if (!user) {
-      throw new UnauthorizedException('The user does not exist');
+      userId = decoded.sub;
+    } catch (e) {
+      throw new BadRequestException(e.message);
     }
+
+    const user = await this.usersService.getUser({
+      userId: new ObjectId(userId),
+    });
 
     return await this.generateTokens(user);
   }
 
   async generateTokens(user: IUserPublic): Promise<Tokens> {
-    try {
-      const { accessTokenTtl, refreshTokenTtl } = this.jwtConfiguration;
+    const { accessTokenTtl, refreshTokenTtl } = this.jwtConfiguration;
 
-      const aToken = this.signToken(String(user._id), accessTokenTtl);
-      const rToken = this.signToken(String(user._id), refreshTokenTtl);
+    const aToken = this.signToken(String(user._id), accessTokenTtl);
+    const rToken = this.signToken(String(user._id), refreshTokenTtl);
 
-      const [accessToken, refreshToken] = await Promise.all([aToken, rToken]);
+    const [accessToken, refreshToken] = await Promise.all([aToken, rToken]);
 
-      return {
-        accessToken,
-        refreshToken,
-      };
-    } catch {
-      if (!user) {
-        throw new UnauthorizedException('The user does not exist');
-      }
-    }
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 
   private async signToken<T extends Record<string, any>>(

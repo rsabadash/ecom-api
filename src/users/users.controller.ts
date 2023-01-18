@@ -14,9 +14,9 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
-  ApiUnauthorizedResponse,
   ApiNoContentResponse,
   ApiConflictResponse,
+  ApiBadRequestResponse,
 } from '@nestjs/swagger';
 import { ObjectId } from 'mongodb';
 import { UsersService } from './users.service';
@@ -28,11 +28,18 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ParseObjectIdsPipe } from '../common/pipes/parse-body-objectId.pipe';
 import { USER_ID_PARAM } from './constants/param.constants';
 import { PublicUserDto } from './dto/public-user.dto';
-import { HttpStatusMessage } from '../common/constants/swagger.constants';
 import { USERS_MODULE_NAME } from './constants/swagger.constants';
+import { Auth } from '../iam/decorators/auth.decorator';
+import { AuthType } from '../iam/enums/auth-type.enum';
+import { Roles } from '../iam/decorators/roles.decorator';
+import { Role } from './enums/role.enums';
+import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
+import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
 
-@ApiTags(USERS_MODULE_NAME)
+@Auth(AuthType.Bearer)
+@Roles(Role.Admin)
 @Controller(USERS_ROUTE)
+@ApiTags(USERS_MODULE_NAME)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -41,9 +48,7 @@ export class UsersController {
     description: 'List of users were retrieved',
     type: [PublicUserDto],
   })
-  @ApiUnauthorizedResponse({
-    description: HttpStatusMessage[HttpStatus.UNAUTHORIZED],
-  })
+  @ApiNoAccessResponse()
   async getUsers(): Promise<IUserPublic[]> {
     return await this.usersService.getUsers();
   }
@@ -54,11 +59,10 @@ export class UsersController {
     type: PublicUserDto,
   })
   @ApiNotFoundResponse({
-    description: HttpStatusMessage[HttpStatus.NOT_FOUND],
+    description: 'The user has not been found',
+    type: HttpErrorDto,
   })
-  @ApiUnauthorizedResponse({
-    description: HttpStatusMessage[HttpStatus.UNAUTHORIZED],
-  })
+  @ApiNoAccessResponse()
   async getUser(
     @Param(USER_ID_PARAM, ParseObjectIdPipe) userId: ObjectId,
   ): Promise<IUserPublic> {
@@ -67,15 +71,18 @@ export class UsersController {
 
   @Post()
   @ApiCreatedResponse({
-    description: 'The user has been successfully created',
+    description: 'The user has been created',
     type: PublicUserDto,
   })
   @ApiConflictResponse({
     description: 'User with the email already exists',
+    type: HttpErrorDto,
   })
-  @ApiUnauthorizedResponse({
-    description: HttpStatusMessage[HttpStatus.UNAUTHORIZED],
+  @ApiBadRequestResponse({
+    description: 'The user has not been created',
+    type: HttpErrorDto,
   })
+  @ApiNoAccessResponse()
   async createUser(@Body() createUserDto: CreateUserDto): Promise<IUserPublic> {
     return await this.usersService.createUser(createUserDto);
   }
@@ -84,14 +91,17 @@ export class UsersController {
   @Patch()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
-    description: 'The user has been successfully updated',
+    description: 'The user has been updated',
   })
   @ApiNotFoundResponse({
-    description: HttpStatusMessage[HttpStatus.NOT_FOUND],
+    description: 'The user has not been found',
+    type: HttpErrorDto,
   })
-  @ApiUnauthorizedResponse({
-    description: HttpStatusMessage[HttpStatus.UNAUTHORIZED],
+  @ApiBadRequestResponse({
+    description: 'The user has not been updated',
+    type: HttpErrorDto,
   })
+  @ApiNoAccessResponse()
   async updateUser(@Body() updateUserDto: UpdateUserDto): Promise<void> {
     await this.usersService.updateUser(updateUserDto);
   }

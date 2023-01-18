@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
 import { SUPPLIER_COLLECTION } from '../common/constants/collections.constants';
 import {
@@ -9,10 +13,12 @@ import { DeleteSupplierDto } from './dto/delete-supplier.dto';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
+import { CompareFieldsService } from '../common/services/compare-fields.service';
 
 @Injectable()
 export class SuppliersService {
   constructor(
+    private readonly compareFieldsService: CompareFieldsService,
     @InjectCollectionModel(SUPPLIER_COLLECTION)
     private readonly supplierCollection: ICollectionModel<ISupplier>,
   ) {}
@@ -27,7 +33,7 @@ export class SuppliersService {
     });
 
     if (!supplier) {
-      throw new NotFoundException();
+      throw new NotFoundException('The supplier has not been found');
     }
 
     return supplier;
@@ -36,7 +42,13 @@ export class SuppliersService {
   async createSupplier(
     createSupplierDto: CreateSupplierDto,
   ): Promise<ISupplier> {
-    return await this.supplierCollection.create(createSupplierDto);
+    const newSupplier = await this.supplierCollection.create(createSupplierDto);
+
+    if (!newSupplier) {
+      throw new BadRequestException('The supplier has not been created');
+    }
+
+    return newSupplier;
   }
 
   async updateSupplier(updateSupplierDto: UpdateSupplierDto): Promise<void> {
@@ -45,12 +57,22 @@ export class SuppliersService {
     });
 
     if (!supplier) {
-      throw new NotFoundException();
+      throw new NotFoundException('The supplier has not been found');
     }
 
-    const { id, ...rest } = updateSupplierDto;
+    const { _id, updatedFields } = this.compareFieldsService.compare<ISupplier>(
+      updateSupplierDto,
+      supplier,
+    );
 
-    await this.supplierCollection.updateOne({ _id: id }, rest);
+    const updateResult = await this.supplierCollection.updateOne(
+      { _id },
+      updatedFields,
+    );
+
+    if (!updateResult.isUpdated) {
+      throw new BadRequestException('The supplier has not been updated');
+    }
   }
 
   async deleteSupplier(deleteSupplierDto: DeleteSupplierDto): Promise<void> {
@@ -59,7 +81,7 @@ export class SuppliersService {
     });
 
     if (!supplier) {
-      throw new NotFoundException();
+      throw new NotFoundException('The supplier has not been found');
     }
 
     const deleteResult = await this.supplierCollection.deleteOne({
@@ -67,7 +89,7 @@ export class SuppliersService {
     });
 
     if (!deleteResult.isDeleted) {
-      throw new NotFoundException();
+      throw new BadRequestException('The supplier has not been deleted');
     }
   }
 }

@@ -35,7 +35,10 @@ import { DROPDOWN_LIST_PATH } from '../common/constants/path.constants';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Roles } from '../iam/decorators/roles.decorator';
 import { Role } from '../users/enums/role.enums';
+import { Auth } from '../iam/decorators/auth.decorator';
+import { AuthType } from '../iam/enums/auth-type.enum';
 
+@Auth(AuthType.Bearer)
 @Controller(CATEGORIES_ROUTE)
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}

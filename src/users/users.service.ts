@@ -2,6 +2,7 @@ import {
   Injectable,
   ConflictException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
 import {
@@ -34,7 +35,7 @@ export class UsersService {
     );
 
     if (!user) {
-      throw new NotFoundException();
+      throw new NotFoundException('The user has not been found');
     }
 
     return user;
@@ -51,19 +52,25 @@ export class UsersService {
       throw new ConflictException('User with the email already exists');
     }
 
-    const { _id, roles, email } = await this.usersCollection.create(
-      createUserDto,
-    );
+    const newUser = await this.usersCollection.create(createUserDto);
+
+    if (!newUser) {
+      throw new BadRequestException('The user has not been created');
+    }
 
     return {
-      _id,
-      roles,
-      email,
+      _id: newUser._id,
+      roles: newUser.roles,
+      email: newUser.email,
     };
   }
 
   async updateUser(updateUserDto: UpdateUserDto): Promise<void> {
     const user = this.getUser({ userId: updateUserDto.id });
+
+    if (!user) {
+      throw new NotFoundException('The user has not been found');
+    }
 
     const { _id, updatedFields } = this.compareFieldsService.compare<IUser>(
       updateUserDto,
@@ -76,7 +83,7 @@ export class UsersService {
     );
 
     if (!updateResult.isFound) {
-      throw new NotFoundException();
+      throw new BadRequestException('The user has not been updated');
     }
   }
 }

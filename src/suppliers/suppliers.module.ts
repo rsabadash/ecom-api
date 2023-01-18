@@ -4,6 +4,7 @@ import { MongoModule } from '../mongo/mongo.module';
 import { SUPPLIER_COLLECTION } from '../common/constants/collections.constants';
 import { SuppliersService } from './suppliers.service';
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
+import { CompareFieldsService } from '../common/services/compare-fields.service';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
     ),
   ],
   controllers: [SuppliersController],
-  providers: [SuppliersService],
+  providers: [SuppliersService, CompareFieldsService],
 })
 export class SuppliersModule {}
