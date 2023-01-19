@@ -13,13 +13,13 @@ import {
   PartialEntityUpdate,
 } from '../types/mongo-query.types';
 
-export interface DeleteOneResult {
-  isDeleted: boolean;
-}
-
 export interface UpdateOneResult {
   isFound: boolean;
   isUpdated: boolean;
+}
+
+export interface DeleteOneResult {
+  isDeleted: boolean;
 }
 
 export interface ICollectionModel<Entity> {

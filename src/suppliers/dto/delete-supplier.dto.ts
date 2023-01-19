@@ -6,7 +6,7 @@ export class DeleteSupplierDto {
   @IsMongoId()
   @ApiProperty({
     type: 'string',
-    description: 'Supplier identifier',
+    description: "Supplier's identifier",
   })
   readonly id: ObjectId;
 }

@@ -29,7 +29,7 @@ export class CollectionModel<CollectionEntity>
 
   async findOne(
     entityQuery?: PartialEntity<CollectionEntity>,
-    options?: Omit<FindEntityOptions<CollectionEntity>, 'limit' | 'skip'>,
+    options?: FindEntityOptions<CollectionEntity>,
   ): Promise<EntityWithId<CollectionEntity> | null> {
     const findOptions = options || {};
 

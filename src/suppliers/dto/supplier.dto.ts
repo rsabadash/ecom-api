@@ -14,7 +14,7 @@ export class SupplierDto {
   @IsMongoId()
   @ApiProperty({
     type: 'string',
-    description: 'Supplier identifier',
+    description: "Supplier's identifier",
   })
   readonly _id: ObjectId;
 
@@ -28,7 +28,7 @@ export class SupplierDto {
       'Name is too long. Maximal length is $constraint1 characters, but actual is $value',
   })
   @ApiProperty({
-    description: 'The name of particular supplier',
+    description: "Supplier's name",
     minimum: 3,
     maximum: 50,
   })
@@ -37,7 +37,7 @@ export class SupplierDto {
   @IsString()
   @IsOptional()
   @ApiPropertyOptional({
-    description: 'Some information about supplier',
+    description: "Supplier's additional information",
   })
   readonly note: string;
 
@@ -46,7 +46,7 @@ export class SupplierDto {
   @IsMongoId()
   @ApiPropertyOptional({
     type: 'string',
-    description: 'Supplier account id / bank id (to retrieve account data)',
+    description: "Supplier's bill identifier",
   })
   readonly accountId: ObjectId;
 
@@ -57,7 +57,7 @@ export class SupplierDto {
       'Supplier address is too long. Maximal length is $constraint1 characters, but actual is $value',
   })
   @ApiPropertyOptional({
-    description: 'Supplier address',
+    description: "Supplier's address",
     maximum: 256,
   })
   readonly address: string;
@@ -66,7 +66,7 @@ export class SupplierDto {
   @Length(10, 10)
   @IsOptional()
   @ApiPropertyOptional({
-    description: 'Supplier phone number',
+    description: "Supplier's phone number",
     minimum: 10,
     maximum: 10,
   })
