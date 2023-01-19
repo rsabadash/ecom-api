@@ -72,6 +72,12 @@ export class UsersService {
       throw new NotFoundException('The user has not been found');
     }
 
+    const isUserWithEmailExist = await this.getUserByEmail(updateUserDto.email);
+
+    if (isUserWithEmailExist) {
+      throw new ConflictException('User with the email already exists');
+    }
+
     const { _id, updatedFields } = this.compareFieldsService.compare<IUser>(
       updateUserDto,
       user,

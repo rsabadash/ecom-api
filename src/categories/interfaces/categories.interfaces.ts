@@ -26,7 +26,3 @@ export interface IUpdateCategory extends Partial<ICreateCategory> {
 export interface IDeleteCategory {
   id: string;
 }
-
-export interface GetCategoryParameters {
-  categoryId: ObjectId;
-}

@@ -5,10 +5,8 @@ import {
 } from '@nestjs/common';
 import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
 import { SUPPLIER_COLLECTION } from '../common/constants/collections.constants';
-import {
-  ISupplier,
-  GetSupplierParameters,
-} from './interfaces/suppliers.interfaces';
+import { ISupplier } from './interfaces/suppliers.interfaces';
+import { GetSupplierParameters } from './types/suppliers.types';
 import { DeleteSupplierDto } from './dto/delete-supplier.dto';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';

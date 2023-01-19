@@ -26,6 +26,38 @@ export class AuthenticationService {
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
     private readonly usersService: UsersService,
   ) {}
+  private async generateTokens(user: IUserPublic): Promise<Tokens> {
+    const { accessTokenTtl, refreshTokenTtl } = this.jwtConfiguration;
+
+    const aToken = this.signToken(String(user._id), accessTokenTtl);
+    const rToken = this.signToken(String(user._id), refreshTokenTtl);
+
+    const [accessToken, refreshToken] = await Promise.all([aToken, rToken]);
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  private async signToken<T extends Record<string, any>>(
+    userId: string,
+    expiresIn: number,
+    payload?: T,
+  ): Promise<string> {
+    const { audience, issuer, secret } = this.jwtConfiguration;
+    const signPayload = {
+      sub: userId,
+      ...(payload || {}),
+    };
+
+    return await this.jwtService.signAsync(signPayload, {
+      audience,
+      issuer,
+      secret,
+      expiresIn,
+    });
+  }
 
   async signUp(signUpDto: SignUpDto): Promise<IUserPublic> {
     const hashedPassword = await this.hashingService.hash(signUpDto.password);
@@ -82,38 +114,5 @@ export class AuthenticationService {
     });
 
     return await this.generateTokens(user);
-  }
-
-  async generateTokens(user: IUserPublic): Promise<Tokens> {
-    const { accessTokenTtl, refreshTokenTtl } = this.jwtConfiguration;
-
-    const aToken = this.signToken(String(user._id), accessTokenTtl);
-    const rToken = this.signToken(String(user._id), refreshTokenTtl);
-
-    const [accessToken, refreshToken] = await Promise.all([aToken, rToken]);
-
-    return {
-      accessToken,
-      refreshToken,
-    };
-  }
-
-  private async signToken<T extends Record<string, any>>(
-    userId: string,
-    expiresIn: number,
-    payload?: T,
-  ): Promise<string> {
-    const { audience, issuer, secret } = this.jwtConfiguration;
-    const signPayload = {
-      sub: userId,
-      ...(payload || {}),
-    };
-
-    return await this.jwtService.signAsync(signPayload, {
-      audience,
-      issuer,
-      secret,
-      expiresIn,
-    });
   }
 }

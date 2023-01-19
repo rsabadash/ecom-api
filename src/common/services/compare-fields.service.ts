@@ -20,7 +20,7 @@ export class CompareFieldsService {
     categoryKeys.forEach((key) => {
       const dataValue = newEntity[key];
 
-      if (!this.areFieldsEqual(dataValue, existedEntity[key])) {
+      if (!this.areFieldsValueEqual(dataValue, existedEntity[key])) {
         updatedFields = {
           ...updatedFields,
           [key]: dataValue,
@@ -34,7 +34,7 @@ export class CompareFieldsService {
     };
   }
 
-  areFieldsEqual(fieldA: any, fieldB: any): boolean {
+  areFieldsValueEqual(fieldA: any, fieldB: any): boolean {
     if (isObjects(fieldA, fieldB)) {
       return equalObjectsValue(fieldA, fieldB);
     }

@@ -16,7 +16,3 @@ export interface IUpdateSupplier extends Omit<ISupplier, '_id'> {
 export interface IDeleteSupplier {
   id: string;
 }
-
-export interface GetSupplierParameters {
-  supplierId: ObjectId;
-}

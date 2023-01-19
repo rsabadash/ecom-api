@@ -10,11 +10,8 @@ import {
 } from '../mongo/decorators/mongo.decorators';
 import { CATEGORIES_COLLECTION } from '../common/constants/collections.constants';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
-import {
-  ICategory,
-  ICategoryDetail,
-  GetCategoryParameters,
-} from './interfaces/categories.interfaces';
+import { ICategory, ICategoryDetail } from './interfaces/categories.interfaces';
+import { GetCategoryParameters } from './types/categories.types';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { DeleteCategoryDto } from './dto/delete-category.dto';
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';

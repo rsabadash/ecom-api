@@ -97,6 +97,10 @@ export class UsersController {
     description: 'The user has not been found',
     type: HttpErrorDto,
   })
+  @ApiConflictResponse({
+    description: 'User with the email already exists',
+    type: HttpErrorDto,
+  })
   @ApiBadRequestResponse({
     description: 'The user has not been updated',
     type: HttpErrorDto,
