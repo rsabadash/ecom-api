@@ -28,12 +28,12 @@ import { AUTH_MODULE_NAME } from './constants/swagger.constants';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
 import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
 
-@ApiTags(AUTH_MODULE_NAME)
+@Auth(AuthType.None)
 @Controller(AUTHENTICATION_ROUTE)
+@ApiTags(AUTH_MODULE_NAME)
 export class AuthenticationController {
   constructor(private readonly authService: AuthenticationService) {}
 
-  @Auth(AuthType.None)
   @Post(SIGN_UP_PATH)
   @ApiCreatedResponse({
     description: 'The user has been signed up',
@@ -51,7 +51,6 @@ export class AuthenticationController {
     return this.authService.signUp(signUpDto);
   }
 
-  @Auth(AuthType.None)
   @Post(SIGN_IN_PATH)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
@@ -66,7 +65,6 @@ export class AuthenticationController {
     return this.authService.signIn(signInDto);
   }
 
-  @Auth(AuthType.Bearer)
   @Post(REFRESH_TOKEN_PATH)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({

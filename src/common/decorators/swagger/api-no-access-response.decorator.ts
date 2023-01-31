@@ -3,23 +3,19 @@ import { ApiForbiddenResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { HttpStatusMessage } from '../../constants/swagger.constants';
 import { HttpErrorDto } from '../../dto/swagger/http-error.dto';
 
-interface ApiNoAccessDecoratorArgs {
-  desc401?: string;
-  desc403?: string;
-}
+export const ApiNoAccessResponse = () => {
+  const desc401 = `
+    'jwt malformed'
+    'jwt expired'
+  `;
 
-export const ApiNoAccessResponse = (
-  descriptions: ApiNoAccessDecoratorArgs = {},
-) => {
   return applyDecorators(
     ApiUnauthorizedResponse({
-      description:
-        descriptions.desc401 || HttpStatusMessage[HttpStatus.UNAUTHORIZED],
+      description: desc401,
       type: HttpErrorDto,
     }),
     ApiForbiddenResponse({
-      description:
-        descriptions.desc403 || HttpStatusMessage[HttpStatus.FORBIDDEN],
+      description: `${HttpStatusMessage[HttpStatus.FORBIDDEN]}`,
       type: HttpErrorDto,
     }),
   );

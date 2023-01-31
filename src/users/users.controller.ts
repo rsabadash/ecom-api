@@ -21,7 +21,11 @@ import {
 import { ObjectId } from 'mongodb';
 import { UsersService } from './users.service';
 import { IUpdateUser, IUserPublic } from './interfaces/users.interfaces';
-import { GET_USER_BY_ID_PATH, USERS_ROUTE } from './constants/route.constants';
+import {
+  GET_USER_BY_ID_PATH,
+  GET_USER_SIGN_IN,
+  USERS_ROUTE,
+} from './constants/route.constants';
 import { ParseObjectIdPipe } from '../common/pipes/parse-objectId.pipe';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -35,6 +39,7 @@ import { Roles } from '../iam/decorators/roles.decorator';
 import { Role } from './enums/role.enums';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
 import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
+import { UserId } from './decorators/user-id.decorator';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
@@ -51,6 +56,20 @@ export class UsersController {
   @ApiNoAccessResponse()
   async getUsers(): Promise<IUserPublic[]> {
     return await this.usersService.getUsers();
+  }
+
+  @Get(GET_USER_SIGN_IN)
+  @ApiOkResponse({
+    description: 'The user was retrieved',
+    type: PublicUserDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'The user has not been found',
+    type: HttpErrorDto,
+  })
+  @ApiNoAccessResponse()
+  async getUserSignIn(@UserId() userId: ObjectId): Promise<IUserPublic> {
+    return await this.usersService.getUser({ userId });
   }
 
   @Get(GET_USER_BY_ID_PATH)
