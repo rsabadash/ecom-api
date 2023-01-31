@@ -6,6 +6,7 @@ import { Role } from '../../users/enums/role.enums';
 import { UsersService } from '../../users/users.service';
 import { RequestExtended } from '../../common/interfaces/request';
 import { REQUEST_USER_KEY } from '../../common/constants/request.constants';
+import { IUserPublic } from '../../users/interfaces/users.interfaces';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -13,6 +14,10 @@ export class RolesGuard implements CanActivate {
     private readonly reflector: Reflector,
     private readonly usersService: UsersService,
   ) {}
+
+  private hasAllAccesses(user: IUserPublic): boolean {
+    return !!user.roles.find((role) => role === Role.Admin);
+  }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const contextRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
@@ -31,7 +36,11 @@ export class RolesGuard implements CanActivate {
         userId: new ObjectId(request[REQUEST_USER_KEY].sub),
       });
 
-      return contextRoles.some((role) => user.roles.find((r) => r === role));
+      const hasAllAccesses = this.hasAllAccesses(user);
+      return (
+        hasAllAccesses ||
+        contextRoles.some((role) => user.roles.find((r) => r === role))
+      );
     }
 
     return false;
