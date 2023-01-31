@@ -11,6 +11,14 @@ import {
   Post,
   UsePipes,
 } from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ObjectId } from 'mongodb';
 import { CategoriesService } from './categories.service';
 import {
@@ -37,14 +45,24 @@ import { Roles } from '../iam/decorators/roles.decorator';
 import { Role } from '../users/enums/role.enums';
 import { Auth } from '../iam/decorators/auth.decorator';
 import { AuthType } from '../iam/enums/auth-type.enum';
+import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
+import { CategoryDto } from './dto/category.dto';
+import { CATEGORIES_MODULE_NAME } from './constants/swagger.constants';
+import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
 
+@Roles(Role.Admin)
 @Auth(AuthType.Bearer)
 @Controller(CATEGORIES_ROUTE)
+@ApiTags(CATEGORIES_MODULE_NAME)
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
-  @Roles(Role.Admin)
   @Get()
+  @ApiOkResponse({
+    description: 'List of categories were retrieved',
+    type: [CategoryDto],
+  })
+  @ApiNoAccessResponse()
   async getCategories(): Promise<ICategory[]> {
     return await this.categoriesService.getCategories();
   }
@@ -57,6 +75,15 @@ export class CategoriesController {
   }
 
   @Get(GET_CATEGORY_BY_ID_PATH)
+  @ApiOkResponse({
+    description: 'The category was retrieved',
+    type: CategoryDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'The category has not been found',
+    type: HttpErrorDto,
+  })
+  @ApiNoAccessResponse()
   async getProduct(
     @Param(CATEGORY_ID_PARAM, ParseObjectIdPipe) categoryId: ObjectId,
   ): Promise<ICategoryDetail> {
@@ -65,6 +92,14 @@ export class CategoriesController {
 
   @UsePipes(new ParseObjectIdsPipe<ICreateCategory>('parentIds', 'array'))
   @Post()
+  @ApiCreatedResponse({
+    description: 'The category has been created',
+    type: CategoryDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'The category has not been created',
+    type: HttpErrorDto,
+  })
   async createCategory(
     @Body() createCategoryDto: CreateCategoryDto,
   ): Promise<ICategory> {
@@ -79,6 +114,18 @@ export class CategoriesController {
   )
   @Patch()
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description: 'The category has been updated',
+  })
+  @ApiNotFoundResponse({
+    description: 'The category has not been found',
+    type: HttpErrorDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'The category has not been updated',
+    type: HttpErrorDto,
+  })
+  @ApiNoAccessResponse()
   async updateCategory(
     @Body() updateCategoryDto: UpdateCategoryDto,
   ): Promise<void> {
@@ -88,6 +135,18 @@ export class CategoriesController {
   @UsePipes(new ParseObjectIdsPipe<IDeleteCategory>('id', 'string'))
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description: 'The category has been deleted',
+  })
+  @ApiNotFoundResponse({
+    description: 'The category has not been found',
+    type: HttpErrorDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'The category has not been deleted',
+    type: HttpErrorDto,
+  })
+  @ApiNoAccessResponse()
   async deleteCategory(
     @Body() deleteCategoryDto: DeleteCategoryDto,
   ): Promise<void> {

@@ -14,7 +14,7 @@ export class SupplierDto {
   @IsMongoId()
   @ApiProperty({
     type: 'string',
-    description: "Supplier's identifier",
+    description: 'Identifier of the supplier',
   })
   readonly _id: ObjectId;
 
@@ -39,7 +39,7 @@ export class SupplierDto {
   @ApiPropertyOptional({
     description: "Supplier's additional information",
   })
-  readonly note: string;
+  readonly note: string | null = null;
 
   @IsString()
   @IsOptional()
@@ -48,7 +48,7 @@ export class SupplierDto {
     type: 'string',
     description: "Supplier's bill identifier",
   })
-  readonly accountId: ObjectId;
+  readonly accountId: ObjectId | null = null;
 
   @IsString()
   @IsOptional()
@@ -60,7 +60,7 @@ export class SupplierDto {
     description: "Supplier's address",
     maximum: 256,
   })
-  readonly address: string;
+  readonly address: string | null = null;
 
   @IsString()
   @Length(10, 10)
@@ -70,5 +70,5 @@ export class SupplierDto {
     minimum: 10,
     maximum: 10,
   })
-  readonly phoneNumber: string;
+  readonly phoneNumber: string | null = null;
 }

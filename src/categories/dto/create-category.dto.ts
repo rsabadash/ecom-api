@@ -1,17 +1,6 @@
-import { ObjectId } from 'mongodb';
-import { IsBoolean, IsMongoId, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
-import { Translations } from '../../common/types/i18n.types';
-import { TranslationsDto } from '../../common/dto/translations.dto';
+import { OmitType } from '@nestjs/swagger';
+import { CategoryDto } from './category.dto';
 
-export class CreateCategoryDto {
-  @ValidateNested()
-  @Type(() => TranslationsDto)
-  readonly name: Translations;
-
-  @IsBoolean()
-  readonly isActive: boolean;
-
-  @IsMongoId({ each: true })
-  readonly parentIds: ObjectId[];
-}
+export class CreateCategoryDto extends OmitType(CategoryDto, [
+  '_id',
+] as const) {}
