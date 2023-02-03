@@ -21,8 +21,20 @@ export class SuppliersService {
     private readonly supplierCollection: ICollectionModel<ISupplier>,
   ) {}
 
+  async createSupplier(
+    createSupplierDto: CreateSupplierDto,
+  ): Promise<ISupplier> {
+    const newSupplier = await this.supplierCollection.create(createSupplierDto);
+
+    if (!newSupplier) {
+      throw new BadRequestException('The supplier has not been created');
+    }
+
+    return newSupplier;
+  }
+
   async getSuppliers(): Promise<ISupplier[]> {
-    return await this.supplierCollection.find({});
+    return await this.supplierCollection.find();
   }
 
   async getSupplier(parameters: GetSupplierParameters): Promise<ISupplier> {
@@ -35,18 +47,6 @@ export class SuppliersService {
     }
 
     return supplier;
-  }
-
-  async createSupplier(
-    createSupplierDto: CreateSupplierDto,
-  ): Promise<ISupplier> {
-    const newSupplier = await this.supplierCollection.create(createSupplierDto);
-
-    if (!newSupplier) {
-      throw new BadRequestException('The supplier has not been created');
-    }
-
-    return newSupplier;
   }
 
   async updateSupplier(updateSupplierDto: UpdateSupplierDto): Promise<void> {

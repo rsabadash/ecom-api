@@ -11,14 +11,15 @@ import {
   FindEntityOptions,
   PartialEntity,
   PartialEntityUpdate,
-  // PartialEntityUpdateArray,
   PartialEntityRemoveFields,
+  // PartialEntityUpdateArray,
   // UpdateOneArrayOptions,
 } from '../types/mongo-query.types';
 import { DEFAULT_FIND_OPTIONS } from '../constants/mongo-query.constants';
 import {
   UpdateOneResult,
   DeleteOneResult,
+  // UpdateOneArrayResult,
 } from '../interfaces/colection-model.interfaces';
 import { ICollectionModel } from '../interfaces/colection-model.interfaces';
 
@@ -64,38 +65,45 @@ export class CollectionModel<CollectionEntity>
     };
   }
 
+  async updateWithOperator(
+    entityQuery: PartialEntity<CollectionEntity>,
+    setData: PartialEntityUpdate<CollectionEntity>,
+  ): Promise<UpdateOneResult> {
+    const updatedEntity = await this.collection.updateOne(entityQuery, setData);
+
+    return {
+      isUpdated: updatedEntity.modifiedCount > 0 && updatedEntity.acknowledged,
+      isFound: updatedEntity.matchedCount > 0,
+    };
+  }
+
   async updateMany(
     filter: Filter<CollectionEntity>,
     update: UpdateFilter<CollectionEntity>,
   ) {
     return await this.collection.updateMany(filter, update);
   }
+
   // async updateOneArray(
   //   entityQuery: PartialEntity<CollectionEntity>,
   //   setData: PartialEntityUpdateArray<CollectionEntity>,
   //   options?: UpdateOneArrayOptions,
-  //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //   // @ts-ignore
-  // ): Promise<EntityWithId<CollectionEntity> | null> {
-  //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //   // @ts-ignore
-  //   const t = await this.collection.findOne({ key: 'year' });
-  //   console.log(t);
-  //   await this.collection.updateOne(
-  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //     // @ts-ignore
-  //     { key: 'year' },
-  //     {
-  //       $push: {
-  //         cases: {
-  //           $each: [1985],
-  //           $sort: -1,
-  //         },
+  // ): Promise<UpdateOneArrayResult> {
+  //   const item = await this.collection.findOne(entityQuery);
+  //   console.log(item);
+  //   const updatedEntity = this.collection.updateOne(entityQuery, {
+  //     $push: {
+  //       cases: {
+  //         $each: [setData],
+  //         $sort: -1,
   //       },
   //     },
-  //   );
+  //   });
   //
-  //   // return updatedEntity.value;
+  //   return {
+  //     isUpdated: updatedEntity.modifiedCount > 0 && updatedEntity.acknowledged,
+  //     isFound: updatedEntity.matchedCount > 0,
+  //   };
   // }
 
   async removeField(

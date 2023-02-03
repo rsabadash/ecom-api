@@ -114,7 +114,6 @@ export class SuppliersController {
     await this.suppliersService.updateSupplier(updateSupplierDto);
   }
 
-  @UsePipes(new ParseObjectIdsPipe<IDeleteSupplier>('id', 'string'))
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
@@ -129,6 +128,7 @@ export class SuppliersController {
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
+  @UsePipes(new ParseObjectIdsPipe<IDeleteSupplier>('id', 'string'))
   async deleteSupplier(
     @Body() deleteSupplierDto: DeleteSupplierDto,
   ): Promise<void> {
