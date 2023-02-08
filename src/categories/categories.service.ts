@@ -3,7 +3,7 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import {
   InjectClients,
   InjectCollectionModel,
@@ -15,8 +15,11 @@ import { GetCategoryParameters } from './types/categories.types';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { DeleteCategoryDto } from './dto/delete-category.dto';
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
-import { ClientsMap } from '../mongo/types/mongo-query.types';
-import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
+import { ClientsMap, PartialEntity } from '../mongo/types/mongo-query.types';
+import {
+  DropdownListItem,
+  DropdownListQueryParams,
+} from '../common/interfaces/dropdown-list.interface';
 import { Language } from '../common/types/i18n.types';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
@@ -34,14 +37,34 @@ export class CategoriesService {
     this.client = this.clients.get(CONNECTION_DB_NAME);
   }
 
-  async getCategories(): Promise<ICategory[]> {
-    return await this.categoryCollection.find({});
+  private filterIdDuplication(
+    list: undefined | ObjectId[],
+    id: ObjectId,
+  ): ObjectId[] {
+    const idAsString = id.toString();
+
+    return list?.filter((listId) => listId.toString() !== idAsString);
+  }
+
+  async getCategories(
+    query: PartialEntity<ICategory> = {},
+  ): Promise<ICategory[]> {
+    return await this.categoryCollection.find(query);
   }
 
   async getCategoriesDropdownList(
     language: Language,
+    queryParams: DropdownListQueryParams = {},
   ): Promise<DropdownListItem[]> {
-    const categories = await this.getCategories();
+    let query: PartialEntity<ICategory> = {};
+
+    if (queryParams._id) {
+      query = {
+        _id: { $not: { $eq: queryParams._id } },
+      };
+    }
+
+    const categories = await this.getCategories(query);
 
     return categories.map((category) => {
       return {
@@ -92,13 +115,27 @@ export class CategoriesService {
       throw new NotFoundException();
     }
 
-    const { _id, updatedFields } = this.compareFieldsService.compare<ICategory>(
+    const comparedFields = this.compareFieldsService.compare<ICategory>(
       updateCategoryDto,
       category,
     );
 
+    let updatedFields = comparedFields.updatedFields;
+
+    if (updatedFields.parentIds) {
+      const filteredIds = this.filterIdDuplication(
+        updatedFields.parentIds,
+        updateCategoryDto.id,
+      );
+
+      updatedFields = {
+        ...updatedFields,
+        parentIds: filteredIds,
+      };
+    }
+
     const updateResult = await this.categoryCollection.updateOne(
-      { _id },
+      { _id: comparedFields._id },
       updatedFields,
     );
 

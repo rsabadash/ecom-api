@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Inject,
   Injectable,
@@ -106,7 +105,7 @@ export class AuthenticationService {
 
       userId = decoded.sub;
     } catch (e) {
-      throw new BadRequestException(e.message);
+      throw new UnauthorizedException(e.message);
     }
 
     const user = await this.usersService.getUser({

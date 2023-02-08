@@ -2,10 +2,10 @@ import { ObjectId } from 'mongodb';
 import { PartialType } from '@nestjs/mapped-types';
 import { IsMongoId } from 'class-validator';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { SupplierDto } from '../../suppliers/dto/supplier.dto';
+import { CategoryDto } from './category.dto';
 
 export class UpdateCategoryDto extends PartialType(
-  OmitType(SupplierDto, ['_id'] as const),
+  OmitType(CategoryDto, ['_id'] as const),
 ) {
   @IsMongoId()
   @ApiProperty({

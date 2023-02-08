@@ -9,6 +9,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UsePipes,
 } from '@nestjs/common';
 import {
@@ -38,7 +39,10 @@ import { CATEGORY_ID_PARAM } from './constants/param.constants';
 import { ParseObjectIdPipe } from '../common/pipes/parse-objectId.pipe';
 import { DeleteCategoryDto } from './dto/delete-category.dto';
 import { Language } from '../common/types/i18n.types';
-import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
+import {
+  DropdownListItem,
+  DropdownListQueryParams,
+} from '../common/interfaces/dropdown-list.interface';
 import { DROPDOWN_LIST_PATH } from '../common/constants/path.constants';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Roles } from '../iam/decorators/roles.decorator';
@@ -67,11 +71,16 @@ export class CategoriesController {
     return await this.categoriesService.getCategories();
   }
 
+  @UsePipes(new ParseObjectIdsPipe<ICategory>('_id', 'string'))
   @Get(DROPDOWN_LIST_PATH)
   async getCategoriesDropdownList(
+    @Query() queryParams: DropdownListQueryParams,
     @Headers('accept-language') language: Language,
   ): Promise<DropdownListItem[]> {
-    return this.categoriesService.getCategoriesDropdownList(language);
+    return this.categoriesService.getCategoriesDropdownList(
+      language,
+      queryParams,
+    );
   }
 
   @Get(GET_CATEGORY_BY_ID_PATH)
