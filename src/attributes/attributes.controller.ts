@@ -12,12 +12,9 @@ import {
 } from '@nestjs/common';
 import {
   ATTRIBUTES_ROUTE,
-  CREATE_ATTRIBUTE_VARIANT_PATH,
-  DELETE_ATTRIBUTE_VARIANT_PATH,
-  GET_ATTRIBUTE_VARIANT_PATH,
+  ATTRIBUTE_VARIANT_PATH,
   GET_ATTRIBUTES_BY_ID_PATH,
-  GET_ATTRIBUTES_VARIANTS_PATH,
-  UPDATE_ATTRIBUTE_VARIANT_PATH,
+  ATTRIBUTES_VARIANTS_PATH,
 } from './constants/route.constants';
 import { Auth } from '../iam/decorators/auth.decorator';
 import { AuthType } from '../iam/enums/auth-type.enum';
@@ -54,7 +51,10 @@ import { DeleteAttributeVariantDto } from './dto/delete-attribute-variant.dto';
 import { AttributeDto } from './dto/attribute.dto';
 import { AttributeVariantDto } from './dto/attribute-variant.dto';
 import { GetAttributeVariantDto } from './dto/get-attribute-variant.dto';
+import { Roles } from '../iam/decorators/roles.decorator';
+import { Role } from '../users/enums/role.enums';
 
+@Roles(Role.Admin)
 @Auth(AuthType.Bearer)
 @Controller(ATTRIBUTES_ROUTE)
 export class AttributesController {
@@ -76,7 +76,7 @@ export class AttributesController {
     return this.attributesService.createAttribute(createAttributeDto);
   }
 
-  @Get(GET_ATTRIBUTES_VARIANTS_PATH)
+  @Get(ATTRIBUTES_VARIANTS_PATH)
   @ApiOkResponse({
     description: 'List of attributes variants were retrieved',
     type: [AttributeVariantDto],
@@ -86,7 +86,7 @@ export class AttributesController {
     return await this.attributesService.getAttributesVariants();
   }
 
-  @Get(GET_ATTRIBUTE_VARIANT_PATH)
+  @Get(ATTRIBUTE_VARIANT_PATH)
   @ApiOkResponse({
     description: 'List of attributes variants were retrieved',
     type: [AttributeVariantDto],
@@ -176,7 +176,7 @@ export class AttributesController {
 
   //Attribute variant
 
-  @Post(CREATE_ATTRIBUTE_VARIANT_PATH)
+  @Post(ATTRIBUTE_VARIANT_PATH)
   @ApiCreatedResponse({
     description: 'The attribute variant has been created',
     type: AttributeDto,
@@ -195,7 +195,7 @@ export class AttributesController {
     );
   }
 
-  @Patch(UPDATE_ATTRIBUTE_VARIANT_PATH)
+  @Patch(ATTRIBUTE_VARIANT_PATH)
   @ApiCreatedResponse({
     description: 'The attribute variant has been updated',
     type: AttributeDto,
@@ -219,7 +219,7 @@ export class AttributesController {
     );
   }
 
-  @Delete(DELETE_ATTRIBUTE_VARIANT_PATH)
+  @Delete(ATTRIBUTE_VARIANT_PATH)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
     description: 'The attribute variant has been deleted',
