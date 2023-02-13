@@ -32,6 +32,7 @@ import {
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
 import { ParseObjectIdPipe } from '../common/pipes/parse-objectId.pipe';
@@ -53,10 +54,12 @@ import { AttributeVariantDto } from './dto/attribute-variant.dto';
 import { GetAttributeVariantDto } from './dto/get-attribute-variant.dto';
 import { Roles } from '../iam/decorators/roles.decorator';
 import { Role } from '../users/enums/role.enums';
+import { ATTRIBUTES_MODULE_NAME } from './constants/swagger.constants';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
 @Controller(ATTRIBUTES_ROUTE)
+@ApiTags(ATTRIBUTES_MODULE_NAME)
 export class AttributesController {
   constructor(private readonly attributesService: AttributesService) {}
 
