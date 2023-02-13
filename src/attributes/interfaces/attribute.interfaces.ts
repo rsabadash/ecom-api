@@ -1,13 +1,13 @@
 import { ObjectId } from 'mongodb';
 import { Translations } from '../../common/types/i18n.types';
-import { AttributeVariantType } from '../types/attributeVariant.type';
+import { IAttributeVariant } from './attribute-variant.interfaces';
 
 export interface IAttribute {
   _id: ObjectId;
   name: Translations;
   isActive: boolean;
   sortOrder: number;
-  variants: AttributeVariantType[];
+  variants: IAttributeVariant[];
 }
 
 export interface IUpdateAttribute extends Omit<IAttribute, '_id' | 'variants'> {

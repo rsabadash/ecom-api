@@ -60,20 +60,20 @@ export class CollectionModel<CollectionEntity>
     });
 
     return {
-      isUpdated: updatedEntity.modifiedCount > 0 && updatedEntity.acknowledged,
       isFound: updatedEntity.matchedCount > 0,
+      isUpdated: updatedEntity.modifiedCount > 0,
     };
   }
 
   async updateWithOperator(
     entityQuery: PartialEntity<CollectionEntity>,
-    setData: PartialEntityUpdate<CollectionEntity>,
+    filter: UpdateFilter<CollectionEntity>,
   ): Promise<UpdateOneResult> {
-    const updatedEntity = await this.collection.updateOne(entityQuery, setData);
+    const updatedEntity = await this.collection.updateOne(entityQuery, filter);
 
     return {
-      isUpdated: updatedEntity.modifiedCount > 0 && updatedEntity.acknowledged,
       isFound: updatedEntity.matchedCount > 0,
+      isUpdated: updatedEntity.modifiedCount > 0,
     };
   }
 

@@ -1,8 +1,9 @@
-import { ATTRIBUTES_ID_PARAM } from './param.constants';
+import { ATTRIBUTE_ID_PARAM, VARIANT_ID_PARAM } from './param.constants';
 
 export const ATTRIBUTES_ROUTE = 'attributes';
 
-export const GET_ATTRIBUTES_BY_ID_PATH = `/:${ATTRIBUTES_ID_PARAM}`;
+export const GET_ATTRIBUTE_BY_ID_PATH = `/:${ATTRIBUTE_ID_PARAM}`;
 
-export const ATTRIBUTE_VARIANT_PATH = '/variant';
-export const ATTRIBUTES_VARIANTS_PATH = '/variants';
+export const GET_VARIANT_BY_ID_PATH = `/:${VARIANT_ID_PARAM}`;
+
+export const VARIANTS_PATH = '/variants';

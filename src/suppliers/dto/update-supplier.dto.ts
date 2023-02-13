@@ -9,7 +9,7 @@ export class UpdateSupplierDto extends PartialType(
   @IsMongoId()
   @ApiProperty({
     type: 'string',
-    description: "Supplier's identifier",
+    description: 'Identifier of the supplier',
   })
   readonly id: ObjectId;
 }

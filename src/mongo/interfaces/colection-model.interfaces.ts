@@ -44,7 +44,7 @@ export interface ICollectionModel<Entity> {
 
   updateWithOperator(
     entityQuery: PartialEntity<Entity>,
-    updateData: PartialEntityUpdate<Entity>,
+    options: UpdateFilter<Entity>,
   ): Promise<UpdateOneResult>;
 
   updateMany(filter: Filter<Entity>, update: UpdateFilter<Entity>);

@@ -11,10 +11,19 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiGoneResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+} from '@nestjs/swagger';
+import { ObjectId } from 'mongodb';
+import {
   ATTRIBUTES_ROUTE,
-  ATTRIBUTE_VARIANT_PATH,
-  GET_ATTRIBUTES_BY_ID_PATH,
-  ATTRIBUTES_VARIANTS_PATH,
+  GET_ATTRIBUTE_BY_ID_PATH,
+  VARIANTS_PATH,
+  GET_VARIANT_BY_ID_PATH,
 } from './constants/route.constants';
 import { Auth } from '../iam/decorators/auth.decorator';
 import { AuthType } from '../iam/enums/auth-type.enum';
@@ -26,31 +35,21 @@ import {
   IUpdateAttribute,
 } from './interfaces/attribute.interfaces';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
-import {
-  ApiBadRequestResponse,
-  ApiCreatedResponse,
-  ApiNoContentResponse,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-} from '@nestjs/swagger';
 import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
 import { ParseObjectIdPipe } from '../common/pipes/parse-objectId.pipe';
-import { ObjectId } from 'mongodb';
-import { ATTRIBUTES_ID_PARAM } from './constants/param.constants';
+import {
+  ATTRIBUTE_ID_PARAM,
+  VARIANT_ID_PARAM,
+} from './constants/param.constants';
 import { DeleteAttributeDto } from './dto/delete-attribute.dto';
 import { ParseObjectIdsPipe } from '../common/pipes/parse-body-objectId.pipe';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
 import { CreateAttributeVariantDto } from './dto/create-attribute-variant.dto';
-import {
-  IAttributeVariant,
-  IDeleteAttributeValue,
-  IGetAttributeValue,
-} from './interfaces/attribute-variant.interfaces';
+import { IAttributeVariant } from './interfaces/attribute-variant.interfaces';
 import { UpdateAttributeVariantDto } from './dto/update-attribute-variant.dto';
 import { DeleteAttributeVariantDto } from './dto/delete-attribute-variant.dto';
 import { AttributeDto } from './dto/attribute.dto';
 import { AttributeVariantDto } from './dto/attribute-variant.dto';
-import { GetAttributeVariantDto } from './dto/get-attribute-variant.dto';
 import { Roles } from '../iam/decorators/roles.decorator';
 import { Role } from '../users/enums/role.enums';
 
@@ -59,6 +58,58 @@ import { Role } from '../users/enums/role.enums';
 @Controller(ATTRIBUTES_ROUTE)
 export class AttributesController {
   constructor(private readonly attributesService: AttributesService) {}
+
+  @Get()
+  @ApiOkResponse({
+    description: 'List of attributes were retrieved',
+    type: [AttributeDto],
+  })
+  @ApiNoAccessResponse()
+  async getAttributes(): Promise<IAttribute[]> {
+    return await this.attributesService.getAttributes();
+  }
+
+  @Get(VARIANTS_PATH)
+  @ApiOkResponse({
+    description: 'List of variants were of attributes retrieved',
+    type: [AttributeVariantDto],
+  })
+  @ApiNoAccessResponse()
+  async getAttributesVariants(): Promise<IAttributeVariant[]> {
+    return await this.attributesService.getAttributesVariants();
+  }
+
+  @Get(GET_ATTRIBUTE_BY_ID_PATH)
+  @ApiOkResponse({
+    description: 'The attribute was retrieved',
+    type: AttributeDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'The attribute has not been found',
+    type: HttpErrorDto,
+  })
+  @ApiNoAccessResponse()
+  async getAttribute(
+    @Param(ATTRIBUTE_ID_PARAM, ParseObjectIdPipe) attributeId: ObjectId,
+  ): Promise<IAttribute> {
+    return await this.attributesService.getAttribute({ attributeId });
+  }
+
+  @Get(`${VARIANTS_PATH}${GET_VARIANT_BY_ID_PATH}`)
+  @ApiOkResponse({
+    description: 'The variant of the attribute was retrieved',
+    type: AttributeVariantDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'The variant of the attribute has not been found',
+    type: HttpErrorDto,
+  })
+  @ApiNoAccessResponse()
+  async getAttributeVariant(
+    @Param(VARIANT_ID_PARAM, ParseObjectIdPipe) variantId: ObjectId,
+  ): Promise<IAttributeVariant> {
+    return await this.attributesService.getAttributeVariant({ variantId });
+  }
 
   @Post()
   @ApiCreatedResponse({
@@ -76,65 +127,9 @@ export class AttributesController {
     return this.attributesService.createAttribute(createAttributeDto);
   }
 
-  @Get(ATTRIBUTES_VARIANTS_PATH)
-  @ApiOkResponse({
-    description: 'List of attributes variants were retrieved',
-    type: [AttributeVariantDto],
-  })
-  @ApiNoAccessResponse()
-  async getAttributesVariants(): Promise<IAttributeVariant[]> {
-    return await this.attributesService.getAttributesVariants();
-  }
-
-  @Get(ATTRIBUTE_VARIANT_PATH)
-  @ApiOkResponse({
-    description: 'List of attributes variants were retrieved',
-    type: [AttributeVariantDto],
-  })
-  @ApiNoAccessResponse()
-  @UsePipes(
-    new ParseObjectIdsPipe<IGetAttributeValue>(
-      ['attributeId', 'variantId'],
-      ['string', 'string'],
-    ),
-  )
-  async getAttributesVariant(
-    @Body() getAttributeVariantDto: GetAttributeVariantDto,
-  ): Promise<IAttributeVariant[]> {
-    return await this.attributesService.getAttributeVariant(
-      getAttributeVariantDto,
-    );
-  }
-
-  @Get()
-  @ApiOkResponse({
-    description: 'List of attributes were retrieved',
-    type: [AttributeDto],
-  })
-  @ApiNoAccessResponse()
-  async getAttributes(): Promise<IAttribute[]> {
-    return await this.attributesService.getAttributes();
-  }
-
-  @Get(GET_ATTRIBUTES_BY_ID_PATH)
-  @ApiOkResponse({
-    description: 'The attribute was retrieved',
-    type: AttributeDto,
-  })
-  @ApiNotFoundResponse({
-    description: 'The attribute has not been found',
-    type: HttpErrorDto,
-  })
-  @ApiNoAccessResponse()
-  async getAttribute(
-    @Param(ATTRIBUTES_ID_PARAM, ParseObjectIdPipe) attributeId: ObjectId,
-  ): Promise<IAttribute> {
-    return await this.attributesService.getAttribute({ attributeId });
-  }
-
-  @UsePipes(new ParseObjectIdsPipe<IUpdateAttribute>('id', 'string'))
   @Patch()
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UsePipes(new ParseObjectIdsPipe<IUpdateAttribute>('id', 'string'))
   @ApiNoContentResponse({
     description: 'The attribute has been updated',
   })
@@ -155,37 +150,27 @@ export class AttributesController {
 
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UsePipes(new ParseObjectIdsPipe<IDeleteAttribute>('id', 'string'))
   @ApiNoContentResponse({
     description: 'The attribute has been deleted',
   })
-  @ApiNotFoundResponse({
-    description: 'The attribute has not been found',
-    type: HttpErrorDto,
-  })
-  @ApiBadRequestResponse({
-    description: 'The attribute has not been deleted',
-    type: HttpErrorDto,
-  })
   @ApiNoAccessResponse()
-  @UsePipes(new ParseObjectIdsPipe<IDeleteAttribute>('id', 'string'))
   async deleteAttribute(
     @Body() deleteAttributeDto: DeleteAttributeDto,
   ): Promise<void> {
     await this.attributesService.deleteAttribute(deleteAttributeDto);
   }
 
-  //Attribute variant
-
-  @Post(ATTRIBUTE_VARIANT_PATH)
+  @Post(VARIANTS_PATH)
+  @UsePipes(new ParseObjectIdsPipe<IAttributeVariant>('attributeId', 'string'))
   @ApiCreatedResponse({
-    description: 'The attribute variant has been created',
+    description: 'The variant of the attribute has been created',
     type: AttributeDto,
   })
   @ApiBadRequestResponse({
-    description: 'The attribute variant has not been created',
+    description: 'The variant of the attribute has not been created',
     type: HttpErrorDto,
   })
-  @UsePipes(new ParseObjectIdsPipe<IAttributeVariant>('attributeId', 'string'))
   @ApiNoAccessResponse()
   async createAttributeVariant(
     @Body() createAttributeValueDto: CreateAttributeVariantDto,
@@ -195,21 +180,20 @@ export class AttributesController {
     );
   }
 
-  @Patch(ATTRIBUTE_VARIANT_PATH)
+  @Patch(VARIANTS_PATH)
+  @UsePipes(new ParseObjectIdsPipe<IAttributeVariant>('variantId', 'string'))
   @ApiCreatedResponse({
-    description: 'The attribute variant has been updated',
+    description: 'The variant of the attribute has been updated',
     type: AttributeDto,
   })
-  @ApiBadRequestResponse({
-    description: 'The attribute variant has not been updated',
+  @ApiNotFoundResponse({
+    description: 'The variant of the attribute has not been found',
     type: HttpErrorDto,
   })
-  @UsePipes(
-    new ParseObjectIdsPipe<IAttributeVariant>(
-      ['attributeId', 'variantId'],
-      ['string', 'string'],
-    ),
-  )
+  @ApiGoneResponse({
+    description: 'The variant of the attribute has not been updated',
+    type: HttpErrorDto,
+  })
   @ApiNoAccessResponse()
   async updateAttributeVariant(
     @Body() updateAttributeVariantDto: UpdateAttributeVariantDto,
@@ -219,26 +203,13 @@ export class AttributesController {
     );
   }
 
-  @Delete(ATTRIBUTE_VARIANT_PATH)
+  @Delete(VARIANTS_PATH)
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UsePipes(new ParseObjectIdsPipe<IAttributeVariant>('variantId', 'string'))
   @ApiNoContentResponse({
-    description: 'The attribute variant has been deleted',
-  })
-  @ApiNotFoundResponse({
-    description: 'The attribute variant has not been found',
-    type: HttpErrorDto,
-  })
-  @ApiBadRequestResponse({
-    description: 'The attribute variant has not been deleted',
-    type: HttpErrorDto,
+    description: 'The variant of the attribute has been deleted',
   })
   @ApiNoAccessResponse()
-  @UsePipes(
-    new ParseObjectIdsPipe<IDeleteAttributeValue>(
-      ['attributeId', 'variantId'],
-      ['string', 'string'],
-    ),
-  )
   async deleteAttributeVariant(
     @Body() deleteAttributeVariantDto: DeleteAttributeVariantDto,
   ): Promise<void> {

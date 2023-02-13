@@ -9,7 +9,7 @@ export class UpdateAttributeDto extends PartialType(
   @IsMongoId()
   @ApiProperty({
     type: 'string',
-    description: "Attribute's identifier",
+    description: 'Identifier of the attribute',
   })
   readonly id: ObjectId;
 }

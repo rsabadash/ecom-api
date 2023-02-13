@@ -17,6 +17,7 @@ import { SupplierDto } from './dto/supplier.dto';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
+  ApiGoneResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -27,7 +28,7 @@ import {
   GET_SUPPLIER_BY_ID_PATH,
   SUPPLIERS_ROUTE,
 } from './constants/route.constants';
-import { SUPPLIERS_ID_PARAM } from './constants/param.constants';
+import { SUPPLIER_ID_PARAM } from './constants/param.constants';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { DeleteSupplierDto } from './dto/delete-supplier.dto';
 import { ParseObjectIdsPipe } from '../common/pipes/parse-body-objectId.pipe';
@@ -44,8 +45,8 @@ import { AuthType } from '../iam/enums/auth-type.enum';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
 import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
 
-@Auth(AuthType.Bearer)
 @Roles(Role.Admin)
+@Auth(AuthType.Bearer)
 @Controller(SUPPLIERS_ROUTE)
 @ApiTags(SUPPLIERS_MODULE_NAME)
 export class SuppliersController {
@@ -72,7 +73,7 @@ export class SuppliersController {
   })
   @ApiNoAccessResponse()
   async getSupplier(
-    @Param(SUPPLIERS_ID_PARAM, ParseObjectIdPipe) supplierId: ObjectId,
+    @Param(SUPPLIER_ID_PARAM, ParseObjectIdPipe) supplierId: ObjectId,
   ): Promise<ISupplier> {
     return await this.suppliersService.getSupplier({ supplierId });
   }
@@ -93,9 +94,9 @@ export class SuppliersController {
     return await this.suppliersService.createSupplier(createSupplierDto);
   }
 
-  @UsePipes(new ParseObjectIdsPipe<IUpdateSupplier>('id', 'string'))
   @Patch()
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UsePipes(new ParseObjectIdsPipe<IUpdateSupplier>('id', 'string'))
   @ApiNoContentResponse({
     description: 'The supplier has been updated',
   })
@@ -103,7 +104,7 @@ export class SuppliersController {
     description: 'The supplier has not been found',
     type: HttpErrorDto,
   })
-  @ApiBadRequestResponse({
+  @ApiGoneResponse({
     description: 'The supplier has not been updated',
     type: HttpErrorDto,
   })
@@ -116,19 +117,11 @@ export class SuppliersController {
 
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UsePipes(new ParseObjectIdsPipe<IDeleteSupplier>('id', 'string'))
   @ApiNoContentResponse({
     description: 'The supplier has been deleted',
   })
-  @ApiNotFoundResponse({
-    description: 'The supplier has not been found',
-    type: HttpErrorDto,
-  })
-  @ApiBadRequestResponse({
-    description: 'The supplier has not been deleted',
-    type: HttpErrorDto,
-  })
   @ApiNoAccessResponse()
-  @UsePipes(new ParseObjectIdsPipe<IDeleteSupplier>('id', 'string'))
   async deleteSupplier(
     @Body() deleteSupplierDto: DeleteSupplierDto,
   ): Promise<void> {

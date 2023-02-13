@@ -5,6 +5,7 @@ import { SuppliersModule } from './suppliers/suppliers.module';
 import { CategoriesModule } from './categories/categories.module';
 import { AttributesModule } from './attributes/attributes.module';
 // import { IamModule } from './iam/iam.module';
+import { UsersModule } from './users/users.module';
 import { getEnvPath } from './common/utils/env.utils';
 
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
@@ -13,6 +14,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
   imports: [
     ConfigModule.forRoot({ envFilePath }),
     DatabaseModule,
+    UsersModule,
     // IamModule,
     CategoriesModule,
     AttributesModule,

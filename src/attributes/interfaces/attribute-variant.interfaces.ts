@@ -8,13 +8,3 @@ export interface IAttributeVariant {
   isActive: boolean;
   sortOrder: number;
 }
-
-export interface IDeleteAttributeValue {
-  attributeId: ObjectId;
-  variantId: ObjectId;
-}
-
-export interface IGetAttributeValue {
-  attributeId: ObjectId;
-  variantId: ObjectId;
-}

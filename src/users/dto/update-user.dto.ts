@@ -7,7 +7,7 @@ export class UpdateUserDto extends PartialType(OmitType(UserDto, ['_id'])) {
   @IsMongoId()
   @ApiProperty({
     type: 'string',
-    description: "User's identifier",
+    description: 'Identifier of the user',
   })
   readonly id: ObjectId;
 }

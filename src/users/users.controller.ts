@@ -17,6 +17,7 @@ import {
   ApiNoContentResponse,
   ApiConflictResponse,
   ApiBadRequestResponse,
+  ApiGoneResponse,
 } from '@nestjs/swagger';
 import { ObjectId } from 'mongodb';
 import { UsersService } from './users.service';
@@ -41,8 +42,8 @@ import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-
 import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
 import { UserId } from './decorators/user-id.decorator';
 
-@Auth(AuthType.Bearer)
 @Roles(Role.Admin)
+@Auth(AuthType.Bearer)
 @Controller(USERS_ROUTE)
 @ApiTags(USERS_MODULE_NAME)
 export class UsersController {
@@ -106,9 +107,9 @@ export class UsersController {
     return await this.usersService.createUser(createUserDto);
   }
 
-  @UsePipes(new ParseObjectIdsPipe<IUpdateUser>('id', 'string'))
   @Patch()
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UsePipes(new ParseObjectIdsPipe<IUpdateUser>('id', 'string'))
   @ApiNoContentResponse({
     description: 'The user has been updated',
   })
@@ -120,7 +121,7 @@ export class UsersController {
     description: 'User with the email already exists',
     type: HttpErrorDto,
   })
-  @ApiBadRequestResponse({
+  @ApiGoneResponse({
     description: 'The user has not been updated',
     type: HttpErrorDto,
   })

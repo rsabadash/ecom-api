@@ -8,16 +8,16 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ObjectId } from 'mongodb';
+import { ApiProperty } from '@nestjs/swagger';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
-import { ApiProperty } from '@nestjs/swagger';
 
 export class AttributeVariantDto {
   @IsString()
   @IsMongoId()
   @ApiProperty({
     type: 'string',
-    description: 'Attribute variant identifier',
+    description: 'Identifier of the parent attribute',
   })
   readonly attributeId: ObjectId;
 
@@ -25,31 +25,28 @@ export class AttributeVariantDto {
   @IsMongoId()
   @ApiProperty({
     type: 'string',
-    description: 'Attribute identifier',
+    description: 'Identifier of the variant',
   })
   readonly variantId: ObjectId;
 
   @ValidateNested()
-  @ApiProperty({
-    type: 'string',
-    description: "Attribute's variant name",
-  })
   @Type(() => TranslationsDto)
+  @ApiProperty({
+    type: TranslationsDto,
+    description: 'Translation object for the variant name',
+  })
   readonly name: Translations;
 
   @IsBoolean()
   @ApiProperty({
-    type: 'string',
-    description: "Attribute's variant active state",
+    description: 'Is the variant publicly visible',
   })
-  readonly isActive: boolean;
+  readonly isActive: boolean = false;
 
   @IsNumber()
   @IsOptional()
   @ApiProperty({
-    type: 'string',
-    description:
-      "Attribute's variant sort order. If empty - last in collection",
+    description: 'Sort order of the variant',
   })
-  readonly sortOrder: number;
+  readonly sortOrder: number = 0;
 }
