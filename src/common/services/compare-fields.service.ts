@@ -6,8 +6,8 @@ import { equalArrays, isArrays } from '../utils/arrays.utils';
 @Injectable()
 export class CompareFieldsService {
   compare<Entity>(
-    newEntity,
-    existedEntity,
+    newEntity: Partial<Entity>,
+    existedEntity: Partial<Entity> & { _id?: ObjectId },
   ): {
     _id: ObjectId;
     updatedFields: Partial<Entity>;

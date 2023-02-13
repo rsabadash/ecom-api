@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  GoneException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -22,7 +23,7 @@ export class SuppliersService {
   ) {}
 
   async getSuppliers(): Promise<ISupplier[]> {
-    return await this.supplierCollection.find({});
+    return await this.supplierCollection.find();
   }
 
   async getSupplier(parameters: GetSupplierParameters): Promise<ISupplier> {
@@ -54,10 +55,6 @@ export class SuppliersService {
       supplierId: updateSupplierDto.id,
     });
 
-    if (!supplier) {
-      throw new NotFoundException('The supplier has not been found');
-    }
-
     const { _id, updatedFields } = this.compareFieldsService.compare<ISupplier>(
       updateSupplierDto,
       supplier,
@@ -69,25 +66,13 @@ export class SuppliersService {
     );
 
     if (!updateResult.isUpdated) {
-      throw new BadRequestException('The supplier has not been updated');
+      throw new GoneException('The supplier has not been updated');
     }
   }
 
   async deleteSupplier(deleteSupplierDto: DeleteSupplierDto): Promise<void> {
-    const supplier = await this.getSupplier({
-      supplierId: deleteSupplierDto.id,
-    });
-
-    if (!supplier) {
-      throw new NotFoundException('The supplier has not been found');
-    }
-
-    const deleteResult = await this.supplierCollection.deleteOne({
+    await this.supplierCollection.deleteOne({
       _id: deleteSupplierDto.id,
     });
-
-    if (!deleteResult.isDeleted) {
-      throw new BadRequestException('The supplier has not been deleted');
-    }
   }
 }

@@ -11,6 +11,8 @@ import {
   PartialEntity,
   PartialEntityRemoveFields,
   PartialEntityUpdate,
+  // PartialEntityUpdateArray,
+  // UpdateOneArrayOptions,
 } from '../types/mongo-query.types';
 
 export interface UpdateOneResult {
@@ -40,7 +42,13 @@ export interface ICollectionModel<Entity> {
     updateData: PartialEntityUpdate<Entity>,
   ): Promise<UpdateOneResult>;
 
+  updateWithOperator(
+    entityQuery: PartialEntity<Entity>,
+    options: UpdateFilter<Entity>,
+  ): Promise<UpdateOneResult>;
+
   updateMany(filter: Filter<Entity>, update: UpdateFilter<Entity>);
+
   // updateOneArray(
   //   entityQuery: PartialEntity<Entity>,
   //   updateData: PartialEntityUpdateArray<Entity>,

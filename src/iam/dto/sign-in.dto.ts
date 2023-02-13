@@ -4,6 +4,6 @@ import { UserDto } from '../../users/dto/user.dto';
 
 export class SignInDto extends PickType(UserDto, ['email']) {
   @IsString()
-  @ApiProperty({ description: "User's password" })
+  @ApiProperty({ description: 'Password of the user' })
   readonly password: string;
 }

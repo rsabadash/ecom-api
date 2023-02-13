@@ -15,6 +15,7 @@ import {
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
+  ApiGoneResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -71,8 +72,8 @@ export class CategoriesController {
     return await this.categoriesService.getCategories();
   }
 
-  @UsePipes(new ParseObjectIdsPipe<ICategory>('_id', 'string'))
   @Get(DROPDOWN_LIST_PATH)
+  @UsePipes(new ParseObjectIdsPipe<ICategory>('_id', 'string'))
   async getCategoriesDropdownList(
     @Query() queryParams: DropdownListQueryParams,
     @Headers('accept-language') language: Language,
@@ -93,14 +94,14 @@ export class CategoriesController {
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
-  async getProduct(
+  async getCategory(
     @Param(CATEGORY_ID_PARAM, ParseObjectIdPipe) categoryId: ObjectId,
   ): Promise<ICategoryDetail> {
     return await this.categoriesService.getCategory({ categoryId });
   }
 
-  @UsePipes(new ParseObjectIdsPipe<ICreateCategory>('parentIds', 'array'))
   @Post()
+  @UsePipes(new ParseObjectIdsPipe<ICreateCategory>('parentIds', 'array'))
   @ApiCreatedResponse({
     description: 'The category has been created',
     type: CategoryDto,
@@ -109,19 +110,20 @@ export class CategoriesController {
     description: 'The category has not been created',
     type: HttpErrorDto,
   })
+  @ApiNoAccessResponse()
   async createCategory(
     @Body() createCategoryDto: CreateCategoryDto,
   ): Promise<ICategory> {
     return await this.categoriesService.createCategory(createCategoryDto);
   }
 
+  @Patch()
   @UsePipes(
     new ParseObjectIdsPipe<IUpdateCategory>(
       ['id', 'parentIds'],
       ['string', 'array'],
     ),
   )
-  @Patch()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
     description: 'The category has been updated',
@@ -130,7 +132,7 @@ export class CategoriesController {
     description: 'The category has not been found',
     type: HttpErrorDto,
   })
-  @ApiBadRequestResponse({
+  @ApiGoneResponse({
     description: 'The category has not been updated',
     type: HttpErrorDto,
   })
@@ -141,19 +143,11 @@ export class CategoriesController {
     await this.categoriesService.updateCategory(updateCategoryDto);
   }
 
-  @UsePipes(new ParseObjectIdsPipe<IDeleteCategory>('id', 'string'))
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UsePipes(new ParseObjectIdsPipe<IDeleteCategory>('id', 'string'))
   @ApiNoContentResponse({
     description: 'The category has been deleted',
-  })
-  @ApiNotFoundResponse({
-    description: 'The category has not been found',
-    type: HttpErrorDto,
-  })
-  @ApiBadRequestResponse({
-    description: 'The category has not been deleted',
-    type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
   async deleteCategory(

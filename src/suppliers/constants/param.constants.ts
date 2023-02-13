@@ -1,1 +1,1 @@
-export const SUPPLIERS_ID_PARAM = 'supplierId';
+export const SUPPLIER_ID_PARAM = 'supplierId';

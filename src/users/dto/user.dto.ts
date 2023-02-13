@@ -14,23 +14,23 @@ export class UserDto {
   @IsMongoId()
   @ApiProperty({
     type: 'string',
-    description: "User's identifier",
+    description: 'Identifier of the user',
   })
   readonly _id: ObjectId;
 
   @IsEmail()
-  @ApiProperty({ description: "User's email" })
+  @ApiProperty({ description: 'Email of the user' })
   readonly email: string;
 
   @IsString()
   @MinLength(8)
-  @ApiProperty({ description: "User's password" })
+  @ApiProperty({ description: 'Password of the user' })
   readonly password: string;
 
   @IsArray()
   @IsEnum(Role, { each: true })
   @ApiProperty({
-    description: "User's role",
+    description: 'Roles of the user',
     enum: Role,
     isArray: true,
     example: [Role.Admin, Role.ContentManager],

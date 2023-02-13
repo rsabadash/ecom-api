@@ -3,6 +3,7 @@ import {
   ConflictException,
   NotFoundException,
   BadRequestException,
+  GoneException,
 } from '@nestjs/common';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
 import {
@@ -66,11 +67,7 @@ export class UsersService {
   }
 
   async updateUser(updateUserDto: UpdateUserDto): Promise<void> {
-    const user = this.getUser({ userId: updateUserDto.id });
-
-    if (!user) {
-      throw new NotFoundException('The user has not been found');
-    }
+    const user = await this.getUser({ userId: updateUserDto.id });
 
     const isUserWithEmailExist = await this.getUserByEmail(updateUserDto.email);
 
@@ -78,18 +75,16 @@ export class UsersService {
       throw new ConflictException('User with the email already exists');
     }
 
-    const { _id, updatedFields } = this.compareFieldsService.compare<IUser>(
-      updateUserDto,
-      user,
-    );
+    const { _id, updatedFields } =
+      this.compareFieldsService.compare<IUserPublic>(updateUserDto, user);
 
     const updateResult = await this.usersCollection.updateOne(
       { _id },
       updatedFields,
     );
 
-    if (!updateResult.isFound) {
-      throw new BadRequestException('The user has not been updated');
+    if (!updateResult.isUpdated) {
+      throw new GoneException('The user has not been updated');
     }
   }
 }

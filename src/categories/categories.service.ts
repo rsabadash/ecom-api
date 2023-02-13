@@ -1,7 +1,8 @@
 import {
+  BadRequestException,
+  GoneException,
   Injectable,
   NotFoundException,
-  UnprocessableEntityException,
 } from '@nestjs/common';
 import { MongoClient, ObjectId } from 'mongodb';
 import {
@@ -77,24 +78,26 @@ export class CategoriesService {
   async getCategory(
     parameters: GetCategoryParameters,
   ): Promise<ICategoryDetail> {
-    const categoryDetailArray =
-      await this.categoryCollection.aggregate<ICategoryDetail>([
-        { $match: { _id: parameters.categoryId } },
-        {
-          $lookup: {
-            from: 'categories',
-            localField: 'parentIds',
-            foreignField: '_id',
-            as: 'parents',
-          },
+    const pipeline = [
+      { $match: { _id: parameters.categoryId } },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'parentIds',
+          foreignField: '_id',
+          as: 'parents',
         },
-        { $project: { _id: 1, name: 1, isActive: 1, parents: 1 } },
-      ]);
+      },
+      { $project: { _id: 1, name: 1, isActive: 1, parents: 1 } },
+    ];
 
-    const category = categoryDetailArray[0];
+    const categoryDetail =
+      await this.categoryCollection.aggregate<ICategoryDetail>(pipeline);
+
+    const category = categoryDetail[0];
 
     if (!category) {
-      throw new NotFoundException('Not found');
+      throw new NotFoundException('The category has not been found');
     }
 
     return category;
@@ -103,7 +106,13 @@ export class CategoriesService {
   async createCategory(
     createCategoryDto: CreateCategoryDto,
   ): Promise<ICategory> {
-    return await this.categoryCollection.create(createCategoryDto);
+    const newCategory = await this.categoryCollection.create(createCategoryDto);
+
+    if (!newCategory) {
+      throw new BadRequestException('The category has not been created');
+    }
+
+    return newCategory;
   }
 
   async updateCategory(updateCategoryDto: UpdateCategoryDto): Promise<void> {
@@ -112,7 +121,7 @@ export class CategoriesService {
     });
 
     if (!category) {
-      throw new NotFoundException();
+      throw new NotFoundException('The category has not been found');
     }
 
     const comparedFields = this.compareFieldsService.compare<ICategory>(
@@ -139,35 +148,23 @@ export class CategoriesService {
       updatedFields,
     );
 
-    if (!updateResult.isFound) {
-      throw new NotFoundException();
+    if (!updateResult.isUpdated) {
+      throw new GoneException('The category has not been updated');
     }
   }
 
   async deleteCategory(deleteCategoryDto: DeleteCategoryDto): Promise<void> {
-    const category = await this.categoryCollection.findOne({
-      _id: deleteCategoryDto.id,
-    });
-
-    if (!category) {
-      throw new NotFoundException();
-    }
-
     const session = this.client.startSession();
 
     try {
       await session.withTransaction(async () => {
-        const deleteResult = await this.categoryCollection.deleteOne({
+        await this.categoryCollection.deleteOne({
           _id: deleteCategoryDto.id,
         });
 
-        if (!deleteResult.isDeleted) {
-          throw new UnprocessableEntityException();
-        }
-
         await this.categoryCollection.updateMany(
-          { parentIds: { $in: [category._id] } },
-          { $pull: { parentIds: category._id } },
+          { parentIds: { $in: [deleteCategoryDto.id] } },
+          { $pull: { parentIds: deleteCategoryDto.id } },
         );
       });
     } finally {

@@ -22,20 +22,20 @@ export class CategoryDto {
   @ValidateNested()
   @Type(() => TranslationsDto)
   @ApiProperty({
-    description: 'Translation object for the category name',
     type: TranslationsDto,
+    description: 'Translation object for the category name',
   })
   readonly name: Translations;
 
   @IsBoolean()
   @ApiProperty({
-    description: 'If the category publicly visible',
+    description: 'Is the category publicly visible',
   })
   readonly isActive: boolean = false;
 
   @IsMongoId({ each: true })
   @ApiProperty({
-    description: 'Parens categories for the category',
+    description: 'Parents categories for the category',
   })
   readonly parentIds: ObjectId[] = [];
 }
