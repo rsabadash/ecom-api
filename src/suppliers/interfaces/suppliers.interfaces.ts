@@ -4,7 +4,6 @@ export interface ISupplier {
   _id: ObjectId;
   name: string;
   note: string | null;
-  accountId: ObjectId | null;
   address: string | null;
   phoneNumber: string | null;
 }

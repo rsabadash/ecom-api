@@ -43,15 +43,6 @@ export class SupplierDto {
 
   @IsString()
   @IsOptional()
-  @IsMongoId()
-  @ApiPropertyOptional({
-    type: 'string',
-    description: 'Bill identifier of the supplier',
-  })
-  readonly accountId: ObjectId | null = null;
-
-  @IsString()
-  @IsOptional()
   @MaxLength(256, {
     message:
       'Supplier address is too long. Maximal length is $constraint1 characters, but actual is $value',
