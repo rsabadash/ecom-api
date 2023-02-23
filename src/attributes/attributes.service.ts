@@ -34,7 +34,7 @@ export class AttributesService {
     return await this.attributeCollection.find();
   }
 
-  async getAttributesVariants(): Promise<IVariantWithAttribute[]> {
+  async getVariants(): Promise<IVariantWithAttribute[]> {
     const pipeline = [
       { $unwind: '$variants' },
       { $sort: { 'variants.isActive': -1, 'variants.sortOrder': 1 } },
@@ -77,9 +77,7 @@ export class AttributesService {
     return attribute;
   }
 
-  async getAttributeVariant(
-    parameters: GetAttributeVariant,
-  ): Promise<IVariant> {
+  async getVariant(parameters: GetAttributeVariant): Promise<IVariant> {
     const pipeline = [
       { $unwind: '$variants' },
       {
@@ -154,7 +152,7 @@ export class AttributesService {
     });
   }
 
-  async createAttributeVariant(
+  async createVariant(
     createAttributeValueDto: CreateVariantDto,
   ): Promise<void> {
     const variant: IVariant = {
@@ -178,7 +176,7 @@ export class AttributesService {
     }
   }
 
-  async updateAttributeVariant(
+  async updateVariant(
     updateAttributeVariantDto: UpdateVariantDto,
   ): Promise<void> {
     const attribute = await this.attributeCollection.find({
@@ -221,7 +219,7 @@ export class AttributesService {
     }
   }
 
-  async deleteAttributeVariant(
+  async deleteVariant(
     deleteAttributeVariantDto: DeleteVariantDto,
   ): Promise<void> {
     await this.attributeCollection.updateWithOperator(

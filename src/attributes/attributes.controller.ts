@@ -80,7 +80,7 @@ export class AttributesController {
   })
   @ApiNoAccessResponse()
   async getAttributesVariants(): Promise<IVariantWithAttribute[]> {
-    return await this.attributesService.getAttributesVariants();
+    return await this.attributesService.getVariants();
   }
 
   @Get(GET_ATTRIBUTE_BY_ID_PATH)
@@ -112,7 +112,7 @@ export class AttributesController {
   async getAttributeVariant(
     @Param(VARIANT_ID_PARAM, ParseObjectIdPipe) variantId: ObjectId,
   ): Promise<IVariant> {
-    return await this.attributesService.getAttributeVariant({ variantId });
+    return await this.attributesService.getVariant({ variantId });
   }
 
   @Post()
@@ -179,7 +179,7 @@ export class AttributesController {
   async createAttributeVariant(
     @Body() createValueDto: CreateVariantDto,
   ): Promise<void> {
-    return this.attributesService.createAttributeVariant(createValueDto);
+    return this.attributesService.createVariant(createValueDto);
   }
 
   @Patch(VARIANTS_PATH)
@@ -200,7 +200,7 @@ export class AttributesController {
   async updateAttributeVariant(
     @Body() updateVariantDto: UpdateVariantDto,
   ): Promise<void> {
-    return this.attributesService.updateAttributeVariant(updateVariantDto);
+    return this.attributesService.updateVariant(updateVariantDto);
   }
 
   @Delete(VARIANTS_PATH)
@@ -213,6 +213,6 @@ export class AttributesController {
   async deleteAttributeVariant(
     @Body() deleteVariantDto: DeleteVariantDto,
   ): Promise<void> {
-    await this.attributesService.deleteAttributeVariant(deleteVariantDto);
+    await this.attributesService.deleteVariant(deleteVariantDto);
   }
 }
