@@ -12,7 +12,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
 
-export class AttributeVariantDto {
+export class VariantDto {
   @IsString()
   @IsMongoId()
   @ApiProperty({

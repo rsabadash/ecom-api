@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import { IsMongoId } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class DeleteAttributeVariantDto {
+export class DeleteVariantDto {
   @IsMongoId()
   @ApiProperty({
     type: 'string',

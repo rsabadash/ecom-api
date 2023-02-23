@@ -11,8 +11,8 @@ import { ObjectId } from 'mongodb';
 import { ApiProperty } from '@nestjs/swagger';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
-import { AttributeVariantDto } from './attribute-variant.dto';
-import { IAttributeVariant } from '../interfaces/attribute-variant.interfaces';
+import { VariantDto } from './variant.dto';
+import { IVariant } from '../interfaces/variant.interfaces';
 
 export class AttributeDto {
   @IsString()
@@ -46,9 +46,9 @@ export class AttributeDto {
 
   @IsOptional()
   @ValidateNested()
-  @Type(() => AttributeVariantDto)
+  @Type(() => VariantDto)
   @ApiProperty({
     description: 'Variants of the attribute',
   })
-  readonly variants: IAttributeVariant[] = [];
+  readonly variants: IVariant[] = [];
 }
