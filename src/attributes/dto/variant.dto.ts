@@ -17,14 +17,6 @@ export class VariantDto {
   @IsMongoId()
   @ApiProperty({
     type: 'string',
-    description: 'Identifier of the parent attribute',
-  })
-  readonly attributeId: ObjectId;
-
-  @IsString()
-  @IsMongoId()
-  @ApiProperty({
-    type: 'string',
     description: 'Identifier of the variant',
   })
   readonly variantId: ObjectId;

@@ -14,12 +14,12 @@ import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { GetAttributeParameters } from './types/attributes.types';
 import { DeleteAttributeDto } from './dto/delete-attribute.dto';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
-import { CreateVariantDto } from './dto/create-variant.dto';
 import { UpdateVariantDto } from './dto/update-variant.dto';
 import { DeleteVariantDto } from './dto/delete-variant.dto';
+import { CreateVariantDto } from './dto/create-variant.dto';
 import { IVariant } from './interfaces/variant.interfaces';
 import { FindEntityOptions } from '../mongo/types/mongo-query.types';
-import { GetAttributeVariant } from './types/attribute-variant.type';
+import { GetVariant } from './types/variant.type';
 import { IVariantWithAttribute } from './interfaces/variant-with-attribute.interfaces';
 
 @Injectable()
@@ -40,7 +40,6 @@ export class AttributesService {
       { $sort: { 'variants.isActive': -1, 'variants.sortOrder': 1 } },
       {
         $project: {
-          _id: 0,
           variants: 1,
           attributeName: '$name',
         },
@@ -48,7 +47,10 @@ export class AttributesService {
       {
         $replaceRoot: {
           newRoot: {
-            $mergeObjects: ['$variants', { attributeName: '$attributeName' }],
+            $mergeObjects: [
+              '$variants',
+              { attributeName: '$attributeName', attributeId: '$_id' },
+            ],
           },
         },
       },
@@ -77,7 +79,7 @@ export class AttributesService {
     return attribute;
   }
 
-  async getVariant(parameters: GetAttributeVariant): Promise<IVariant> {
+  async getVariant(parameters: GetVariant): Promise<IVariant> {
     const pipeline = [
       { $unwind: '$variants' },
       {
@@ -153,13 +155,15 @@ export class AttributesService {
   async createVariant(
     createAttributeValueDto: CreateVariantDto,
   ): Promise<void> {
+    const { attributeId, ...rest } = createAttributeValueDto;
+
     const variant: IVariant = {
-      ...createAttributeValueDto,
+      ...rest,
       variantId: new ObjectId(),
     };
 
     const updateResult = await this.attributeCollection.updateWithOperator(
-      { _id: createAttributeValueDto.attributeId },
+      { _id: attributeId },
       {
         $push: {
           variants: variant,

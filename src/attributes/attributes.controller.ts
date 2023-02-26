@@ -45,9 +45,9 @@ import {
 import { DeleteAttributeDto } from './dto/delete-attribute.dto';
 import { ParseObjectIdsPipe } from '../common/pipes/parse-body-objectId.pipe';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
-import { CreateVariantDto } from './dto/create-variant.dto';
-import { IVariant } from './interfaces/variant.interfaces';
 import { UpdateVariantDto } from './dto/update-variant.dto';
+import { CreateVariantDto } from './dto/create-variant.dto';
+import { ICreateVariant, IVariant } from './interfaces/variant.interfaces';
 import { DeleteVariantDto } from './dto/delete-variant.dto';
 import { AttributeDto } from './dto/attribute.dto';
 import { VariantDto } from './dto/variant.dto';
@@ -166,7 +166,7 @@ export class AttributesController {
   }
 
   @Post(VARIANTS_PATH)
-  @UsePipes(new ParseObjectIdsPipe<IVariant>('attributeId', 'string'))
+  @UsePipes(new ParseObjectIdsPipe<ICreateVariant>('attributeId', 'string'))
   @ApiCreatedResponse({
     description: 'The variant of the attribute has been created',
     type: AttributeDto,
