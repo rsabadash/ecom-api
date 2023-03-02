@@ -1,12 +1,11 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { VariantDto } from './variant.dto';
 import { ObjectId } from 'mongodb';
-import { IsMongoId, IsString } from 'class-validator';
+import { IsMongoId } from 'class-validator';
+import { VariantDto } from './variant.dto';
 
 export class CreateVariantDto extends OmitType(VariantDto, [
   'variantId',
 ] as const) {
-  @IsString()
   @IsMongoId()
   @ApiProperty({
     type: 'string',

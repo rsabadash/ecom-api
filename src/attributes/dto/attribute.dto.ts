@@ -3,7 +3,6 @@ import {
   IsMongoId,
   IsNumber,
   IsOptional,
-  IsString,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -15,7 +14,6 @@ import { VariantDto } from './variant.dto';
 import { IVariant } from '../interfaces/variant.interfaces';
 
 export class AttributeDto {
-  @IsString()
   @IsMongoId()
   @ApiProperty({
     type: 'string',

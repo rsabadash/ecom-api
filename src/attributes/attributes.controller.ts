@@ -79,7 +79,7 @@ export class AttributesController {
     type: [VariantDto],
   })
   @ApiNoAccessResponse()
-  async getAttributesVariants(): Promise<IVariantWithAttribute[]> {
+  async getVariants(): Promise<IVariantWithAttribute[]> {
     return await this.attributesService.getVariants();
   }
 
@@ -109,7 +109,7 @@ export class AttributesController {
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
-  async getAttributeVariant(
+  async getVariant(
     @Param(VARIANT_ID_PARAM, ParseObjectIdPipe) variantId: ObjectId,
   ): Promise<IVariant> {
     return await this.attributesService.getVariant({ variantId });
@@ -176,9 +176,7 @@ export class AttributesController {
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
-  async createAttributeVariant(
-    @Body() createValueDto: CreateVariantDto,
-  ): Promise<void> {
+  async createVariant(@Body() createValueDto: CreateVariantDto): Promise<void> {
     return this.attributesService.createVariant(createValueDto);
   }
 
@@ -197,7 +195,7 @@ export class AttributesController {
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
-  async updateAttributeVariant(
+  async updateVariant(
     @Body() updateVariantDto: UpdateVariantDto,
   ): Promise<void> {
     return this.attributesService.updateVariant(updateVariantDto);
@@ -210,7 +208,7 @@ export class AttributesController {
     description: 'The variant of the attribute has been deleted',
   })
   @ApiNoAccessResponse()
-  async deleteAttributeVariant(
+  async deleteVariant(
     @Body() deleteVariantDto: DeleteVariantDto,
   ): Promise<void> {
     await this.attributesService.deleteVariant(deleteVariantDto);

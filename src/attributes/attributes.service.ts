@@ -91,6 +91,7 @@ export class AttributesService {
         $match: { variantId: parameters.variantId },
       },
     ];
+
     const variantDetail = await this.attributeCollection.aggregate<IVariant>(
       pipeline,
     );
