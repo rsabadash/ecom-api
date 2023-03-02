@@ -1,10 +1,13 @@
 import { ObjectId } from 'mongodb';
 import { Translations } from '../../common/types/i18n.types';
 
-export interface IAttributeVariant {
+export interface IVariant {
   variantId: ObjectId;
-  attributeId: ObjectId;
   name: Translations;
   isActive: boolean;
   sortOrder: number;
+}
+
+export interface ICreateVariant extends IVariant {
+  attributeId: ObjectId;
 }

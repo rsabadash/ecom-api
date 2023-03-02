@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
 
-export type GetAttributeVariant = {
+export type GetVariant = {
   variantId: ObjectId;
 };

@@ -45,15 +45,16 @@ import {
 import { DeleteAttributeDto } from './dto/delete-attribute.dto';
 import { ParseObjectIdsPipe } from '../common/pipes/parse-body-objectId.pipe';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
-import { CreateAttributeVariantDto } from './dto/create-attribute-variant.dto';
-import { IAttributeVariant } from './interfaces/attribute-variant.interfaces';
-import { UpdateAttributeVariantDto } from './dto/update-attribute-variant.dto';
-import { DeleteAttributeVariantDto } from './dto/delete-attribute-variant.dto';
+import { UpdateVariantDto } from './dto/update-variant.dto';
+import { CreateVariantDto } from './dto/create-variant.dto';
+import { ICreateVariant, IVariant } from './interfaces/variant.interfaces';
+import { DeleteVariantDto } from './dto/delete-variant.dto';
 import { AttributeDto } from './dto/attribute.dto';
-import { AttributeVariantDto } from './dto/attribute-variant.dto';
+import { VariantDto } from './dto/variant.dto';
 import { Roles } from '../iam/decorators/roles.decorator';
 import { Role } from '../users/enums/role.enums';
 import { ATTRIBUTES_MODULE_NAME } from './constants/swagger.constants';
+import { IVariantWithAttribute } from './interfaces/variant-with-attribute.interfaces';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -75,11 +76,11 @@ export class AttributesController {
   @Get(VARIANTS_PATH)
   @ApiOkResponse({
     description: 'List of variants were of attributes retrieved',
-    type: [AttributeVariantDto],
+    type: [VariantDto],
   })
   @ApiNoAccessResponse()
-  async getAttributesVariants(): Promise<IAttributeVariant[]> {
-    return await this.attributesService.getAttributesVariants();
+  async getVariants(): Promise<IVariantWithAttribute[]> {
+    return await this.attributesService.getVariants();
   }
 
   @Get(GET_ATTRIBUTE_BY_ID_PATH)
@@ -101,17 +102,17 @@ export class AttributesController {
   @Get(`${VARIANTS_PATH}${GET_VARIANT_BY_ID_PATH}`)
   @ApiOkResponse({
     description: 'The variant of the attribute was retrieved',
-    type: AttributeVariantDto,
+    type: VariantDto,
   })
   @ApiNotFoundResponse({
     description: 'The variant of the attribute has not been found',
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
-  async getAttributeVariant(
+  async getVariant(
     @Param(VARIANT_ID_PARAM, ParseObjectIdPipe) variantId: ObjectId,
-  ): Promise<IAttributeVariant> {
-    return await this.attributesService.getAttributeVariant({ variantId });
+  ): Promise<IVariant> {
+    return await this.attributesService.getVariant({ variantId });
   }
 
   @Post()
@@ -165,7 +166,7 @@ export class AttributesController {
   }
 
   @Post(VARIANTS_PATH)
-  @UsePipes(new ParseObjectIdsPipe<IAttributeVariant>('attributeId', 'string'))
+  @UsePipes(new ParseObjectIdsPipe<ICreateVariant>('attributeId', 'string'))
   @ApiCreatedResponse({
     description: 'The variant of the attribute has been created',
     type: AttributeDto,
@@ -175,16 +176,12 @@ export class AttributesController {
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
-  async createAttributeVariant(
-    @Body() createAttributeValueDto: CreateAttributeVariantDto,
-  ): Promise<void> {
-    return this.attributesService.createAttributeVariant(
-      createAttributeValueDto,
-    );
+  async createVariant(@Body() createValueDto: CreateVariantDto): Promise<void> {
+    return this.attributesService.createVariant(createValueDto);
   }
 
   @Patch(VARIANTS_PATH)
-  @UsePipes(new ParseObjectIdsPipe<IAttributeVariant>('variantId', 'string'))
+  @UsePipes(new ParseObjectIdsPipe<IVariant>('variantId', 'string'))
   @ApiCreatedResponse({
     description: 'The variant of the attribute has been updated',
     type: AttributeDto,
@@ -198,26 +195,22 @@ export class AttributesController {
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
-  async updateAttributeVariant(
-    @Body() updateAttributeVariantDto: UpdateAttributeVariantDto,
+  async updateVariant(
+    @Body() updateVariantDto: UpdateVariantDto,
   ): Promise<void> {
-    return this.attributesService.updateAttributeVariant(
-      updateAttributeVariantDto,
-    );
+    return this.attributesService.updateVariant(updateVariantDto);
   }
 
   @Delete(VARIANTS_PATH)
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UsePipes(new ParseObjectIdsPipe<IAttributeVariant>('variantId', 'string'))
+  @UsePipes(new ParseObjectIdsPipe<IVariant>('variantId', 'string'))
   @ApiNoContentResponse({
     description: 'The variant of the attribute has been deleted',
   })
   @ApiNoAccessResponse()
-  async deleteAttributeVariant(
-    @Body() deleteAttributeVariantDto: DeleteAttributeVariantDto,
+  async deleteVariant(
+    @Body() deleteVariantDto: DeleteVariantDto,
   ): Promise<void> {
-    await this.attributesService.deleteAttributeVariant(
-      deleteAttributeVariantDto,
-    );
+    await this.attributesService.deleteVariant(deleteVariantDto);
   }
 }

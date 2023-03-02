@@ -14,12 +14,13 @@ import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { GetAttributeParameters } from './types/attributes.types';
 import { DeleteAttributeDto } from './dto/delete-attribute.dto';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
-import { CreateAttributeVariantDto } from './dto/create-attribute-variant.dto';
-import { UpdateAttributeVariantDto } from './dto/update-attribute-variant.dto';
-import { DeleteAttributeVariantDto } from './dto/delete-attribute-variant.dto';
-import { IAttributeVariant } from './interfaces/attribute-variant.interfaces';
+import { UpdateVariantDto } from './dto/update-variant.dto';
+import { DeleteVariantDto } from './dto/delete-variant.dto';
+import { CreateVariantDto } from './dto/create-variant.dto';
+import { IVariant } from './interfaces/variant.interfaces';
 import { FindEntityOptions } from '../mongo/types/mongo-query.types';
-import { GetAttributeVariant } from './types/attribute-variant.type';
+import { GetVariant } from './types/variant.type';
+import { IVariantWithAttribute } from './interfaces/variant-with-attribute.interfaces';
 
 @Injectable()
 export class AttributesService {
@@ -33,19 +34,29 @@ export class AttributesService {
     return await this.attributeCollection.find();
   }
 
-  async getAttributesVariants(): Promise<IAttributeVariant[]> {
+  async getVariants(): Promise<IVariantWithAttribute[]> {
     const pipeline = [
       { $unwind: '$variants' },
-      { $project: { variants: 1 } },
-      { $sort: { 'variants.isActive': -1 } },
+      { $sort: { 'variants.isActive': -1, 'variants.sortOrder': 1 } },
+      {
+        $project: {
+          variants: 1,
+          attributeName: '$name',
+        },
+      },
       {
         $replaceRoot: {
-          newRoot: '$variants',
+          newRoot: {
+            $mergeObjects: [
+              '$variants',
+              { attributeName: '$attributeName', attributeId: '$_id' },
+            ],
+          },
         },
       },
     ];
 
-    return await this.attributeCollection.aggregate<IAttributeVariant>(
+    return await this.attributeCollection.aggregate<IVariantWithAttribute>(
       pipeline,
     );
   }
@@ -68,12 +79,9 @@ export class AttributesService {
     return attribute;
   }
 
-  async getAttributeVariant(
-    parameters: GetAttributeVariant,
-  ): Promise<IAttributeVariant> {
+  async getVariant(parameters: GetVariant): Promise<IVariant> {
     const pipeline = [
       { $unwind: '$variants' },
-      { $project: { _id: 0, variants: 1 } },
       {
         $replaceRoot: {
           newRoot: '$variants',
@@ -84,8 +92,9 @@ export class AttributesService {
       },
     ];
 
-    const variantDetail =
-      await this.attributeCollection.aggregate<IAttributeVariant>(pipeline);
+    const variantDetail = await this.attributeCollection.aggregate<IVariant>(
+      pipeline,
+    );
 
     const variant = variantDetail[0];
 
@@ -144,19 +153,21 @@ export class AttributesService {
     });
   }
 
-  async createAttributeVariant(
-    createAttributeValueDto: CreateAttributeVariantDto,
+  async createVariant(
+    createAttributeValueDto: CreateVariantDto,
   ): Promise<void> {
-    const attributeVariant: IAttributeVariant = {
-      ...createAttributeValueDto,
+    const { attributeId, ...rest } = createAttributeValueDto;
+
+    const variant: IVariant = {
+      ...rest,
       variantId: new ObjectId(),
     };
 
     const updateResult = await this.attributeCollection.updateWithOperator(
-      { _id: createAttributeValueDto.attributeId },
+      { _id: attributeId },
       {
         $push: {
-          variants: attributeVariant,
+          variants: variant,
         },
       },
     );
@@ -168,8 +179,8 @@ export class AttributesService {
     }
   }
 
-  async updateAttributeVariant(
-    updateAttributeVariantDto: UpdateAttributeVariantDto,
+  async updateVariant(
+    updateAttributeVariantDto: UpdateVariantDto,
   ): Promise<void> {
     const attribute = await this.attributeCollection.find({
       'variants.variantId': {
@@ -190,11 +201,10 @@ export class AttributesService {
       );
     });
 
-    const { updatedFields } =
-      this.compareFieldsService.compare<IAttributeVariant>(
-        updateAttributeVariantDto,
-        variant,
-      );
+    const { updatedFields } = this.compareFieldsService.compare<IVariant>(
+      updateAttributeVariantDto,
+      variant,
+    );
 
     const updateResult = await this.attributeCollection.updateOne(
       {
@@ -212,8 +222,8 @@ export class AttributesService {
     }
   }
 
-  async deleteAttributeVariant(
-    deleteAttributeVariantDto: DeleteAttributeVariantDto,
+  async deleteVariant(
+    deleteAttributeVariantDto: DeleteVariantDto,
   ): Promise<void> {
     await this.attributeCollection.updateWithOperator(
       {

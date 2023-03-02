@@ -3,7 +3,6 @@ import {
   IsMongoId,
   IsNumber,
   IsOptional,
-  IsString,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -12,16 +11,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
 
-export class AttributeVariantDto {
-  @IsString()
-  @IsMongoId()
-  @ApiProperty({
-    type: 'string',
-    description: 'Identifier of the parent attribute',
-  })
-  readonly attributeId: ObjectId;
-
-  @IsString()
+export class VariantDto {
   @IsMongoId()
   @ApiProperty({
     type: 'string',
