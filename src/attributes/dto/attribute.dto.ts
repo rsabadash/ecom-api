@@ -1,7 +1,10 @@
 import {
   IsBoolean,
+  IsDefined,
   IsMongoId,
+  IsNotEmptyObject,
   IsNumber,
+  IsObject,
   IsOptional,
   ValidateNested,
 } from 'class-validator';
@@ -21,7 +24,10 @@ export class AttributeDto {
   })
   readonly _id: ObjectId;
 
+  @IsObject()
+  @IsDefined()
   @ValidateNested()
+  @IsNotEmptyObject()
   @Type(() => TranslationsDto)
   @ApiProperty({
     type: TranslationsDto,

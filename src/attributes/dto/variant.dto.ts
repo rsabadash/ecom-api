@@ -1,7 +1,9 @@
 import {
   IsBoolean,
+  IsDefined,
   IsMongoId,
   IsNumber,
+  IsObject,
   IsOptional,
   ValidateNested,
 } from 'class-validator';
@@ -19,6 +21,9 @@ export class VariantDto {
   })
   readonly variantId: ObjectId;
 
+  @IsObject()
+  @IsDefined()
+  @ValidateNested()
   @ValidateNested()
   @Type(() => TranslationsDto)
   @ApiProperty({
