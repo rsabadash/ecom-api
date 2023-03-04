@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 import {
   IsBoolean,
   IsMongoId,
+  IsNotEmptyObject,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -20,6 +21,7 @@ export class CategoryDto {
   readonly _id: ObjectId;
 
   @ValidateNested()
+  @IsNotEmptyObject()
   @Type(() => TranslationsDto)
   @ApiProperty({
     type: TranslationsDto,

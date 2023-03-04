@@ -20,6 +20,7 @@ export class VariantDto {
   readonly variantId: ObjectId;
 
   @ValidateNested()
+  @ValidateNested()
   @Type(() => TranslationsDto)
   @ApiProperty({
     type: TranslationsDto,
