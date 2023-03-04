@@ -15,7 +15,7 @@ import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
 import { VariantDto } from './variant.dto';
 import { IVariant } from '../interfaces/variant.interfaces';
-import { onlyNumbersAndLatinLetters } from '../../common/constants/regExp.contants';
+import { onlyNumbersAndLatinLetters } from '../../common/constants/reg-exp.contants';
 
 export class AttributeDto {
   @IsMongoId()
@@ -41,7 +41,8 @@ export class AttributeDto {
       'SEO name of the attribute should contains only number and Latin letters',
   })
   @ApiProperty({
-    description: 'Name of the attribute, that used for search optimization',
+    description:
+      'Name of the attribute, that used for search engine optimization',
   })
   readonly seoName: string;
 

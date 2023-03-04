@@ -13,7 +13,7 @@ import { ObjectId } from 'mongodb';
 import { ApiProperty } from '@nestjs/swagger';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
-import { onlyNumbersAndLatinLetters } from '../../common/constants/regExp.contants';
+import { onlyNumbersAndLatinLetters } from '../../common/constants/reg-exp.contants';
 
 export class VariantDto {
   @IsMongoId()
@@ -39,7 +39,8 @@ export class VariantDto {
       'SEO name of the variant should contains only number and Latin letters',
   })
   @ApiProperty({
-    description: 'Name of the variant, that used for search optimization',
+    description:
+      'Name of the variant, that used for search engine optimization',
   })
   readonly seoName: string;
 
