@@ -5,6 +5,7 @@ import { IVariant } from './variant.interfaces';
 export interface IAttribute {
   _id: ObjectId;
   name: Translations;
+  seoName: string;
   isActive: boolean;
   sortOrder: number;
   variants: IVariant[];

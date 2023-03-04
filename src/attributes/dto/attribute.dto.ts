@@ -1,18 +1,22 @@
 import {
   IsBoolean,
   IsMongoId,
+  IsNotEmpty,
   IsNotEmptyObject,
   IsNumber,
   IsOptional,
+  IsString,
+  Matches,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { ObjectId } from 'mongodb';
 import { ApiProperty } from '@nestjs/swagger';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
 import { VariantDto } from './variant.dto';
 import { IVariant } from '../interfaces/variant.interfaces';
+import { URL_SLUG } from '../../common/constants/reg-exp.contants';
 
 export class AttributeDto {
   @IsMongoId()
@@ -30,6 +34,19 @@ export class AttributeDto {
     description: 'Translation object for the attribute name',
   })
   readonly name: Translations;
+
+  @Transform(({ value }) => value.trim().toLowerCase())
+  @IsString()
+  @IsNotEmpty()
+  @Matches(RegExp(URL_SLUG), {
+    message:
+      'SEO name of the attribute should contains only number and Latin letters',
+  })
+  @ApiProperty({
+    description:
+      'Name of the attribute, that used for search engine optimization',
+  })
+  readonly seoName: string;
 
   @IsBoolean()
   @ApiProperty({

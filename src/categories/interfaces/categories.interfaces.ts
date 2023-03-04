@@ -4,14 +4,12 @@ import { Translations } from '../../common/types/i18n.types';
 export interface ICategory {
   _id: ObjectId;
   name: Translations;
+  seoName: string;
   isActive: boolean;
   parentIds: ObjectId[];
 }
 
-export interface ICategoryDetail {
-  _id: ObjectId;
-  name: string;
-  isActive: boolean;
+export interface ICategoryDetail extends Omit<ICategory, 'parentIds'> {
   parents: ICategory[];
 }
 
