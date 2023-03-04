@@ -88,7 +88,7 @@ export class CategoriesService {
           as: 'parents',
         },
       },
-      { $project: { _id: 1, name: 1, isActive: 1, parents: 1 } },
+      { $project: { _id: 1, name: 1, isActive: 1, parents: 1, seoName: 1 } },
     ];
 
     const categoryDetail =
