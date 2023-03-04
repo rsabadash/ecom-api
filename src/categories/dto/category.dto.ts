@@ -12,7 +12,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
-import { onlyNumbersAndLatinLetters } from '../../common/constants/reg-exp.contants';
+import { URL_SLUG } from '../../common/constants/reg-exp.contants';
 
 export class CategoryDto {
   @IsString()
@@ -35,7 +35,7 @@ export class CategoryDto {
   @Transform(({ value }) => value.trim().toLowerCase())
   @IsString()
   @IsNotEmpty()
-  @Matches(RegExp(onlyNumbersAndLatinLetters), {
+  @Matches(RegExp(URL_SLUG), {
     message:
       'SEO name of the category should contains only number and Latin letters',
   })
