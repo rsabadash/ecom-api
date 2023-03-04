@@ -1,10 +1,8 @@
 import { ObjectId } from 'mongodb';
 import {
   IsBoolean,
-  IsDefined,
   IsMongoId,
   IsNotEmptyObject,
-  IsObject,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -22,8 +20,6 @@ export class CategoryDto {
   })
   readonly _id: ObjectId;
 
-  @IsObject()
-  @IsDefined()
   @ValidateNested()
   @IsNotEmptyObject()
   @Type(() => TranslationsDto)
