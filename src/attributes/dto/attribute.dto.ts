@@ -2,6 +2,7 @@ import {
   IsBoolean,
   IsMongoId,
   IsNotEmpty,
+  IsNotEmptyObject,
   IsNumber,
   IsOptional,
   IsString,
@@ -26,6 +27,7 @@ export class AttributeDto {
   readonly _id: ObjectId;
 
   @ValidateNested()
+  @IsNotEmptyObject()
   @Type(() => TranslationsDto)
   @ApiProperty({
     type: TranslationsDto,
