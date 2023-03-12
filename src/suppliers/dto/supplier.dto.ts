@@ -1,16 +1,8 @@
 import { ObjectId } from 'mongodb';
-import {
-  IsString,
-  MinLength,
-  MaxLength,
-  IsOptional,
-  Length,
-  IsMongoId,
-} from 'class-validator';
+import { IsString, IsOptional, IsMongoId } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class SupplierDto {
-  @IsString()
   @IsMongoId()
   @ApiProperty({
     type: 'string',
@@ -19,18 +11,8 @@ export class SupplierDto {
   readonly _id: ObjectId;
 
   @IsString()
-  @MinLength(3, {
-    message:
-      'Name is too short. Minimal length is $constraint1 characters, but actual is $value',
-  })
-  @MaxLength(50, {
-    message:
-      'Name is too long. Maximal length is $constraint1 characters, but actual is $value',
-  })
   @ApiProperty({
     description: 'Name of the supplier',
-    minimum: 3,
-    maximum: 50,
   })
   readonly name: string;
 
@@ -38,28 +20,26 @@ export class SupplierDto {
   @IsOptional()
   @ApiPropertyOptional({
     description: 'Additional information of the supplier',
+    nullable: true,
+    default: null,
   })
-  readonly note: string | null = null;
+  readonly note: null | string = null;
 
   @IsString()
   @IsOptional()
-  @MaxLength(256, {
-    message:
-      'Supplier address is too long. Maximal length is $constraint1 characters, but actual is $value',
-  })
   @ApiPropertyOptional({
     description: 'Address of the supplier',
-    maximum: 256,
+    nullable: true,
+    default: null,
   })
-  readonly address: string | null = null;
+  readonly address: null | string = null;
 
   @IsString()
-  @Length(10, 10)
   @IsOptional()
   @ApiPropertyOptional({
     description: 'Phone number of the supplier',
-    minimum: 10,
-    maximum: 10,
+    nullable: true,
+    default: null,
   })
-  readonly phoneNumber: string | null = null;
+  readonly phoneNumber: null | string = null;
 }

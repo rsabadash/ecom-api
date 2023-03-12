@@ -9,9 +9,9 @@ import {
   Matches,
   ValidateNested,
 } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 import { ObjectId } from 'mongodb';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
 import { VariantDto } from './variant.dto';
@@ -35,7 +35,6 @@ export class AttributeDto {
   })
   readonly name: Translations;
 
-  @Transform(({ value }) => value.trim().toLowerCase())
   @IsString()
   @IsNotEmpty()
   @Matches(RegExp(URL_SLUG), {
@@ -52,20 +51,22 @@ export class AttributeDto {
   @ApiProperty({
     description: 'Is the attribute publicly visible',
   })
-  readonly isActive: boolean = false;
+  readonly isActive: boolean;
 
   @IsNumber()
   @IsOptional()
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Sort order of the attribute',
+    default: 0,
   })
   readonly sortOrder: number = 0;
 
   @IsOptional()
-  @ValidateNested()
+  @ValidateNested({ each: true })
   @Type(() => VariantDto)
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Variants of the attribute',
+    default: [],
   })
   readonly variants: IVariant[] = [];
 }

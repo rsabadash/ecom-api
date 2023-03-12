@@ -17,5 +17,6 @@ import { ATTRIBUTES_COLLECTION } from '../common/constants/collections.constants
   ],
   controllers: [AttributesController],
   providers: [AttributesService, CompareFieldsService],
+  exports: [AttributesService],
 })
 export class AttributesModule {}

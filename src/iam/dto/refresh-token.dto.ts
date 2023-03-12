@@ -1,10 +1,6 @@
-import { IsNotEmpty } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { PickType } from '@nestjs/swagger';
+import { TokensDto } from './tokens-dto';
 
-export class RefreshTokenDto {
-  @IsNotEmpty()
-  @ApiProperty({
-    description: 'The refresh token to sign a new access token',
-  })
-  readonly refreshToken: string;
-}
+export class RefreshTokenDto extends PickType(TokensDto, [
+  'refreshToken',
+] as const) {}

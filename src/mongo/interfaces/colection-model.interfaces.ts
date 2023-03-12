@@ -67,6 +67,10 @@ export interface ICollectionModel<Entity> {
 
   create(entity: OptionalId<Entity>): Promise<EntityWithId<Entity> | null>;
 
+  createMany(
+    entity: OptionalId<Entity>[],
+  ): Promise<EntityWithId<Entity>[] | null>;
+
   deleteOne(entityQuery: PartialEntity<Entity>): Promise<DeleteOneResult>;
 
   aggregate<Result>(pipeline, options?: AggregateOptions): Promise<Result[]>;

@@ -92,7 +92,7 @@ export class AuthenticationService {
     @Body() refreshTokenDto: RefreshTokenDto,
   ): Promise<Tokens> {
     const { secret, audience, issuer } = this.jwtConfiguration;
-    let userId: string | null = null;
+    let userId: null | string = null;
 
     try {
       const decoded = await this.jwtService.verifyAsync<

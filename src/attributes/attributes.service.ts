@@ -18,9 +18,12 @@ import { UpdateVariantDto } from './dto/update-variant.dto';
 import { DeleteVariantDto } from './dto/delete-variant.dto';
 import { CreateVariantDto } from './dto/create-variant.dto';
 import { IVariant } from './interfaces/variant.interfaces';
-import { FindEntityOptions } from '../mongo/types/mongo-query.types';
 import { GetVariant } from './types/variant.type';
 import { IVariantWithAttribute } from './interfaces/variant-with-attribute.interfaces';
+import {
+  FindEntityOptions,
+  PartialEntity,
+} from '../mongo/types/mongo-query.types';
 
 @Injectable()
 export class AttributesService {
@@ -30,8 +33,11 @@ export class AttributesService {
     private readonly attributeCollection: ICollectionModel<IAttribute>,
   ) {}
 
-  async getAttributes(): Promise<IAttribute[]> {
-    return await this.attributeCollection.find();
+  async getAttributes(
+    query: PartialEntity<IAttribute> = {},
+    options?: FindEntityOptions<IAttribute>,
+  ): Promise<IAttribute[]> {
+    return await this.attributeCollection.find(query, options);
   }
 
   async getVariants(): Promise<IVariantWithAttribute[]> {

@@ -144,6 +144,26 @@ export class CollectionModel<CollectionEntity>
     return null;
   }
 
+  async createMany(
+    entity: OptionalId<CollectionEntity>[],
+  ): Promise<EntityWithId<CollectionEntity>[] | null> {
+    const typedEntity = entity as OptionalUnlessRequiredId<CollectionEntity>[];
+    const createdEntity = await this.collection.insertMany(typedEntity);
+
+    if (createdEntity.insertedCount > 0) {
+      return entity.map((entityItem, index) => {
+        const entityId = createdEntity.insertedIds[index];
+
+        return {
+          ...entityItem,
+          _id: entityId,
+        };
+      });
+    }
+
+    return null;
+  }
+
   async deleteOne(
     entityQuery: PartialEntity<CollectionEntity>,
   ): Promise<DeleteOneResult> {

@@ -3,7 +3,9 @@ import { IsMongoId } from 'class-validator';
 import { ObjectId } from 'mongodb';
 import { UserDto } from './user.dto';
 
-export class UpdateUserDto extends PartialType(OmitType(UserDto, ['_id'])) {
+export class UpdateUserDto extends PartialType(
+  OmitType(UserDto, ['_id'] as const),
+) {
   @IsMongoId()
   @ApiProperty({
     type: 'string',

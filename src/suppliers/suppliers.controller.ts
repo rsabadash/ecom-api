@@ -54,7 +54,7 @@ export class SuppliersController {
 
   @Get()
   @ApiOkResponse({
-    description: 'List of suppliers were retrieved',
+    description: 'List of suppliers was retrieved',
     type: [SupplierDto],
   })
   @ApiNoAccessResponse()

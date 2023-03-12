@@ -1,11 +1,12 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { IsOptional, IsString, Matches } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { EMPTY_SPACE } from '../constants/reg-exp.contants';
 
 export class TranslationsDto {
-  @Transform(({ value }) => value.trim())
   @IsString()
-  @IsNotEmpty()
+  @Matches(RegExp(EMPTY_SPACE), {
+    message: ({ property }) => `${property} should not be empty`,
+  })
   @ApiProperty({
     type: 'string',
     description: 'Ukrainian translation',
@@ -14,10 +15,10 @@ export class TranslationsDto {
 
   @IsString()
   @IsOptional()
-  @ApiProperty({
-    type: 'string',
+  @ApiPropertyOptional({
     description: 'English translation',
-    required: false,
+    nullable: true,
+    default: null,
   })
-  readonly en: string | null = null;
+  readonly en: null | string = null;
 }
