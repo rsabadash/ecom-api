@@ -15,7 +15,7 @@ class AttributeWarehouseProductCreateDto extends OmitType(
 export class CreateWarehouseProductDto extends OmitType(WarehouseProductDto, [
   '_id',
   'groupId',
-  'createdAt',
+  'createdDate',
   'attributes',
 ] as const) {
   @ValidateNested({ each: true })

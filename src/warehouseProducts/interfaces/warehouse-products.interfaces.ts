@@ -19,16 +19,15 @@ export interface IWarehouseProduct {
   attributes: null | IWarehouseProductAttribute[];
   groupId: null | ObjectId;
   groupName: null | string;
-  createdAt: Date;
+  createdDate: Date;
 }
 
 export interface ICreateWarehouseProduct
   extends Omit<
     IWarehouseProduct,
-    '_id' | 'groupId' | 'createdAt' | 'attributes'
+    '_id' | 'groupId' | 'createdDate' | 'attributes'
   > {
   attributes: null | Omit<IWarehouseProductAttribute, 'name'>[];
 }
 
-export interface IUpdatedWarehouseProduct
-  extends Omit<IWarehouseProduct, '_id'> {}
+export interface INewWarehouseProduct extends Omit<IWarehouseProduct, '_id'> {}

@@ -5,7 +5,7 @@ import { WAREHOUSE_PRODUCTS_COLLECTION } from '../common/constants/collections.c
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
 import {
   ICreateWarehouseProduct,
-  IUpdatedWarehouseProduct,
+  INewWarehouseProduct,
   IWarehouseProduct,
 } from './interfaces/warehouse-products.interfaces';
 import { CreateWarehouseProductDto } from './dto/create-warehouse-product.dto';
@@ -45,50 +45,52 @@ export class WarehouseProductsService {
       { projection: { name: 1, variants: { name: 1, variantId: 1 } } },
     );
 
-    const updatedProducts = products.reduce<IUpdatedWarehouseProduct[]>(
+    const newProducts = products.reduce<INewWarehouseProduct[]>(
       (acc, product) => {
         const {
-          attributes: productAttributes,
+          attributes: warehouseProductAttributes,
           groupName,
           ...restProductValues
         } = product;
 
-        const updatedAttributes = productAttributes.map((productAttribute) => {
-          const foundAttribute = attributes.find(
-            (attribute) =>
-              attribute._id.toString() ===
-              productAttribute.attributeId.toString(),
-          );
+        const productAttributes = warehouseProductAttributes.map(
+          (productAttribute) => {
+            const foundAttribute = attributes.find(
+              (attribute) =>
+                attribute._id.toString() ===
+                productAttribute.attributeId.toString(),
+            );
 
-          const updatedVariants = productAttribute.variants.map(
-            (productVariant) => {
-              const foundVariant = foundAttribute.variants.find((variant) => {
-                return (
-                  variant.variantId.toString() ===
-                  productVariant.variantId.toString()
-                );
-              });
+            const productVariants = productAttribute.variants.map(
+              (productVariant) => {
+                const foundVariant = foundAttribute.variants.find((variant) => {
+                  return (
+                    variant.variantId.toString() ===
+                    productVariant.variantId.toString()
+                  );
+                });
 
-              return {
-                variantId: foundVariant.variantId.toString(),
-                name: foundVariant.name,
-              };
-            },
-          );
+                return {
+                  variantId: foundVariant.variantId.toString(),
+                  name: foundVariant.name,
+                };
+              },
+            );
 
-          return {
-            attributeId: foundAttribute._id.toString(),
-            name: foundAttribute.name,
-            variants: updatedVariants,
-          };
-        });
+            return {
+              attributeId: foundAttribute._id.toString(),
+              name: foundAttribute.name,
+              variants: productVariants,
+            };
+          },
+        );
 
-        const updatedProduct: IUpdatedWarehouseProduct = {
+        const updatedProduct: INewWarehouseProduct = {
           ...restProductValues,
           groupName: groupName ? groupName : null,
           groupId: groupName ? new ObjectId() : null,
-          attributes: updatedAttributes,
-          createdAt: currentDate,
+          attributes: productAttributes,
+          createdDate: currentDate,
         };
 
         acc.push(updatedProduct);
@@ -98,7 +100,7 @@ export class WarehouseProductsService {
       [],
     );
 
-    return await this.warehouseProductCollection.createMany(updatedProducts);
+    return await this.warehouseProductCollection.createMany(newProducts);
   }
 
   async getWarehouseProducts(
@@ -119,7 +121,7 @@ export class WarehouseProductsService {
       attributes: null,
       groupName: groupName ? groupName : null,
       groupId: groupName ? new ObjectId() : null,
-      createdAt: currentDate,
+      createdDate: currentDate,
     });
   }
 

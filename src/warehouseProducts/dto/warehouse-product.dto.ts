@@ -111,5 +111,5 @@ export class WarehouseProductDto {
   @ApiProperty({
     description: 'Date of the warehouse product creation',
   })
-  createdAt: Date;
+  createdDate: Date;
 }
