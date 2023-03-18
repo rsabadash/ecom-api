@@ -51,7 +51,7 @@ export class UsersController {
 
   @Get()
   @ApiOkResponse({
-    description: 'List of users were retrieved',
+    description: 'List of users was retrieved',
     type: [PublicUserDto],
   })
   @ApiNoAccessResponse()

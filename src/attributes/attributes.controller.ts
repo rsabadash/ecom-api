@@ -65,7 +65,7 @@ export class AttributesController {
 
   @Get()
   @ApiOkResponse({
-    description: 'List of attributes were retrieved',
+    description: 'List of attributes was retrieved',
     type: [AttributeDto],
   })
   @ApiNoAccessResponse()

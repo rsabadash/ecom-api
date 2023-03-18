@@ -4,18 +4,18 @@ import {
   IsMongoId,
   IsNotEmptyObject,
   IsString,
+  IsOptional,
   ValidateNested,
   Matches,
   IsNotEmpty,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
 import { URL_SLUG } from '../../common/constants/reg-exp.contants';
 
 export class CategoryDto {
-  @IsString()
   @IsMongoId()
   @ApiProperty({
     type: 'string',
@@ -32,7 +32,6 @@ export class CategoryDto {
   })
   readonly name: Translations;
 
-  @Transform(({ value }) => value.trim().toLowerCase())
   @IsString()
   @IsNotEmpty()
   @Matches(RegExp(URL_SLUG), {
@@ -49,11 +48,13 @@ export class CategoryDto {
   @ApiProperty({
     description: 'Is the category publicly visible',
   })
-  readonly isActive: boolean = false;
+  readonly isActive: boolean;
 
   @IsMongoId({ each: true })
-  @ApiProperty({
+  @IsOptional()
+  @ApiPropertyOptional({
     description: 'Parents categories for the category',
+    default: [],
   })
   readonly parentIds: ObjectId[] = [];
 }

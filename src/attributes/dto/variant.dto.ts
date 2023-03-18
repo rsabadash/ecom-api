@@ -8,7 +8,7 @@ import {
   Matches,
   ValidateNested,
 } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 import { ObjectId } from 'mongodb';
 import { ApiProperty } from '@nestjs/swagger';
 import { TranslationsDto } from '../../common/dto/translations.dto';
@@ -32,7 +32,6 @@ export class VariantDto {
   })
   readonly name: Translations;
 
-  @Transform(({ value }) => value.trim().toLowerCase())
   @IsString()
   @IsNotEmpty()
   @Matches(RegExp(URL_SLUG), {

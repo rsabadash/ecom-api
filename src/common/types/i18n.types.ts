@@ -3,7 +3,7 @@ export type TranslationRequired = {
 };
 
 export type TranslationsOptional = {
-  en?: string | null;
+  en?: null | string;
 };
 
 export type Translations = TranslationRequired & TranslationsOptional;

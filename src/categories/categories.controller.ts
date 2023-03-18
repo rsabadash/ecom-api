@@ -64,7 +64,7 @@ export class CategoriesController {
 
   @Get()
   @ApiOkResponse({
-    description: 'List of categories were retrieved',
+    description: 'List of categories was retrieved',
     type: [CategoryDto],
   })
   @ApiNoAccessResponse()

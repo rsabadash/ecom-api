@@ -5,3 +5,5 @@ export const CATEGORIES_COLLECTION = 'categories';
 export const USERS_COLLECTION = 'users';
 
 export const ATTRIBUTES_COLLECTION = 'attributes';
+
+export const WAREHOUSE_PRODUCTS_COLLECTION = 'warehouseProducts';
