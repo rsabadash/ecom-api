@@ -11,10 +11,13 @@ import { IWarehouse } from './interfaces/warehouses.interfaces';
 import { PartialEntity } from '../mongo/types/mongo-query.types';
 import { CreateWarehouseDto } from './dto/create-warehouse.dto';
 import { GetWarehouseParameters } from './types/warehouses.types';
+import { CompareFieldsService } from '../common/services/compare-fields.service';
+import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
 
 @Injectable()
 export class WarehousesService {
   constructor(
+    private readonly compareFieldsService: CompareFieldsService,
     @InjectCollectionModel(WAREHOUSES_COLLECTION)
     private readonly warehousesCollection: ICollectionModel<IWarehouse>,
   ) {}
@@ -49,5 +52,26 @@ export class WarehousesService {
     }
 
     return newWarehouse;
+  }
+
+  async updateWarehouse(updateWarehouseDto: UpdateWarehouseDto): Promise<void> {
+    const warehouse = await this.getWarehouse({
+      warehouseId: updateWarehouseDto.id,
+    });
+
+    const { _id, updatedFields } =
+      this.compareFieldsService.compare<IWarehouse>(
+        updateWarehouseDto,
+        warehouse,
+      );
+
+    const updatedResult = await this.warehousesCollection.updateOne(
+      { _id },
+      updatedFields,
+    );
+
+    if (!updatedResult.isUpdated) {
+      throw new BadRequestException('The warehouse has not been updated');
+    }
   }
 }

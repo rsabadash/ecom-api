@@ -143,12 +143,12 @@ export class AttributesService {
         attribute,
       );
 
-    const updateResult = await this.attributeCollection.updateOne(
+    const updatedResult = await this.attributeCollection.updateOne(
       { _id },
       updatedFields,
     );
 
-    if (!updateResult.isUpdated) {
+    if (!updatedResult.isUpdated) {
       throw new BadRequestException('The attribute has not been updated');
     }
   }

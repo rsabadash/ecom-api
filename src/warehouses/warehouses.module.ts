@@ -4,6 +4,7 @@ import { WAREHOUSES_COLLECTION } from '../common/constants/collections.constants
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
 import { WarehousesController } from './warehouses.controller';
 import { WarehousesService } from './warehouses.service';
+import { CompareFieldsService } from '../common/services/compare-fields.service';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { WarehousesService } from './warehouses.service';
     ),
   ],
   controllers: [WarehousesController],
-  providers: [WarehousesService],
+  providers: [WarehousesService, CompareFieldsService],
 })
 export class WarehousesModule {}

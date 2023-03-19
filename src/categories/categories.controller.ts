@@ -15,7 +15,6 @@ import {
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
-  ApiGoneResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -132,7 +131,7 @@ export class CategoriesController {
     description: 'The category has not been found',
     type: HttpErrorDto,
   })
-  @ApiGoneResponse({
+  @ApiBadRequestResponse({
     description: 'The category has not been updated',
     type: HttpErrorDto,
   })

@@ -1,7 +1,17 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
@@ -22,6 +32,7 @@ import { Roles } from '../iam/decorators/roles.decorator';
 import { Role } from '../users/enums/role.enums';
 import { Auth } from '../iam/decorators/auth.decorator';
 import { AuthType } from '../iam/enums/auth-type.enum';
+import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -70,5 +81,25 @@ export class WarehousesController {
     @Body() createWarehouse: CreateWarehouseDto,
   ): Promise<IWarehouse> {
     return await this.warehousesService.createWarehouse(createWarehouse);
+  }
+
+  @Patch()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description: 'The warehouse has been updated',
+  })
+  @ApiNotFoundResponse({
+    description: 'The warehouse has not been found',
+    type: HttpErrorDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'The warehouse has not been updated',
+    type: HttpErrorDto,
+  })
+  @ApiNoAccessResponse()
+  async updateWarehouse(
+    @Body() updateWarehouseDto: UpdateWarehouseDto,
+  ): Promise<void> {
+    return await this.warehousesService.updateWarehouse(updateWarehouseDto);
   }
 }
