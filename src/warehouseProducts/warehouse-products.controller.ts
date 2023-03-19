@@ -29,7 +29,7 @@ export class WarehouseProductsController {
 
   @Get()
   @ApiOkResponse({
-    description: 'List of warehouse products was retrieved',
+    description: 'List of warehouses products was retrieved',
     type: [WarehouseProductDto],
   })
   @ApiNoAccessResponse()

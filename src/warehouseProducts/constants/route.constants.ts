@@ -1,1 +1,1 @@
-export const WAREHOUSE_PRODUCTS_ROUTE = 'warehouse-products';
+export const WAREHOUSE_PRODUCTS_ROUTE = 'warehouses-products';

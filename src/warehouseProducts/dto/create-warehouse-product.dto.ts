@@ -22,7 +22,7 @@ export class CreateWarehouseProductDto extends OmitType(WarehouseProductDto, [
   @Type(() => AttributeWarehouseProductCreateDto)
   @ApiProperty({
     type: [AttributeWarehouseProductCreateDto],
-    description: 'Attributes for the warehouse product',
+    description: 'Attributes for the warehouses product',
     nullable: true,
     default: null,
   })

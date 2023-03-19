@@ -14,8 +14,9 @@ import { Type } from 'class-transformer';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
 import { URL_SLUG } from '../../common/constants/reg-exp.contants';
+import { ICategory } from '../interfaces/categories.interfaces';
 
-export class CategoryDto {
+export class CategoryDto implements ICategory {
   @IsMongoId()
   @ApiProperty({
     type: 'string',
