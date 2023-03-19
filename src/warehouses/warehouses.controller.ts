@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -33,6 +34,7 @@ import { Role } from '../users/enums/role.enums';
 import { Auth } from '../iam/decorators/auth.decorator';
 import { AuthType } from '../iam/enums/auth-type.enum';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
+import { DeleteWarehouseDto } from './dto/delete-warehouse.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -101,5 +103,17 @@ export class WarehousesController {
     @Body() updateWarehouseDto: UpdateWarehouseDto,
   ): Promise<void> {
     return await this.warehousesService.updateWarehouse(updateWarehouseDto);
+  }
+
+  @Delete()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description: 'The warehouse has been deleted',
+  })
+  @ApiNoAccessResponse()
+  async deleteWarehouse(
+    @Body() deleteWarehouseDto: DeleteWarehouseDto,
+  ): Promise<void> {
+    await this.warehousesService.deleteWarehouse(deleteWarehouseDto);
   }
 }

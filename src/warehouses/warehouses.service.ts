@@ -13,6 +13,7 @@ import { CreateWarehouseDto } from './dto/create-warehouse.dto';
 import { GetWarehouseParameters } from './types/warehouses.types';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
+import { DeleteWarehouseDto } from './dto/delete-warehouse.dto';
 
 @Injectable()
 export class WarehousesService {
@@ -73,5 +74,11 @@ export class WarehousesService {
     if (!updatedResult.isUpdated) {
       throw new BadRequestException('The warehouse has not been updated');
     }
+  }
+
+  async deleteWarehouse(deleteWarehouseDto: DeleteWarehouseDto): Promise<void> {
+    await this.warehousesCollection.deleteOne({
+      _id: new ObjectId(deleteWarehouseDto.id),
+    });
   }
 }
