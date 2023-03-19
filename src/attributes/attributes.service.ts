@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-  GoneException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException, GoneException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
 import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
@@ -24,6 +19,7 @@ import {
   FindEntityOptions,
   PartialEntity,
 } from '../mongo/types/mongo-query.types';
+import { EntityNotFoundException } from '../common/exeptions/EntityNotFoundException';
 
 @Injectable()
 export class AttributesService {
@@ -79,7 +75,7 @@ export class AttributesService {
     );
 
     if (!attribute) {
-      throw new NotFoundException('The attribute has not been found');
+      throw new EntityNotFoundException('The attribute has not been found');
     }
 
     return attribute;
@@ -105,7 +101,7 @@ export class AttributesService {
     const variant = variantDetail[0];
 
     if (!variant) {
-      throw new NotFoundException(
+      throw new EntityNotFoundException(
         'The variant of the attribute has not been found',
       );
     }
@@ -195,7 +191,7 @@ export class AttributesService {
     });
 
     if (attribute.length === 0) {
-      throw new NotFoundException(
+      throw new EntityNotFoundException(
         'The variant of the attribute has not been found',
       );
     }

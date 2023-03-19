@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  GoneException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, GoneException, Injectable } from '@nestjs/common';
 import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
 import { SUPPLIER_COLLECTION } from '../common/constants/collections.constants';
 import { ISupplier } from './interfaces/suppliers.interfaces';
@@ -13,6 +8,7 @@ import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
+import { EntityNotFoundException } from '../common/exeptions/EntityNotFoundException';
 
 @Injectable()
 export class SuppliersService {
@@ -32,7 +28,7 @@ export class SuppliersService {
     });
 
     if (!supplier) {
-      throw new NotFoundException('The supplier has not been found');
+      throw new EntityNotFoundException('The supplier has not been found');
     }
 
     return supplier;
