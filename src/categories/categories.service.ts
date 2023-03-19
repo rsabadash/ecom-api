@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  GoneException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, GoneException, Injectable } from '@nestjs/common';
 import { MongoClient, ObjectId } from 'mongodb';
 import {
   InjectClients,
@@ -24,6 +19,7 @@ import {
 import { Language } from '../common/types/i18n.types';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
+import { EntityNotFoundException } from '../common/exeptions/EntityNotFoundException';
 
 @Injectable()
 export class CategoriesService {
@@ -97,7 +93,7 @@ export class CategoriesService {
     const category = categoryDetail[0];
 
     if (!category) {
-      throw new NotFoundException('The category has not been found');
+      throw new EntityNotFoundException('The category has not been found');
     }
 
     return category;
@@ -121,7 +117,7 @@ export class CategoriesService {
     });
 
     if (!category) {
-      throw new NotFoundException('The category has not been found');
+      throw new EntityNotFoundException('The category has not been found');
     }
 
     const comparedFields = this.compareFieldsService.compare<ICategory>(
