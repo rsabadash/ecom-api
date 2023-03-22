@@ -9,8 +9,9 @@ import {
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '../enums/role.enums';
+import { IUser } from '../interfaces/users.interfaces';
 
-export class UserDto {
+export class UserDto implements IUser {
   @IsMongoId()
   @ApiProperty({
     type: 'string',

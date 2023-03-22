@@ -1,8 +1,9 @@
 import { ObjectId } from 'mongodb';
 import { IsString, IsOptional, IsMongoId } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ISupplier } from '../interfaces/suppliers.interfaces';
 
-export class SupplierDto {
+export class SupplierDto implements ISupplier {
   @IsMongoId()
   @ApiProperty({
     type: 'string',

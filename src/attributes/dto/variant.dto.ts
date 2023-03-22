@@ -14,8 +14,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
 import { URL_SLUG } from '../../common/constants/reg-exp.contants';
+import { IVariant } from '../interfaces/variant.interfaces';
 
-export class VariantDto {
+export class VariantDto implements IVariant {
   @IsMongoId()
   @ApiProperty({
     type: 'string',

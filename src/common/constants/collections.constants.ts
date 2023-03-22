@@ -7,3 +7,5 @@ export const USERS_COLLECTION = 'users';
 export const ATTRIBUTES_COLLECTION = 'attributes';
 
 export const WAREHOUSE_PRODUCTS_COLLECTION = 'warehouseProducts';
+
+export const WAREHOUSES_COLLECTION = 'warehouses';

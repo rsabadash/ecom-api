@@ -17,8 +17,9 @@ import { Translations } from '../../common/types/i18n.types';
 import { VariantDto } from './variant.dto';
 import { IVariant } from '../interfaces/variant.interfaces';
 import { URL_SLUG } from '../../common/constants/reg-exp.contants';
+import { IAttribute } from '../interfaces/attribute.interfaces';
 
-export class AttributeDto {
+export class AttributeDto implements IAttribute {
   @IsMongoId()
   @ApiProperty({
     type: 'string',

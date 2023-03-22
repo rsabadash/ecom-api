@@ -7,19 +7,20 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ObjectId } from 'mongodb';
 import { Type } from 'class-transformer';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
 import {
+  IWarehouseProduct,
   IWarehouseProductAttribute,
   IWarehouseProductVariant,
 } from '../interfaces/warehouse-products.interfaces';
-import { ObjectId } from 'mongodb';
 
-class VariantWarehouseProductDto {
+class VariantWarehouseProductDto implements IWarehouseProductVariant {
   @IsMongoId()
   @ApiProperty({
-    description: 'Identifier of the variant for the warehouse product',
+    description: 'Identifier of the variant for the warehouses product',
   })
   readonly variantId: string;
 
@@ -27,15 +28,17 @@ class VariantWarehouseProductDto {
   @Type(() => TranslationsDto)
   @ApiProperty({
     type: TranslationsDto,
-    description: 'Translation object for the warehouse product variant',
+    description: 'Translation object for the warehouses product variant',
   })
   readonly name: Translations;
 }
 
-export class AttributeWarehouseProductDto {
+export class AttributeWarehouseProductDto
+  implements IWarehouseProductAttribute
+{
   @IsMongoId()
   @ApiProperty({
-    description: 'Identifier of the attribute for the warehouse product',
+    description: 'Identifier of the attribute for the warehouses product',
   })
   readonly attributeId: string;
 
@@ -43,7 +46,7 @@ export class AttributeWarehouseProductDto {
   @Type(() => TranslationsDto)
   @ApiProperty({
     type: TranslationsDto,
-    description: 'Translation object for the warehouse product attribute',
+    description: 'Translation object for the warehouses product attribute',
   })
   readonly name: Translations;
 
@@ -51,16 +54,16 @@ export class AttributeWarehouseProductDto {
   @Type(() => VariantWarehouseProductDto)
   @ApiProperty({
     type: [VariantWarehouseProductDto],
-    description: 'Variants for the warehouse product',
+    description: 'Variants for the warehouses product',
   })
   readonly variants: IWarehouseProductVariant[];
 }
 
-export class WarehouseProductDto {
+export class WarehouseProductDto implements IWarehouseProduct {
   @IsMongoId()
   @ApiProperty({
     type: 'string',
-    description: 'Identifier of the warehouse product',
+    description: 'Identifier of the warehouses product',
   })
   readonly _id: ObjectId;
 
@@ -69,13 +72,13 @@ export class WarehouseProductDto {
   @Type(() => TranslationsDto)
   @ApiProperty({
     type: TranslationsDto,
-    description: 'Translation object for the warehouse product name',
+    description: 'Translation object for the warehouses product name',
   })
   readonly name: Translations;
 
   @IsString()
   @ApiProperty({
-    description: 'A unique SKU identifier of the warehouse product',
+    description: 'A unique SKU identifier of the warehouses product',
   })
   readonly sku: string;
 
@@ -83,7 +86,7 @@ export class WarehouseProductDto {
   @Type(() => AttributeWarehouseProductDto)
   @ApiProperty({
     type: [AttributeWarehouseProductDto],
-    description: 'Attributes for the warehouse product',
+    description: 'Attributes for the warehouses product',
     nullable: true,
     default: null,
   })
@@ -92,16 +95,17 @@ export class WarehouseProductDto {
   @IsMongoId()
   @IsOptional()
   @ApiPropertyOptional({
-    description: 'Identifier of the warehouse product group',
+    type: 'string',
+    description: 'Identifier of the warehouses product group',
     nullable: true,
     default: null,
   })
-  readonly groupId: null | string = null;
+  readonly groupId: null | ObjectId = null;
 
   @IsString()
   @IsOptional()
   @ApiPropertyOptional({
-    description: 'Name of the warehouse product group',
+    description: 'Name of the warehouses product group',
     nullable: true,
     default: null,
   })
@@ -109,7 +113,7 @@ export class WarehouseProductDto {
 
   @IsDate()
   @ApiProperty({
-    description: 'Date of the warehouse product creation',
+    description: 'Date of the warehouses product creation',
   })
   createdDate: Date;
 }
