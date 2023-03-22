@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
 import { WAREHOUSES_COLLECTION } from '../common/constants/collections.constants';
@@ -14,6 +10,7 @@ import { GetWarehouseParameters } from './types/warehouses.types';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
 import { DeleteWarehouseDto } from './dto/delete-warehouse.dto';
+import { EntityNotFoundException } from '../common/exeptions/EntityNotFoundException';
 
 @Injectable()
 export class WarehousesService {
@@ -35,7 +32,7 @@ export class WarehousesService {
     });
 
     if (!warehouse) {
-      throw new NotFoundException('The warehouse has not been found');
+      throw new EntityNotFoundException('The warehouse has not been found');
     }
 
     return warehouse;
