@@ -53,6 +53,7 @@ import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-
 import { CategoryDto } from './dto/category.dto';
 import { CATEGORIES_MODULE_NAME } from './constants/swagger.constants';
 import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
+import { DropdownListDto } from '../common/dto/dropdown-list.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -73,6 +74,11 @@ export class CategoriesController {
 
   @Get(DROPDOWN_LIST_PATH)
   @UsePipes(new ParseObjectIdsPipe<ICategory>('_id', 'string'))
+  @ApiOkResponse({
+    description: 'Dropdown list of categories',
+    type: DropdownListDto,
+  })
+  @ApiNoAccessResponse()
   async getCategoriesDropdownList(
     @Query() queryParams: DropdownListQueryParams,
     @Headers('accept-language') language: Language,

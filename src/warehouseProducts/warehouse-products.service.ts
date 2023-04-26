@@ -11,6 +11,8 @@ import {
 import { CreateWarehouseProductDto } from './dto/create-warehouse-product.dto';
 import { AttributesService } from '../attributes/attributes.service';
 import { PartialEntity } from '../mongo/types/mongo-query.types';
+import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
+import { Language } from '../common/types/i18n.types';
 
 @Injectable()
 export class WarehouseProductsService {
@@ -107,6 +109,19 @@ export class WarehouseProductsService {
     query: PartialEntity<IWarehouseProduct> = {},
   ): Promise<IWarehouseProduct[]> {
     return await this.warehouseProductCollection.find(query);
+  }
+
+  async getWarehouseProductsDropdownList(
+    language: Language,
+  ): Promise<DropdownListItem[]> {
+    const warehouseProducts = await this.getWarehouseProducts();
+
+    return warehouseProducts.map((warehouseProduct) => {
+      return {
+        id: warehouseProduct._id.toString(),
+        value: warehouseProduct.name[language],
+      };
+    });
   }
 
   private async createWarehouseProductWithoutAttributes(

@@ -5,6 +5,6 @@ export interface DropdownListQueryParams {
 }
 
 export interface DropdownListItem {
-  id: string | ObjectId;
+  id: string;
   value: string;
 }

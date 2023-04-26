@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -17,6 +17,10 @@ import { IWarehouseProduct } from './interfaces/warehouse-products.interfaces';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
 import { WarehouseProductDto } from './dto/warehouse-product.dto';
 import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
+import { DROPDOWN_LIST_PATH } from '../common/constants/path.constants';
+import { DropdownListDto } from '../common/dto/dropdown-list.dto';
+import { Language } from '../common/types/i18n.types';
+import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -35,6 +39,20 @@ export class WarehouseProductsController {
   @ApiNoAccessResponse()
   async getWarehouseProducts() {
     return await this.warehouseProductsService.getWarehouseProducts();
+  }
+
+  @Get(DROPDOWN_LIST_PATH)
+  @ApiOkResponse({
+    description: 'Dropdown list of categories',
+    type: DropdownListDto,
+  })
+  @ApiNoAccessResponse()
+  async getCategoriesDropdownList(
+    @Headers('accept-language') language: Language,
+  ): Promise<DropdownListItem[]> {
+    return this.warehouseProductsService.getWarehouseProductsDropdownList(
+      language,
+    );
   }
 
   @Post()

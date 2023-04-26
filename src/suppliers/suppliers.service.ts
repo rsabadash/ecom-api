@@ -9,6 +9,7 @@ import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
 import { EntityNotFoundException } from '../common/exeptions/EntityNotFoundException';
+import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 
 @Injectable()
 export class SuppliersService {
@@ -20,6 +21,17 @@ export class SuppliersService {
 
   async getSuppliers(): Promise<ISupplier[]> {
     return await this.supplierCollection.find();
+  }
+
+  async getSuppliersDropdownList(): Promise<DropdownListItem[]> {
+    const suppliers = await this.getSuppliers();
+
+    return suppliers.map((supplier) => {
+      return {
+        id: supplier._id.toString(),
+        value: supplier.name,
+      };
+    });
   }
 
   async getSupplier(parameters: GetSupplierParameters): Promise<ISupplier> {

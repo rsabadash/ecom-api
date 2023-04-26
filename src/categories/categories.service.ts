@@ -65,7 +65,7 @@ export class CategoriesService {
 
     return categories.map((category) => {
       return {
-        id: category._id,
+        id: category._id.toString(),
         value: category.name[language],
       };
     });

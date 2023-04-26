@@ -44,6 +44,9 @@ import { Auth } from '../iam/decorators/auth.decorator';
 import { AuthType } from '../iam/enums/auth-type.enum';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
 import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
+import { DROPDOWN_LIST_PATH } from '../common/constants/path.constants';
+import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
+import { DropdownListDto } from '../common/dto/dropdown-list.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -60,6 +63,16 @@ export class SuppliersController {
   @ApiNoAccessResponse()
   async getSuppliers(): Promise<ISupplier[]> {
     return await this.suppliersService.getSuppliers();
+  }
+
+  @Get(DROPDOWN_LIST_PATH)
+  @ApiOkResponse({
+    description: 'Dropdown list of suppliers',
+    type: DropdownListDto,
+  })
+  @ApiNoAccessResponse()
+  async getSuppliersDropdownList(): Promise<DropdownListItem[]> {
+    return await this.suppliersService.getSuppliersDropdownList();
   }
 
   @Get(GET_SUPPLIER_BY_ID_PATH)

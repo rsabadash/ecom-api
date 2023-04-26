@@ -11,6 +11,7 @@ import { CompareFieldsService } from '../common/services/compare-fields.service'
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
 import { DeleteWarehouseDto } from './dto/delete-warehouse.dto';
 import { EntityNotFoundException } from '../common/exeptions/EntityNotFoundException';
+import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 
 @Injectable()
 export class WarehousesService {
@@ -24,6 +25,17 @@ export class WarehousesService {
     query: PartialEntity<IWarehouse> = {},
   ): Promise<IWarehouse[]> {
     return await this.warehousesCollection.find(query);
+  }
+
+  async getWarehousesDropdownList(): Promise<DropdownListItem[]> {
+    const warehouses = await this.getWarehouses();
+
+    return warehouses.map((warehouse) => {
+      return {
+        id: warehouse._id.toString(),
+        value: warehouse.name,
+      };
+    });
   }
 
   async getWarehouse(parameters: GetWarehouseParameters): Promise<IWarehouse> {

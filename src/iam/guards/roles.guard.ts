@@ -37,6 +37,7 @@ export class RolesGuard implements CanActivate {
       });
 
       const hasAllAccesses = this.hasAllAccesses(user);
+
       return (
         hasAllAccesses ||
         contextRoles.some((role) => user.roles.find((r) => r === role))

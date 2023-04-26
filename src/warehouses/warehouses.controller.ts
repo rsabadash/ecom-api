@@ -35,6 +35,9 @@ import { Auth } from '../iam/decorators/auth.decorator';
 import { AuthType } from '../iam/enums/auth-type.enum';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
 import { DeleteWarehouseDto } from './dto/delete-warehouse.dto';
+import { DROPDOWN_LIST_PATH } from '../common/constants/path.constants';
+import { DropdownListDto } from '../common/dto/dropdown-list.dto';
+import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -51,6 +54,16 @@ export class WarehousesController {
   @ApiNoAccessResponse()
   async getWarehouses(): Promise<IWarehouse[]> {
     return await this.warehousesService.getWarehouses();
+  }
+
+  @Get(DROPDOWN_LIST_PATH)
+  @ApiOkResponse({
+    description: 'Dropdown list of warehouses',
+    type: DropdownListDto,
+  })
+  @ApiNoAccessResponse()
+  async getWarehousesDropdownList(): Promise<DropdownListItem[]> {
+    return await this.warehousesService.getWarehousesDropdownList();
   }
 
   @Get(GET_WAREHOUSE_BY_ID_PATH)
