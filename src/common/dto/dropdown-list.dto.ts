@@ -1,8 +1,11 @@
-import { IsNotEmpty, IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { DropdownListItem } from '../interfaces/dropdown-list.interface';
+import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  DropdownListItem,
+  DropdownMetaValue,
+} from '../interfaces/dropdown-list.interface';
 
-export class DropdownListDto implements DropdownListItem {
+export class DropdownListDto implements Omit<DropdownListItem, 'meta'> {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
@@ -16,4 +19,15 @@ export class DropdownListDto implements DropdownListItem {
     description: 'Value of dropdown item',
   })
   readonly value: string;
+
+  @ValidateNested()
+  @ApiPropertyOptional({
+    type: 'object',
+    additionalProperties: {
+      anyOf: [{ type: 'string' }, { type: 'number' }, { type: 'boolean' }],
+    },
+    description: 'Any additional data related to the dropdown item',
+    default: null,
+  })
+  readonly meta: Map<string, DropdownMetaValue> = null;
 }

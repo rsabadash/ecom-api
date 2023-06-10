@@ -10,7 +10,10 @@ import {
 } from './interfaces/warehouse-products.interfaces';
 import { CreateWarehouseProductDto } from './dto/create-warehouse-product.dto';
 import { AttributesService } from '../attributes/attributes.service';
-import { PartialEntity } from '../mongo/types/mongo-query.types';
+import {
+  FindEntityOptions,
+  PartialEntity,
+} from '../mongo/types/mongo-query.types';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 import { Language } from '../common/types/i18n.types';
 
@@ -107,6 +110,44 @@ export class WarehouseProductsService {
 
   async getWarehouseProducts(
     query: PartialEntity<IWarehouseProduct> = {},
+    options: FindEntityOptions<IWarehouseProduct> = {},
+  ): Promise<IWarehouseProduct[]> {
+    const { skip, limit } = options;
+
+    const paginatedData = await this.warehouseProductCollection.aggregate([
+      { $match: query },
+      {
+        $facet: {
+          data: [
+            {
+              $skip: skip,
+            },
+            {
+              $limit: limit,
+            },
+          ],
+          total: [{ $count: 'count' }],
+        },
+      },
+      {
+        $project: {
+          data: 1,
+          metadata: { total: { $arrayElemAt: ['$total.count', 0] } },
+        },
+      },
+    ]);
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return paginatedData[0];
+    // return await this.warehouseProductCollection.find(query, {
+    //   skip,
+    //   limit,
+    // });
+  }
+
+  async getWarehouseProducts2(
+    query: PartialEntity<IWarehouseProduct> = {},
   ): Promise<IWarehouseProduct[]> {
     return await this.warehouseProductCollection.find(query);
   }
@@ -114,12 +155,15 @@ export class WarehouseProductsService {
   async getWarehouseProductsDropdownList(
     language: Language,
   ): Promise<DropdownListItem[]> {
-    const warehouseProducts = await this.getWarehouseProducts();
+    const warehouseProducts = await this.getWarehouseProducts2();
 
     return warehouseProducts.map((warehouseProduct) => {
       return {
         id: warehouseProduct._id.toString(),
         value: warehouseProduct.name[language],
+        meta: {
+          unit: warehouseProduct.unit,
+        },
       };
     });
   }

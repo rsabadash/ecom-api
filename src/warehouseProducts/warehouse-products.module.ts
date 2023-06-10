@@ -18,5 +18,6 @@ import { AttributesModule } from '../attributes/attributes.module';
   ],
   controllers: [WarehouseProductsController],
   providers: [WarehouseProductsService],
+  exports: [WarehouseProductsService],
 })
 export class WarehouseProductsModule {}

@@ -1,6 +1,6 @@
 import { BadRequestException, GoneException, Injectable } from '@nestjs/common';
 import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
-import { SUPPLIER_COLLECTION } from '../common/constants/collections.constants';
+import { SUPPLIERS_COLLECTION } from '../common/constants/collections.constants';
 import { ISupplier } from './interfaces/suppliers.interfaces';
 import { GetSupplierParameters } from './types/suppliers.types';
 import { DeleteSupplierDto } from './dto/delete-supplier.dto';
@@ -15,7 +15,7 @@ import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 export class SuppliersService {
   constructor(
     private readonly compareFieldsService: CompareFieldsService,
-    @InjectCollectionModel(SUPPLIER_COLLECTION)
+    @InjectCollectionModel(SUPPLIERS_COLLECTION)
     private readonly supplierCollection: ICollectionModel<ISupplier>,
   ) {}
 

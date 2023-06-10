@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { Translations } from '../../common/types/i18n.types';
+import { Unit } from '../enums/unit.enums';
 
 export interface IWarehouseProductVariant {
   variantId: string;
@@ -16,6 +17,7 @@ export interface IWarehouseProduct {
   _id: ObjectId;
   name: Translations;
   sku: string;
+  unit: Unit;
   attributes: null | IWarehouseProductAttribute[];
   groupId: null | ObjectId;
   groupName: null | string;

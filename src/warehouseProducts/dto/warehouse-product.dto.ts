@@ -1,5 +1,6 @@
 import {
   IsDate,
+  IsEnum,
   IsMongoId,
   IsNotEmptyObject,
   IsOptional,
@@ -16,6 +17,8 @@ import {
   IWarehouseProductAttribute,
   IWarehouseProductVariant,
 } from '../interfaces/warehouse-products.interfaces';
+import { Role } from '../../users/enums/role.enums';
+import { Unit } from '../enums/unit.enums';
 
 class VariantWarehouseProductDto implements IWarehouseProductVariant {
   @IsMongoId()
@@ -81,6 +84,24 @@ export class WarehouseProductDto implements IWarehouseProduct {
     description: 'A unique SKU identifier of the warehouses product',
   })
   readonly sku: string;
+
+  @IsEnum(Unit)
+  @ApiProperty({
+    description: 'Measurement unit of warehouse product',
+    enum: Unit,
+    example: [
+      Unit.Meter,
+      Unit.Centimetre,
+      Unit.Millimetre,
+      Unit.Liter,
+      Unit.Milliliter,
+      Unit.Kilogram,
+      Unit.Gram,
+      Unit.Milligram,
+      Unit.Item,
+    ],
+  })
+  readonly unit: Unit;
 
   @ValidateNested({ each: true })
   @Type(() => AttributeWarehouseProductDto)

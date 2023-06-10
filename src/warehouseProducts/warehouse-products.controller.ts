@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Headers, Post } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -21,6 +21,10 @@ import { DROPDOWN_LIST_PATH } from '../common/constants/path.constants';
 import { DropdownListDto } from '../common/dto/dropdown-list.dto';
 import { Language } from '../common/types/i18n.types';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
+import {
+  DEFAULT_SKIP_PAGINATION,
+  DEFAULT_LIMIT_PAGINATION,
+} from '../common/constants/pagination.constants';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -37,13 +41,38 @@ export class WarehouseProductsController {
     type: [WarehouseProductDto],
   })
   @ApiNoAccessResponse()
-  async getWarehouseProducts() {
-    return await this.warehouseProductsService.getWarehouseProducts();
+  async getWarehouseProducts(@Query() query: Pagination) {
+    let skipValue = DEFAULT_SKIP_PAGINATION;
+    let limitValue = DEFAULT_LIMIT_PAGINATION;
+
+    const { page, limit } = query;
+
+    if (limit !== undefined || page !== undefined) {
+      const numberedLimit = parseInt(limit);
+
+      limitValue = Number.isNaN(numberedLimit)
+        ? DEFAULT_LIMIT_PAGINATION
+        : numberedLimit;
+
+      const parsedPage = parseInt(page);
+      const numberedPage =
+        Number.isNaN(parsedPage) || parsedPage === 0 ? 1 : parsedPage;
+
+      skipValue = (numberedPage - 1) * limitValue;
+    }
+
+    return await this.warehouseProductsService.getWarehouseProducts(
+      {},
+      {
+        skip: skipValue,
+        limit: limitValue,
+      },
+    );
   }
 
   @Get(DROPDOWN_LIST_PATH)
   @ApiOkResponse({
-    description: 'Dropdown list of categories',
+    description: 'Dropdown list of warehouse products',
     type: DropdownListDto,
   })
   @ApiNoAccessResponse()

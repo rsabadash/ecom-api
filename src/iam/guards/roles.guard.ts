@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { Role } from '../../users/enums/role.enums';
 import { UsersService } from '../../users/users.service';
-import { RequestExtended } from '../../common/interfaces/request';
+import { RequestExtended } from '../../common/interfaces/request.interface';
 import { REQUEST_USER_KEY } from '../../common/constants/request.constants';
 import { IUserPublic } from '../../users/interfaces/users.interfaces';
 

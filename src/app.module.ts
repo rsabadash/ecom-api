@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
+import { SuppliesModule } from './supplies/supplies.module';
 import { CategoriesModule } from './categories/categories.module';
 import { AttributesModule } from './attributes/attributes.module';
 import { UsersModule } from './users/users.module';
@@ -21,6 +22,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     CategoriesModule,
     AttributesModule,
     SuppliersModule,
+    SuppliesModule,
     WarehouseProductsModule,
     WarehousesModule,
   ],
