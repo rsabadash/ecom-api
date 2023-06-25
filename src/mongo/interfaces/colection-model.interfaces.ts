@@ -1,19 +1,25 @@
 import {
   AggregateOptions,
+  BulkWriteOptions,
   Collection,
   Filter,
+  InsertOneOptions,
   OptionalId,
   UpdateFilter,
 } from 'mongodb';
+import { Document } from 'bson';
 import {
   EntityWithId,
   FindEntityOptions,
   PartialEntity,
   PartialEntityRemoveFields,
   PartialEntityUpdate,
-  // PartialEntityUpdateArray,
-  // UpdateOneArrayOptions,
 } from '../types/mongo-query.types';
+import {
+  BulkOperations,
+  BulkResult,
+  Pipeline,
+} from '../types/colection-model.types';
 
 export interface UpdateOneResult {
   isFound: boolean;
@@ -24,7 +30,7 @@ export interface DeleteOneResult {
   isDeleted: boolean;
 }
 
-export interface ICollectionModel<Entity> {
+export interface ICollectionModel<Entity extends Document> {
   readonly collection: Collection<Entity>;
 
   findOne(
@@ -65,7 +71,10 @@ export interface ICollectionModel<Entity> {
     fieldsToRename: Record<string, string>,
   ): Promise<boolean>;
 
-  create(entity: OptionalId<Entity>): Promise<EntityWithId<Entity> | null>;
+  create(
+    entity: OptionalId<Entity>,
+    options?: InsertOneOptions,
+  ): Promise<EntityWithId<Entity> | null>;
 
   createMany(
     entity: OptionalId<Entity>[],
@@ -73,5 +82,13 @@ export interface ICollectionModel<Entity> {
 
   deleteOne(entityQuery: PartialEntity<Entity>): Promise<DeleteOneResult>;
 
-  aggregate<Result>(pipeline, options?: AggregateOptions): Promise<Result[]>;
+  aggregate<Result>(
+    pipeline: Pipeline,
+    options?: AggregateOptions,
+  ): Promise<Result[]>;
+
+  bulkWrite(
+    operations: BulkOperations<Entity>[],
+    options?: BulkWriteOptions,
+  ): Promise<BulkResult>;
 }

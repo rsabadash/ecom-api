@@ -1,12 +1,5 @@
 import { ObjectId } from 'mongodb';
-import {
-  IsArray,
-  IsEmail,
-  IsEnum,
-  IsMongoId,
-  IsString,
-  MinLength,
-} from 'class-validator';
+import { IsArray, IsEmail, IsEnum, IsMongoId, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '../enums/role.enums';
 import { IUser } from '../interfaces/users.interfaces';
@@ -24,7 +17,6 @@ export class UserDto implements IUser {
   readonly email: string;
 
   @IsString()
-  @MinLength(8)
   @ApiProperty({ description: 'Password of the user' })
   readonly password: string;
 

@@ -17,5 +17,6 @@ import { CompareFieldsService } from '../common/services/compare-fields.service'
   ],
   controllers: [SuppliersController],
   providers: [SuppliersService, CompareFieldsService],
+  exports: [SuppliersService],
 })
 export class SuppliersModule {}

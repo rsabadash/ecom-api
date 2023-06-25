@@ -7,9 +7,9 @@ import { equalArrays, isArrays } from '../utils/arrays.utils';
 export class CompareFieldsService {
   compare<Entity>(
     newEntity: Partial<Entity>,
-    existedEntity: Partial<Entity> & { _id?: ObjectId },
+    existedEntity: Partial<Entity> & { _id?: undefined | ObjectId },
   ): {
-    _id: ObjectId;
+    _id: undefined | ObjectId;
     updatedFields: Partial<Entity>;
   } {
     let updatedFields: Partial<Entity> = {};

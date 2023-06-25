@@ -69,10 +69,14 @@ export class UsersService {
   async updateUser(updateUserDto: UpdateUserDto): Promise<void> {
     const user = await this.getUser({ userId: updateUserDto.id });
 
-    const isUserWithEmailExist = await this.getUserByEmail(updateUserDto.email);
+    if (updateUserDto.email) {
+      const isUserWithEmailExists = await this.getUserByEmail(
+        updateUserDto.email,
+      );
 
-    if (isUserWithEmailExist) {
-      throw new ConflictException('User with the email already exists');
+      if (isUserWithEmailExists) {
+        throw new ConflictException('User with the email already exists');
+      }
     }
 
     const { _id, updatedFields } =

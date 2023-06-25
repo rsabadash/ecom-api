@@ -10,7 +10,7 @@ export interface IWarehouseProductVariant {
 export interface IWarehouseProductAttribute {
   attributeId: string;
   name: Translations;
-  variants: IWarehouseProductVariant[];
+  variants: null | IWarehouseProductVariant[];
 }
 
 export interface IWarehouseProduct {
@@ -22,12 +22,19 @@ export interface IWarehouseProduct {
   groupId: null | ObjectId;
   groupName: null | string;
   createdDate: Date;
+  supplyIds: string[];
+  warehouses: IWarehouseProductWarehouses[];
+}
+
+export interface IWarehouseProductWarehouses {
+  warehouseId: string;
+  totalQuantity: string | null;
 }
 
 export interface ICreateWarehouseProduct
   extends Omit<
     IWarehouseProduct,
-    '_id' | 'groupId' | 'createdDate' | 'attributes'
+    '_id' | 'groupId' | 'createdDate' | 'attributes' | 'supplies' | 'warehouses'
   > {
   attributes: null | Omit<IWarehouseProductAttribute, 'name'>[];
 }

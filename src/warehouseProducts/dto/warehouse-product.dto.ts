@@ -16,9 +16,10 @@ import {
   IWarehouseProduct,
   IWarehouseProductAttribute,
   IWarehouseProductVariant,
+  IWarehouseProductWarehouses,
 } from '../interfaces/warehouse-products.interfaces';
-import { Role } from '../../users/enums/role.enums';
 import { Unit } from '../enums/unit.enums';
+import { WarehouseProductWarehousesDto } from './warehouse-product-warehouses.dto';
 
 class VariantWarehouseProductDto implements IWarehouseProductVariant {
   @IsMongoId()
@@ -137,4 +138,21 @@ export class WarehouseProductDto implements IWarehouseProduct {
     description: 'Date of the warehouses product creation',
   })
   createdDate: Date;
+
+  @ValidateNested({ each: true })
+  @Type(() => ObjectId)
+  @ApiPropertyOptional({
+    description: 'Identifiers of supplies related to the product',
+    nullable: true,
+    default: [],
+  })
+  readonly supplyIds: string[] = [];
+
+  @ValidateNested({ each: true })
+  @Type(() => WarehouseProductWarehousesDto)
+  @ApiPropertyOptional({
+    description: 'List of warehouses to which the product belongs',
+    default: [],
+  })
+  readonly warehouses: IWarehouseProductWarehouses[] = [];
 }

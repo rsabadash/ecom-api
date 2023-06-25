@@ -29,5 +29,5 @@ export class DropdownListDto implements Omit<DropdownListItem, 'meta'> {
     description: 'Any additional data related to the dropdown item',
     default: null,
   })
-  readonly meta: Map<string, DropdownMetaValue> = null;
+  readonly meta: null | Map<string, DropdownMetaValue> = null;
 }

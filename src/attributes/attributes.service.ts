@@ -19,7 +19,7 @@ import {
   FindEntityOptions,
   PartialEntity,
 } from '../mongo/types/mongo-query.types';
-import { EntityNotFoundException } from '../common/exeptions/EntityNotFoundException';
+import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
 
 @Injectable()
 export class AttributesService {
@@ -202,6 +202,12 @@ export class AttributesService {
         updateAttributeVariantDto.variantId.toString()
       );
     });
+
+    if (!variant) {
+      throw new EntityNotFoundException(
+        'The variant of the attribute has not been found',
+      );
+    }
 
     const { updatedFields } = this.compareFieldsService.compare<IVariant>(
       updateAttributeVariantDto,

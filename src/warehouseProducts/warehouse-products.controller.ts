@@ -22,9 +22,10 @@ import { DropdownListDto } from '../common/dto/dropdown-list.dto';
 import { Language } from '../common/types/i18n.types';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 import {
-  DEFAULT_SKIP_PAGINATION,
-  DEFAULT_LIMIT_PAGINATION,
-} from '../common/constants/pagination.constants';
+  PaginationData,
+  PaginationParsedQuery,
+} from 'src/common/interfaces/pagination.interface';
+import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -41,31 +42,16 @@ export class WarehouseProductsController {
     type: [WarehouseProductDto],
   })
   @ApiNoAccessResponse()
-  async getWarehouseProducts(@Query() query: Pagination) {
-    let skipValue = DEFAULT_SKIP_PAGINATION;
-    let limitValue = DEFAULT_LIMIT_PAGINATION;
-
+  async getWarehouseProducts(
+    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
+  ): Promise<PaginationData<IWarehouseProduct>> {
     const { page, limit } = query;
-
-    if (limit !== undefined || page !== undefined) {
-      const numberedLimit = parseInt(limit);
-
-      limitValue = Number.isNaN(numberedLimit)
-        ? DEFAULT_LIMIT_PAGINATION
-        : numberedLimit;
-
-      const parsedPage = parseInt(page);
-      const numberedPage =
-        Number.isNaN(parsedPage) || parsedPage === 0 ? 1 : parsedPage;
-
-      skipValue = (numberedPage - 1) * limitValue;
-    }
 
     return await this.warehouseProductsService.getWarehouseProducts(
       {},
       {
-        skip: skipValue,
-        limit: limitValue,
+        skip: page,
+        limit: limit,
       },
     );
   }

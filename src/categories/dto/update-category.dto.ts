@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb';
 import { PartialType } from '@nestjs/mapped-types';
 import { IsMongoId } from 'class-validator';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
@@ -9,8 +8,7 @@ export class UpdateCategoryDto extends PartialType(
 ) {
   @IsMongoId()
   @ApiProperty({
-    type: 'string',
     description: 'Identifier of the category',
   })
-  readonly id: ObjectId;
+  readonly id: string;
 }

@@ -1,4 +1,9 @@
-import { BadRequestException, GoneException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  GoneException,
+  Injectable,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { MongoClient, ObjectId } from 'mongodb';
 import {
   InjectClients,
@@ -19,7 +24,8 @@ import {
 import { Language } from '../common/types/i18n.types';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
-import { EntityNotFoundException } from '../common/exeptions/EntityNotFoundException';
+import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
+import { DEFAULT_LANGUAGE } from '../common/constants/internationalization.constants';
 
 @Injectable()
 export class CategoriesService {
@@ -31,16 +37,15 @@ export class CategoriesService {
     @InjectClients(CONNECTION_DB_NAME)
     private readonly clients: ClientsMap,
   ) {
-    this.client = this.clients.get(CONNECTION_DB_NAME);
-  }
+    const client = this.clients.get(CONNECTION_DB_NAME);
 
-  private filterIdDuplication(
-    list: undefined | ObjectId[],
-    id: ObjectId,
-  ): ObjectId[] {
-    const idAsString = id.toString();
+    if (!client) {
+      throw new ServiceUnavailableException(
+        'Connection to database is unavailable is CategoriesService',
+      );
+    }
 
-    return list?.filter((listId) => listId.toString() !== idAsString);
+    this.client = client;
   }
 
   async getCategories(
@@ -66,7 +71,7 @@ export class CategoriesService {
     return categories.map((category) => {
       return {
         id: category._id.toString(),
-        value: category.name[language],
+        value: category.name[language] || category.name[DEFAULT_LANGUAGE],
       };
     });
   }
@@ -113,7 +118,7 @@ export class CategoriesService {
 
   async updateCategory(updateCategoryDto: UpdateCategoryDto): Promise<void> {
     const category = await this.categoryCollection.findOne({
-      _id: updateCategoryDto.id,
+      _id: new ObjectId(updateCategoryDto.id),
     });
 
     if (!category) {
@@ -128,9 +133,8 @@ export class CategoriesService {
     let updatedFields = comparedFields.updatedFields;
 
     if (updatedFields.parentIds) {
-      const filteredIds = this.filterIdDuplication(
-        updatedFields.parentIds,
-        updateCategoryDto.id,
+      const filteredIds = updatedFields.parentIds.filter(
+        (listId) => listId.toString() !== updateCategoryDto.id,
       );
 
       updatedFields = {

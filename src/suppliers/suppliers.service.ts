@@ -8,7 +8,7 @@ import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
-import { EntityNotFoundException } from '../common/exeptions/EntityNotFoundException';
+import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 
 @Injectable()

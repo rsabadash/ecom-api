@@ -6,6 +6,8 @@ import { SuppliesController } from './supplies.controller';
 import { SuppliesService } from './supplies.service';
 import { WarehouseProductsModule } from '../warehouseProducts/warehouse-products.module';
 import { WarehousesModule } from '../warehouses/warehouses.module';
+import { SuppliersModule } from '../suppliers/suppliers.module';
+import { MathService } from '../common/services/math.service';
 
 @Module({
   imports: [
@@ -17,8 +19,9 @@ import { WarehousesModule } from '../warehouses/warehouses.module';
     ),
     WarehouseProductsModule,
     WarehousesModule,
+    SuppliersModule,
   ],
   controllers: [SuppliesController],
-  providers: [SuppliesService],
+  providers: [SuppliesService, MathService],
 })
 export class SuppliesModule {}

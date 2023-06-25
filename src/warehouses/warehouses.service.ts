@@ -10,8 +10,9 @@ import { GetWarehouseParameters } from './types/warehouses.types';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
 import { DeleteWarehouseDto } from './dto/delete-warehouse.dto';
-import { EntityNotFoundException } from '../common/exeptions/EntityNotFoundException';
+import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
+import { Pipeline } from '../mongo/types/colection-model.types';
 
 @Injectable()
 export class WarehousesService {
@@ -89,5 +90,9 @@ export class WarehousesService {
     await this.warehousesCollection.deleteOne({
       _id: new ObjectId(deleteWarehouseDto.id),
     });
+  }
+
+  async aggregateWarehouse<R>(pipeline: Pipeline): Promise<R[]> {
+    return this.warehousesCollection.aggregate<R>(pipeline);
   }
 }

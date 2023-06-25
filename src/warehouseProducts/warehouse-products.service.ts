@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ObjectId } from 'mongodb';
+import { BulkWriteOptions, BulkWriteResult, ObjectId } from 'mongodb';
 import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
 import { WAREHOUSE_PRODUCTS_COLLECTION } from '../common/constants/collections.constants';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
@@ -7,6 +7,8 @@ import {
   ICreateWarehouseProduct,
   INewWarehouseProduct,
   IWarehouseProduct,
+  IWarehouseProductAttribute,
+  IWarehouseProductVariant,
 } from './interfaces/warehouse-products.interfaces';
 import { CreateWarehouseProductDto } from './dto/create-warehouse-product.dto';
 import { AttributesService } from '../attributes/attributes.service';
@@ -16,6 +18,9 @@ import {
 } from '../mongo/types/mongo-query.types';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 import { Language } from '../common/types/i18n.types';
+import { PaginationData } from '../common/interfaces/pagination.interface';
+import { DEFAULT_LANGUAGE } from '../common/constants/internationalization.constants';
+import { BulkOperations } from '../mongo/types/colection-model.types';
 
 @Injectable()
 export class WarehouseProductsService {
@@ -58,37 +63,48 @@ export class WarehouseProductsService {
           ...restProductValues
         } = product;
 
-        const productAttributes = warehouseProductAttributes.map(
-          (productAttribute) => {
+        const productAttributes: IWarehouseProductAttribute[] = [];
+
+        if (
+          warehouseProductAttributes &&
+          warehouseProductAttributes?.length > 0
+        ) {
+          warehouseProductAttributes.map((productAttribute) => {
             const foundAttribute = attributes.find(
               (attribute) =>
-                attribute._id.toString() ===
-                productAttribute.attributeId.toString(),
+                attribute._id.toString() === productAttribute.attributeId,
             );
 
-            const productVariants = productAttribute.variants.map(
-              (productVariant) => {
+            const productVariants: IWarehouseProductVariant[] = [];
+
+            if (
+              foundAttribute &&
+              productAttribute.variants &&
+              productAttribute.variants?.length > 0
+            ) {
+              productAttribute.variants.forEach((productVariant) => {
                 const foundVariant = foundAttribute.variants.find((variant) => {
                   return (
-                    variant.variantId.toString() ===
-                    productVariant.variantId.toString()
+                    variant.variantId.toString() === productVariant.variantId
                   );
                 });
 
-                return {
-                  variantId: foundVariant.variantId.toString(),
-                  name: foundVariant.name,
-                };
-              },
-            );
+                if (foundVariant) {
+                  productVariants?.push({
+                    variantId: foundVariant.variantId.toString(),
+                    name: foundVariant.name,
+                  });
+                }
+              });
 
-            return {
-              attributeId: foundAttribute._id.toString(),
-              name: foundAttribute.name,
-              variants: productVariants,
-            };
-          },
-        );
+              productAttributes?.push({
+                attributeId: foundAttribute._id.toString(),
+                name: foundAttribute.name,
+                variants: productVariants,
+              });
+            }
+          });
+        }
 
         const updatedProduct: INewWarehouseProduct = {
           ...restProductValues,
@@ -96,6 +112,8 @@ export class WarehouseProductsService {
           groupId: groupName ? new ObjectId() : null,
           attributes: productAttributes,
           createdDate: currentDate,
+          supplyIds: [],
+          warehouses: [],
         };
 
         acc.push(updatedProduct);
@@ -111,10 +129,12 @@ export class WarehouseProductsService {
   async getWarehouseProducts(
     query: PartialEntity<IWarehouseProduct> = {},
     options: FindEntityOptions<IWarehouseProduct> = {},
-  ): Promise<IWarehouseProduct[]> {
+  ): Promise<PaginationData<IWarehouseProduct>> {
     const { skip, limit } = options;
 
-    const paginatedData = await this.warehouseProductCollection.aggregate([
+    const paginatedData = await this.warehouseProductCollection.aggregate<
+      PaginationData<IWarehouseProduct>
+    >([
       { $match: query },
       {
         $facet: {
@@ -137,13 +157,7 @@ export class WarehouseProductsService {
       },
     ]);
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     return paginatedData[0];
-    // return await this.warehouseProductCollection.find(query, {
-    //   skip,
-    //   limit,
-    // });
   }
 
   async getWarehouseProducts2(
@@ -160,7 +174,9 @@ export class WarehouseProductsService {
     return warehouseProducts.map((warehouseProduct) => {
       return {
         id: warehouseProduct._id.toString(),
-        value: warehouseProduct.name[language],
+        value:
+          warehouseProduct.name[language] ||
+          warehouseProduct.name[DEFAULT_LANGUAGE],
         meta: {
           unit: warehouseProduct.unit,
         },
@@ -181,6 +197,8 @@ export class WarehouseProductsService {
       groupName: groupName ? groupName : null,
       groupId: groupName ? new ObjectId() : null,
       createdDate: currentDate,
+      warehouses: [],
+      supplyIds: [],
     });
   }
 
@@ -213,5 +231,12 @@ export class WarehouseProductsService {
     }
 
     return [newProduct];
+  }
+
+  async bulkWrite(
+    operations: BulkOperations<IWarehouseProduct>[],
+    options: BulkWriteOptions,
+  ): Promise<BulkWriteResult> {
+    return await this.warehouseProductCollection.bulkWrite(operations, options);
   }
 }
