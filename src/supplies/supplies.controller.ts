@@ -1,18 +1,23 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from '../iam/decorators/roles.decorator';
 import { Role } from '../users/enums/role.enums';
 import { Auth } from '../iam/decorators/auth.decorator';
 import { AuthType } from '../iam/enums/auth-type.enum';
-import { SUPPLIES_ROUTE } from './constants/route.constants';
+import {
+  GET_SUPPLY_BY_ID_PATH,
+  GET_SUPPLY_PRODUCTS,
+  SUPPLIES_ROUTE,
+} from './constants/route.constants';
 import { SUPPLIES_MODULE_NAME } from './constants/swagger.constants';
 import { SuppliesService } from './supplies.service';
-import { ISupply } from './interfaces/supplies.interfaces';
+import { ISupply, ISupplyProduct } from './interfaces/supplies.interfaces';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
 import {
   PaginationData,
   PaginationParsedQuery,
 } from '../common/interfaces/pagination.interface';
+import { SUPPLY_ID_PARAM } from './constants/param.constants';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -34,6 +39,18 @@ export class SuppliesController {
         limit: limit,
       },
     );
+  }
+
+  @Get(GET_SUPPLY_BY_ID_PATH)
+  async getSupply(@Param(SUPPLY_ID_PARAM) supplyId: string): Promise<ISupply> {
+    return this.suppliesService.getSupply({ supplyId });
+  }
+
+  @Get(`${GET_SUPPLY_PRODUCTS}${GET_SUPPLY_BY_ID_PATH}`)
+  async getSupplyProducts(
+    @Param(SUPPLY_ID_PARAM) supplyId: string,
+  ): Promise<PaginationData<ISupplyProduct>> {
+    return this.suppliesService.getSupplyProducts({ supplyId });
   }
 
   @Post()

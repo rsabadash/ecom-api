@@ -32,6 +32,8 @@ import {
   PartialEntity,
 } from '../mongo/types/mongo-query.types';
 import { PaginationData } from '../common/interfaces/pagination.interface';
+import { GetSupplyParameters } from './types/supplies.types';
+import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
 
 @Injectable()
 export class SuppliesService {
@@ -228,6 +230,50 @@ export class SuppliesService {
             },
             {
               $limit: limit,
+            },
+          ],
+          total: [{ $count: 'count' }],
+        },
+      },
+      {
+        $project: {
+          data: 1,
+          metadata: { total: { $arrayElemAt: ['$total.count', 0] } },
+        },
+      },
+    ]);
+
+    return paginatedData[0];
+  }
+
+  async getSupply(parameters: GetSupplyParameters): Promise<ISupply> {
+    const supply = await this.supplyCollection.findOne({
+      _id: new ObjectId(parameters.supplyId),
+    });
+
+    if (!supply) {
+      throw new EntityNotFoundException('The supply has not been found');
+    }
+
+    return supply;
+  }
+
+  async getSupplyProducts(
+    parameters: GetSupplyParameters,
+  ): Promise<PaginationData<ISupplyProduct>> {
+    const paginatedData = await this.supplyCollection.aggregate<
+      PaginationData<ISupplyProduct>
+    >([
+      { $match: { _id: new ObjectId(parameters.supplyId) } },
+      { $unwind: '$products' },
+      {
+        $facet: {
+          data: [
+            {
+              $skip: 0,
+            },
+            {
+              $limit: 10,
             },
           ],
           total: [{ $count: 'count' }],
