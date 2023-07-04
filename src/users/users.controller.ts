@@ -7,7 +7,6 @@ import {
   Param,
   Patch,
   Post,
-  UsePipes,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
@@ -19,27 +18,25 @@ import {
   ApiBadRequestResponse,
   ApiGoneResponse,
 } from '@nestjs/swagger';
-import { ObjectId } from 'mongodb';
 import { UsersService } from './users.service';
-import { IUpdateUser, IUserPublic } from './interfaces/users.interfaces';
+import { IUserPublic } from './interfaces/users.interfaces';
 import {
   GET_USER_BY_ID_PATH,
-  GET_USER_SIGN_IN,
+  GET_USER_VERIFICATION,
   USERS_ROUTE,
 } from './constants/route.constants';
-import { ParseObjectIdPipe } from '../common/pipes/parse-objectId.pipe';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ParseObjectIdsPipe } from '../common/pipes/parse-body-objectId.pipe';
 import { USER_ID_PARAM } from './constants/param.constants';
 import { PublicUserDto } from './dto/public-user.dto';
-import { USERS_MODULE_NAME } from './constants/swagger.constants';
 import { Auth } from '../iam/decorators/auth.decorator';
 import { AuthType } from '../iam/enums/auth-type.enum';
 import { Roles } from '../iam/decorators/roles.decorator';
-import { Role } from './enums/role.enums';
+import { Role } from '../iam/enums/role.enums';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
 import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
+import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
+import { USERS_MODULE_NAME } from 'src/common/constants/swager.constants';
 import { UserId } from './decorators/user-id.decorator';
 
 @Roles(Role.Admin)
@@ -51,7 +48,7 @@ export class UsersController {
 
   @Get()
   @ApiOkResponse({
-    description: 'List of users was retrieved',
+    description: SWAGGER_DESCRIPTION.GET_USERS,
     type: [PublicUserDto],
   })
   @ApiNoAccessResponse()
@@ -59,47 +56,45 @@ export class UsersController {
     return await this.usersService.getUsers();
   }
 
-  @Get(GET_USER_SIGN_IN)
+  @Get(GET_USER_VERIFICATION)
   @ApiOkResponse({
-    description: 'The user was retrieved',
+    description: SWAGGER_DESCRIPTION.GET_USER_VERIFICATION,
     type: PublicUserDto,
   })
   @ApiNotFoundResponse({
-    description: 'The user has not been found',
+    description: ERROR.USER_NOT_FOUND,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
-  async getUserSignIn(@UserId() userId: ObjectId): Promise<IUserPublic> {
+  async getUserVerification(@UserId() userId: string): Promise<IUserPublic> {
     return await this.usersService.getUser({ userId });
   }
 
   @Get(GET_USER_BY_ID_PATH)
   @ApiOkResponse({
-    description: 'The user was retrieved',
+    description: SWAGGER_DESCRIPTION.GET_USER,
     type: PublicUserDto,
   })
   @ApiNotFoundResponse({
-    description: 'The user has not been found',
+    description: ERROR.USER_NOT_FOUND,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
-  async getUser(
-    @Param(USER_ID_PARAM, ParseObjectIdPipe) userId: ObjectId,
-  ): Promise<IUserPublic> {
+  async getUser(@Param(USER_ID_PARAM) userId: string): Promise<IUserPublic> {
     return await this.usersService.getUser({ userId });
   }
 
   @Post()
   @ApiCreatedResponse({
-    description: 'The user has been created',
+    description: SWAGGER_DESCRIPTION.CREATE_USER,
     type: PublicUserDto,
   })
   @ApiConflictResponse({
-    description: 'User with the email already exists',
+    description: ERROR.EMAIL_EXISTS,
     type: HttpErrorDto,
   })
   @ApiBadRequestResponse({
-    description: 'The user has not been created',
+    description: ERROR.USER_NOT_CREATED,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
@@ -109,20 +104,19 @@ export class UsersController {
 
   @Patch()
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UsePipes(new ParseObjectIdsPipe<IUpdateUser>('id', 'string'))
   @ApiNoContentResponse({
-    description: 'The user has been updated',
+    description: SWAGGER_DESCRIPTION.UPDATE_USER,
   })
   @ApiNotFoundResponse({
-    description: 'The user has not been found',
+    description: ERROR.USER_NOT_FOUND,
     type: HttpErrorDto,
   })
   @ApiConflictResponse({
-    description: 'User with the email already exists',
+    description: ERROR.EMAIL_EXISTS,
     type: HttpErrorDto,
   })
   @ApiGoneResponse({
-    description: 'The user has not been updated',
+    description: ERROR.USER_NOT_UPDATED,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()

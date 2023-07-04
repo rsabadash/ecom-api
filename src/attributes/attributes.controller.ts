@@ -52,7 +52,7 @@ import { DeleteVariantDto } from './dto/delete-variant.dto';
 import { AttributeDto } from './dto/attribute.dto';
 import { VariantDto } from './dto/variant.dto';
 import { Roles } from '../iam/decorators/roles.decorator';
-import { Role } from '../users/enums/role.enums';
+import { Role } from '../iam/enums/role.enums';
 import { ATTRIBUTES_MODULE_NAME } from './constants/swagger.constants';
 import { IVariantWithAttribute } from './interfaces/variant-with-attribute.interfaces';
 

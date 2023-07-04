@@ -5,17 +5,19 @@ import {
   BadRequestException,
   GoneException,
 } from '@nestjs/common';
+import { ObjectId } from 'mongodb';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
 import {
   GetUserParameters,
   IUser,
+  IUserCreate,
   IUserPublic,
+  IUserUpdate,
 } from './interfaces/users.interfaces';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
 import { USERS_COLLECTION } from '../common/constants/collections.constants';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
+import { ERROR } from './constants/message.constants';
 
 @Injectable()
 export class UsersService {
@@ -31,32 +33,33 @@ export class UsersService {
 
   async getUser(parameters: GetUserParameters): Promise<IUserPublic> {
     const user = await this.usersCollection.findOne(
-      { _id: parameters.userId },
+      { _id: new ObjectId(parameters.userId) },
       { projection: { password: 0 } },
     );
 
     if (!user) {
-      throw new NotFoundException('The user has not been found');
+      throw new NotFoundException(ERROR.USER_NOT_FOUND);
     }
 
     return user;
   }
 
   async getUserByEmail(email: string): Promise<IUser | null> {
+    // No Found did not handle as in different scenarios it handled in a different way
     return await this.usersCollection.findOne({ email });
   }
 
-  async createUser(createUserDto: CreateUserDto): Promise<IUserPublic> {
+  async createUser(createUserDto: IUserCreate): Promise<IUserPublic> {
     const isUserWithEmailExist = await this.getUserByEmail(createUserDto.email);
 
     if (isUserWithEmailExist) {
-      throw new ConflictException('User with the email already exists');
+      throw new ConflictException(ERROR.EMAIL_EXISTS);
     }
 
     const newUser = await this.usersCollection.create(createUserDto);
 
     if (!newUser) {
-      throw new BadRequestException('The user has not been created');
+      throw new BadRequestException(ERROR.USER_NOT_CREATED);
     }
 
     return {
@@ -66,7 +69,7 @@ export class UsersService {
     };
   }
 
-  async updateUser(updateUserDto: UpdateUserDto): Promise<void> {
+  async updateUser(updateUserDto: IUserUpdate): Promise<void> {
     const user = await this.getUser({ userId: updateUserDto.id });
 
     if (updateUserDto.email) {
@@ -75,7 +78,7 @@ export class UsersService {
       );
 
       if (isUserWithEmailExists) {
-        throw new ConflictException('User with the email already exists');
+        throw new ConflictException(ERROR.EMAIL_EXISTS);
       }
     }
 
@@ -88,7 +91,7 @@ export class UsersService {
     );
 
     if (!updateResult.isUpdated) {
-      throw new GoneException('The user has not been updated');
+      throw new GoneException(ERROR.USER_NOT_UPDATED);
     }
   }
 }

@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { ObjectId } from 'mongodb';
 import { SignUpDto } from './dto/sign-up.dto';
 import { HashingService } from './hashing.service';
 import { SignInDto } from './dto/sign-in.dto';
@@ -14,7 +13,8 @@ import jwtConfig from './config/jwt.config';
 import { Tokens, JwtDecoded } from './interfaces/jwt.interfaces';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { UsersService } from '../users/users.service';
-import { IUserCreate, IUserPublic } from '../users/interfaces/users.interfaces';
+import { IUserPublic } from '../users/interfaces/users.interfaces';
+import { SignUpData } from './interfaces/authentication.interfaces';
 
 @Injectable()
 export class AuthenticationService {
@@ -61,7 +61,7 @@ export class AuthenticationService {
   async signUp(signUpDto: SignUpDto): Promise<IUserPublic> {
     const hashedPassword = await this.hashingService.hash(signUpDto.password);
 
-    const user: IUserCreate = {
+    const user: SignUpData = {
       ...signUpDto,
       password: hashedPassword,
     };
@@ -109,7 +109,7 @@ export class AuthenticationService {
     }
 
     const user = await this.usersService.getUser({
-      userId: new ObjectId(userId),
+      userId,
     });
 
     return await this.generateTokens(user);

@@ -1,29 +1,27 @@
-import { ObjectId } from 'mongodb';
 import { IsArray, IsEmail, IsEnum, IsMongoId, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Role } from '../enums/role.enums';
+import { Role } from '../../iam/enums/role.enums';
 import { IUser } from '../interfaces/users.interfaces';
 
-export class UserDto implements IUser {
+export class UserDto implements Omit<IUser, '_id'> {
   @IsMongoId()
   @ApiProperty({
-    type: 'string',
-    description: 'Identifier of the user',
+    description: 'User identifier',
   })
-  readonly _id: ObjectId;
+  readonly _id: string;
 
   @IsEmail()
-  @ApiProperty({ description: 'Email of the user' })
+  @ApiProperty({ description: 'User email' })
   readonly email: string;
 
   @IsString()
-  @ApiProperty({ description: 'Password of the user' })
+  @ApiProperty({ description: 'User account password' })
   readonly password: string;
 
   @IsArray()
   @IsEnum(Role, { each: true })
   @ApiProperty({
-    description: 'Roles of the user',
+    description: 'User roles',
     enum: Role,
     isArray: true,
     example: [Role.Admin, Role.ContentManager],
