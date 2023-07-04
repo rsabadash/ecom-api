@@ -1,5 +1,13 @@
 import { HttpStatus } from '@nestjs/common';
 
+export const USERS_MODULE_NAME = 'Users module';
+
+export const WAREHOUSES_MODULE_NAME = 'Warehouses module';
+
+export const SWAGGER_DESCRIPTION_COMMON = {
+  DROPDOWN_LIST: 'Dropdown list of warehouses',
+};
+
 export const HttpStatusMessage = {
   [HttpStatus.CONTINUE]: 'Continue',
   [HttpStatus.SWITCHING_PROTOCOLS]: 'Switching Protocols',

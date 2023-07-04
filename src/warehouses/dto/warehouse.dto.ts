@@ -14,20 +14,20 @@ export class WarehouseDto implements IWarehouse {
   @IsMongoId()
   @ApiProperty({
     type: 'string',
-    description: 'Identifier of the warehouse',
+    description: 'Warehouse identifier (returned as ObjectId)',
   })
   readonly _id: ObjectId;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'Name of the warehouse',
+    description: 'Warehouse name',
   })
   readonly name: string;
 
   @IsEnum(WarehouseType)
   @ApiProperty({
-    description: 'Type of the warehouse',
+    description: 'Warehouse type',
     enum: WarehouseType,
     example: [
       WarehouseType.Shop,
@@ -41,7 +41,7 @@ export class WarehouseDto implements IWarehouse {
   @IsNotEmpty()
   @IsOptional()
   @ApiPropertyOptional({
-    description: 'Address of the warehouse',
+    description: 'Warehouse address',
     nullable: true,
     default: null,
   })

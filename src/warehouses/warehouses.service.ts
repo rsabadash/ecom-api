@@ -3,16 +3,18 @@ import { ObjectId } from 'mongodb';
 import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
 import { WAREHOUSES_COLLECTION } from '../common/constants/collections.constants';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
-import { IWarehouse } from './interfaces/warehouses.interfaces';
+import {
+  IWarehouse,
+  GetWarehouseParameters,
+  IWarehouseCreate,
+  IWarehouseUpdate,
+} from './interfaces/warehouses.interfaces';
 import { PartialEntity } from '../mongo/types/mongo-query.types';
-import { CreateWarehouseDto } from './dto/create-warehouse.dto';
-import { GetWarehouseParameters } from './types/warehouses.types';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
-import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
 import { DeleteWarehouseDto } from './dto/delete-warehouse.dto';
 import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
-import { Pipeline } from '../mongo/types/colection-model.types';
+import { ERROR } from './constants/message.constants';
 
 @Injectable()
 export class WarehousesService {
@@ -45,27 +47,27 @@ export class WarehousesService {
     });
 
     if (!warehouse) {
-      throw new EntityNotFoundException('The warehouse has not been found');
+      throw new EntityNotFoundException(ERROR.WAREHOUSE_NOT_FOUND);
     }
 
     return warehouse;
   }
 
   async createWarehouse(
-    createWarehouse: CreateWarehouseDto,
+    createWarehouse: IWarehouseCreate,
   ): Promise<IWarehouse> {
     const newWarehouse = await this.warehousesCollection.create(
       createWarehouse,
     );
 
     if (!newWarehouse) {
-      throw new BadRequestException('The warehouse has not been created');
+      throw new BadRequestException(ERROR.WAREHOUSE_NOT_CREATED);
     }
 
     return newWarehouse;
   }
 
-  async updateWarehouse(updateWarehouseDto: UpdateWarehouseDto): Promise<void> {
+  async updateWarehouse(updateWarehouseDto: IWarehouseUpdate): Promise<void> {
     const warehouse = await this.getWarehouse({
       warehouseId: updateWarehouseDto.id,
     });
@@ -90,9 +92,5 @@ export class WarehousesService {
     await this.warehousesCollection.deleteOne({
       _id: new ObjectId(deleteWarehouseDto.id),
     });
-  }
-
-  async aggregateWarehouse<R>(pipeline: Pipeline): Promise<R[]> {
-    return this.warehousesCollection.aggregate<R>(pipeline);
   }
 }

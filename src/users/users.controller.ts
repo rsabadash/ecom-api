@@ -36,7 +36,7 @@ import { Role } from '../iam/enums/role.enums';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
 import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
-import { USERS_MODULE_NAME } from 'src/common/constants/swager.constants';
+import { USERS_MODULE_NAME } from 'src/common/constants/swagger.constants';
 import { UserId } from './decorators/user-id.decorator';
 
 @Roles(Role.Admin)
