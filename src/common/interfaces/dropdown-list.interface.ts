@@ -1,7 +1,5 @@
-import { ObjectId } from 'mongodb';
-
 export interface DropdownListQueryParams {
-  _id?: ObjectId;
+  _id?: string;
 }
 
 export type DropdownMetaValue = string | number | boolean | null;

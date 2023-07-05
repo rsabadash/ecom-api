@@ -11,10 +11,14 @@ import {
 } from '../mongo/decorators/mongo.decorators';
 import { CATEGORIES_COLLECTION } from '../common/constants/collections.constants';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
-import { ICategory, ICategoryDetail } from './interfaces/categories.interfaces';
+import {
+  ICategory,
+  ICategoryCreate,
+  ICategoryDelete,
+  ICategoryDetail,
+  ICategoryUpdate,
+} from './interfaces/categories.interfaces';
 import { GetCategoryParameters } from './types/categories.types';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { DeleteCategoryDto } from './dto/delete-category.dto';
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
 import { ClientsMap, PartialEntity } from '../mongo/types/mongo-query.types';
 import {
@@ -22,10 +26,10 @@ import {
   DropdownListQueryParams,
 } from '../common/interfaces/dropdown-list.interface';
 import { Language } from '../common/types/i18n.types';
-import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
 import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
 import { DEFAULT_LANGUAGE } from '../common/constants/internationalization.constants';
+import { ERROR } from './constants/message.constants';
 
 @Injectable()
 export class CategoriesService {
@@ -62,7 +66,7 @@ export class CategoriesService {
 
     if (queryParams._id) {
       query = {
-        _id: { $not: { $eq: queryParams._id } },
+        _id: { $not: { $eq: new ObjectId(queryParams._id) } },
       };
     }
 
@@ -80,7 +84,7 @@ export class CategoriesService {
     parameters: GetCategoryParameters,
   ): Promise<ICategoryDetail> {
     const pipeline = [
-      { $match: { _id: parameters.categoryId } },
+      { $match: { _id: new ObjectId(parameters.categoryId) } },
       {
         $lookup: {
           from: 'categories',
@@ -98,31 +102,29 @@ export class CategoriesService {
     const category = categoryDetail[0];
 
     if (!category) {
-      throw new EntityNotFoundException('The category has not been found');
+      throw new EntityNotFoundException(ERROR.CATEGORY_NOT_FOUND);
     }
 
     return category;
   }
 
-  async createCategory(
-    createCategoryDto: CreateCategoryDto,
-  ): Promise<ICategory> {
+  async createCategory(createCategoryDto: ICategoryCreate): Promise<ICategory> {
     const newCategory = await this.categoryCollection.create(createCategoryDto);
 
     if (!newCategory) {
-      throw new BadRequestException('The category has not been created');
+      throw new BadRequestException(ERROR.CATEGORY_NOT_CREATED);
     }
 
     return newCategory;
   }
 
-  async updateCategory(updateCategoryDto: UpdateCategoryDto): Promise<void> {
+  async updateCategory(updateCategoryDto: ICategoryUpdate): Promise<void> {
     const category = await this.categoryCollection.findOne({
       _id: new ObjectId(updateCategoryDto.id),
     });
 
     if (!category) {
-      throw new EntityNotFoundException('The category has not been found');
+      throw new EntityNotFoundException(ERROR.CATEGORY_NOT_FOUND);
     }
 
     const comparedFields = this.compareFieldsService.compare<ICategory>(
@@ -134,7 +136,7 @@ export class CategoriesService {
 
     if (updatedFields.parentIds) {
       const filteredIds = updatedFields.parentIds.filter(
-        (listId) => listId.toString() !== updateCategoryDto.id,
+        (listId) => listId !== updateCategoryDto.id,
       );
 
       updatedFields = {
@@ -149,17 +151,17 @@ export class CategoriesService {
     );
 
     if (!updateResult.isUpdated) {
-      throw new GoneException('The category has not been updated');
+      throw new GoneException(ERROR.CATEGORY_NOT_UPDATED);
     }
   }
 
-  async deleteCategory(deleteCategoryDto: DeleteCategoryDto): Promise<void> {
+  async deleteCategory(deleteCategoryDto: ICategoryDelete): Promise<void> {
     const session = this.client.startSession();
 
     try {
       await session.withTransaction(async () => {
         await this.categoryCollection.deleteOne({
-          _id: deleteCategoryDto.id,
+          _id: new ObjectId(deleteCategoryDto.id),
         });
 
         await this.categoryCollection.updateMany(

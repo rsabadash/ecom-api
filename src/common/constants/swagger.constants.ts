@@ -1,6 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 
 export const MODULE_NAME = {
+  CATEGORIES: 'Categories module',
   SUPPLIERS: 'Suppliers module',
   SUPPLIES: 'Supplies module',
   USERS: 'Users module',

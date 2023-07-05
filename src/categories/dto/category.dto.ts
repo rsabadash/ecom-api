@@ -1,35 +1,32 @@
-import { ObjectId } from 'mongodb';
 import {
   IsBoolean,
   IsMongoId,
   IsNotEmptyObject,
   IsString,
-  IsOptional,
   ValidateNested,
   Matches,
   IsNotEmpty,
 } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
 import { URL_SLUG } from '../../common/constants/reg-exp.contants';
 import { ICategory } from '../interfaces/categories.interfaces';
 
-export class CategoryDto implements ICategory {
+export class CategoryDto implements Omit<ICategory, '_id'> {
   @IsMongoId()
   @ApiProperty({
-    type: 'string',
-    description: 'Identifier of the category',
+    description: 'Category identifier',
   })
-  readonly _id: ObjectId;
+  readonly _id: string;
 
   @ValidateNested()
   @IsNotEmptyObject()
   @Type(() => TranslationsDto)
   @ApiProperty({
     type: TranslationsDto,
-    description: 'Translation object for the category name',
+    description: 'Category name translations',
   })
   readonly name: Translations;
 
@@ -40,22 +37,21 @@ export class CategoryDto implements ICategory {
       'SEO name of the category should contains only number and Latin letters',
   })
   @ApiProperty({
-    description:
-      'Name of the category, that used for search engine optimization',
+    description: 'Name of category, that used for search engine optimization',
   })
   readonly seoName: string;
 
   @IsBoolean()
   @ApiProperty({
-    description: 'Is the category publicly visible',
+    description: 'Is category visible for public users',
   })
   readonly isActive: boolean;
 
   @IsMongoId({ each: true })
-  @IsOptional()
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'Parents categories for the category',
+    nullable: true,
     default: [],
   })
-  readonly parentIds: ObjectId[] = [];
+  readonly parentIds: string[] = [];
 }
