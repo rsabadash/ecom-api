@@ -8,10 +8,16 @@ export interface ISupplier {
   phoneNumber: null | string;
 }
 
-export interface IUpdateSupplier extends Omit<ISupplier, '_id'> {
+export interface ISupplierCreate extends Omit<ISupplier, '_id'> {}
+
+export interface ISupplierUpdate extends Partial<Omit<ISupplier, '_id'>> {
   id: string;
 }
 
-export interface IDeleteSupplier {
+export interface ISupplierDelete {
   id: string;
+}
+
+export interface GetSupplierParameters {
+  supplierId: string;
 }

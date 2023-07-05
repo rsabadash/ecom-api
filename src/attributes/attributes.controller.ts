@@ -181,6 +181,7 @@ export class AttributesController {
   }
 
   @Patch(VARIANTS_PATH)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UsePipes(new ParseObjectIdsPipe<IVariant>('variantId', 'string'))
   @ApiCreatedResponse({
     description: 'The variant of the attribute has been updated',
