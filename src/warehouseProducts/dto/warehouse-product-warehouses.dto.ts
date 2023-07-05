@@ -8,7 +8,7 @@ export class WarehouseProductWarehousesDto
   @IsMongoId()
   @ApiProperty({
     type: 'string',
-    description: 'Identifier of a warehouses',
+    description: 'Identifier of a warehouse',
   })
   readonly warehouseId: string;
 

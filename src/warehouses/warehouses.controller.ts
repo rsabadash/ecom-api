@@ -38,10 +38,7 @@ import { DROPDOWN_LIST_PATH } from '../common/constants/path.constants';
 import { DropdownListDto } from '../common/dto/dropdown-list.dto';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
-import {
-  SWAGGER_DESCRIPTION_COMMON,
-  WAREHOUSES_MODULE_NAME,
-} from '../common/constants/swagger.constants';
+import { WAREHOUSES_MODULE_NAME } from '../common/constants/swagger.constants';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -62,7 +59,7 @@ export class WarehousesController {
 
   @Get(DROPDOWN_LIST_PATH)
   @ApiOkResponse({
-    description: SWAGGER_DESCRIPTION_COMMON.DROPDOWN_LIST,
+    description: SWAGGER_DESCRIPTION.DROPDOWN_LIST,
     type: DropdownListDto,
   })
   @ApiNoAccessResponse()

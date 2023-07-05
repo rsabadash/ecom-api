@@ -4,9 +4,7 @@ export const USERS_MODULE_NAME = 'Users module';
 
 export const WAREHOUSES_MODULE_NAME = 'Warehouses module';
 
-export const SWAGGER_DESCRIPTION_COMMON = {
-  DROPDOWN_LIST: 'Dropdown list of warehouses',
-};
+export const WAREHOUSE_PRODUCTS_MODULE_NAME = 'Warehouse products module';
 
 export const HttpStatusMessage = {
   [HttpStatus.CONTINUE]: 'Continue',

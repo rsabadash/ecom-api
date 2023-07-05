@@ -6,17 +6,15 @@ import {
   IsString,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ObjectId } from 'mongodb';
 import { IWarehouse } from '../interfaces/warehouses.interfaces';
 import { WarehouseType } from '../enums/warehouse-types';
 
-export class WarehouseDto implements IWarehouse {
+export class WarehouseDto implements Omit<IWarehouse, '_id'> {
   @IsMongoId()
   @ApiProperty({
-    type: 'string',
     description: 'Warehouse identifier (returned as ObjectId)',
   })
-  readonly _id: ObjectId;
+  readonly _id: string;
 
   @IsString()
   @IsNotEmpty()

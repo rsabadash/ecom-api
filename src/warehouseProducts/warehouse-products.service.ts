@@ -21,6 +21,8 @@ import { Language } from '../common/types/i18n.types';
 import { PaginationData } from '../common/interfaces/pagination.interface';
 import { DEFAULT_LANGUAGE } from '../common/constants/internationalization.constants';
 import { BulkOperations } from '../mongo/types/colection-model.types';
+import { getPaginationPipeline } from '../common/utils/getPaginationPipeline';
+import { ERROR } from './constants/message';
 
 @Injectable()
 export class WarehouseProductsService {
@@ -57,11 +59,8 @@ export class WarehouseProductsService {
 
     const newProducts = products.reduce<INewWarehouseProduct[]>(
       (acc, product) => {
-        const {
-          attributes: warehouseProductAttributes,
-          groupName,
-          ...restProductValues
-        } = product;
+        const { attributes: warehouseProductAttributes, ...restProductValues } =
+          product;
 
         const productAttributes: IWarehouseProductAttribute[] = [];
 
@@ -108,8 +107,6 @@ export class WarehouseProductsService {
 
         const updatedProduct: INewWarehouseProduct = {
           ...restProductValues,
-          groupName: groupName ? groupName : null,
-          groupId: groupName ? new ObjectId() : null,
           attributes: productAttributes,
           createdDate: currentDate,
           supplyIds: [],
@@ -132,30 +129,17 @@ export class WarehouseProductsService {
   ): Promise<PaginationData<IWarehouseProduct>> {
     const { skip, limit } = options;
 
+    const pipeline = getPaginationPipeline<IWarehouseProduct>({
+      query,
+      filter: {
+        skip,
+        limit,
+      },
+    });
+
     const paginatedData = await this.warehouseProductCollection.aggregate<
       PaginationData<IWarehouseProduct>
-    >([
-      { $match: query },
-      {
-        $facet: {
-          data: [
-            {
-              $skip: skip,
-            },
-            {
-              $limit: limit,
-            },
-          ],
-          total: [{ $count: 'count' }],
-        },
-      },
-      {
-        $project: {
-          data: 1,
-          metadata: { total: { $arrayElemAt: ['$total.count', 0] } },
-        },
-      },
-    ]);
+    >(pipeline);
 
     return paginatedData[0];
   }
@@ -189,13 +173,10 @@ export class WarehouseProductsService {
   ): Promise<IWarehouseProduct | null> {
     const product = products[0];
     const currentDate = new Date();
-    const { groupName } = product;
 
     return await this.warehouseProductCollection.create({
       ...product,
-      attributes: null,
-      groupName: groupName ? groupName : null,
-      groupId: groupName ? new ObjectId() : null,
+      attributes: [],
       createdDate: currentDate,
       warehouses: [],
       supplyIds: [],
@@ -204,7 +185,7 @@ export class WarehouseProductsService {
 
   async createWarehouseProducts(
     createWarehouseProductsDto: CreateWarehouseProductDto[],
-  ): Promise<IWarehouseProduct[] | null> {
+  ): Promise<IWarehouseProduct[]> {
     const attributeIds = this.getAttributeIds(createWarehouseProductsDto);
 
     if (attributeIds) {
@@ -214,9 +195,7 @@ export class WarehouseProductsService {
       );
 
       if (!newProducts) {
-        throw new BadRequestException(
-          'Warehouse products have not been created',
-        );
+        throw new BadRequestException(ERROR.WAREHOUSE_PRODUCTS_NOT_CREATED);
       }
 
       return newProducts;
@@ -227,7 +206,7 @@ export class WarehouseProductsService {
     );
 
     if (!newProduct) {
-      throw new BadRequestException('Warehouse products have not been created');
+      throw new BadRequestException(ERROR.WAREHOUSE_PRODUCTS_NOT_CREATED);
     }
 
     return [newProduct];

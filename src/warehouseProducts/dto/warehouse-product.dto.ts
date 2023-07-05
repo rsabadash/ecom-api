@@ -2,8 +2,8 @@ import {
   IsDate,
   IsEnum,
   IsMongoId,
+  IsNotEmpty,
   IsNotEmptyObject,
-  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -15,80 +15,38 @@ import { Translations } from '../../common/types/i18n.types';
 import {
   IWarehouseProduct,
   IWarehouseProductAttribute,
-  IWarehouseProductVariant,
   IWarehouseProductWarehouses,
 } from '../interfaces/warehouse-products.interfaces';
 import { Unit } from '../enums/unit.enums';
 import { WarehouseProductWarehousesDto } from './warehouse-product-warehouses.dto';
+import { AttributeWarehouseProductDto } from './attribute-warehouse-product.dto';
 
-class VariantWarehouseProductDto implements IWarehouseProductVariant {
+export class WarehouseProductDto implements Omit<IWarehouseProduct, '_id'> {
   @IsMongoId()
   @ApiProperty({
-    description: 'Identifier of the variant for the warehouses product',
+    description: 'Warehouse product identifier (returned as ObjectId)',
   })
-  readonly variantId: string;
-
-  @ValidateNested()
-  @Type(() => TranslationsDto)
-  @ApiProperty({
-    type: TranslationsDto,
-    description: 'Translation object for the warehouses product variant',
-  })
-  readonly name: Translations;
-}
-
-export class AttributeWarehouseProductDto
-  implements IWarehouseProductAttribute
-{
-  @IsMongoId()
-  @ApiProperty({
-    description: 'Identifier of the attribute for the warehouses product',
-  })
-  readonly attributeId: string;
-
-  @ValidateNested()
-  @Type(() => TranslationsDto)
-  @ApiProperty({
-    type: TranslationsDto,
-    description: 'Translation object for the warehouses product attribute',
-  })
-  readonly name: Translations;
-
-  @ValidateNested({ each: true })
-  @Type(() => VariantWarehouseProductDto)
-  @ApiProperty({
-    type: [VariantWarehouseProductDto],
-    description: 'Variants for the warehouses product',
-  })
-  readonly variants: IWarehouseProductVariant[];
-}
-
-export class WarehouseProductDto implements IWarehouseProduct {
-  @IsMongoId()
-  @ApiProperty({
-    type: 'string',
-    description: 'Identifier of the warehouses product',
-  })
-  readonly _id: ObjectId;
+  readonly _id: string;
 
   @ValidateNested()
   @IsNotEmptyObject()
   @Type(() => TranslationsDto)
   @ApiProperty({
     type: TranslationsDto,
-    description: 'Translation object for the warehouses product name',
+    description: 'Warehouse product name translations',
   })
   readonly name: Translations;
 
   @IsString()
+  @IsNotEmpty()
   @ApiProperty({
-    description: 'A unique SKU identifier of the warehouses product',
+    description: 'A unique SKU identifier of the warehouse product',
   })
   readonly sku: string;
 
   @IsEnum(Unit)
   @ApiProperty({
-    description: 'Measurement unit of warehouse product',
+    description: 'Warehouse product measurement unit',
     enum: Unit,
     example: [
       Unit.Meter,
@@ -106,44 +64,23 @@ export class WarehouseProductDto implements IWarehouseProduct {
 
   @ValidateNested({ each: true })
   @Type(() => AttributeWarehouseProductDto)
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: [AttributeWarehouseProductDto],
-    description: 'Attributes for the warehouses product',
-    nullable: true,
-    default: null,
+    description: 'Attributes for the warehouse product',
+    default: [],
   })
-  readonly attributes: null | IWarehouseProductAttribute[] = null;
-
-  @IsMongoId()
-  @IsOptional()
-  @ApiPropertyOptional({
-    type: 'string',
-    description: 'Identifier of the warehouses product group',
-    nullable: true,
-    default: null,
-  })
-  readonly groupId: null | ObjectId = null;
-
-  @IsString()
-  @IsOptional()
-  @ApiPropertyOptional({
-    description: 'Name of the warehouses product group',
-    nullable: true,
-    default: null,
-  })
-  readonly groupName: null | string = null;
+  readonly attributes: IWarehouseProductAttribute[] = [];
 
   @IsDate()
   @ApiProperty({
-    description: 'Date of the warehouses product creation',
+    description: 'Warehouse product creation date',
   })
-  createdDate: Date;
+  readonly createdDate: Date;
 
   @ValidateNested({ each: true })
   @Type(() => ObjectId)
   @ApiPropertyOptional({
-    description: 'Identifiers of supplies related to the product',
-    nullable: true,
+    description: 'Identifiers of supplies related to the warehouse product',
     default: [],
   })
   readonly supplyIds: string[] = [];

@@ -6,7 +6,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { WAREHOUSE_PRODUCTS_ROUTE } from './constants/route.constants';
-import { WAREHOUSE_PRODUCTS_MODULE_NAME } from './constants/swagger.constants';
 import { Roles } from '../iam/decorators/roles.decorator';
 import { Role } from '../iam/enums/role.enums';
 import { Auth } from '../iam/decorators/auth.decorator';
@@ -24,8 +23,10 @@ import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 import {
   PaginationData,
   PaginationParsedQuery,
-} from 'src/common/interfaces/pagination.interface';
+} from '../common/interfaces/pagination.interface';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
+import { WAREHOUSE_PRODUCTS_MODULE_NAME } from '../common/constants/swagger.constants';
+import { ERROR, SWAGGER_DESCRIPTION } from './constants/message';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -38,7 +39,7 @@ export class WarehouseProductsController {
 
   @Get()
   @ApiOkResponse({
-    description: 'List of warehouses products was retrieved',
+    description: SWAGGER_DESCRIPTION.GET_WAREHOUSES_PRODUCTS,
     type: [WarehouseProductDto],
   })
   @ApiNoAccessResponse()
@@ -58,7 +59,7 @@ export class WarehouseProductsController {
 
   @Get(DROPDOWN_LIST_PATH)
   @ApiOkResponse({
-    description: 'Dropdown list of warehouse products',
+    description: SWAGGER_DESCRIPTION.DROPDOWN_LIST,
     type: DropdownListDto,
   })
   @ApiNoAccessResponse()
@@ -72,17 +73,17 @@ export class WarehouseProductsController {
 
   @Post()
   @ApiCreatedResponse({
-    description: 'Warehouse products have been created',
+    description: SWAGGER_DESCRIPTION.CREATE_WAREHOUSE_PRODUCTS,
     type: [WarehouseProductDto],
   })
   @ApiBadRequestResponse({
-    description: 'Warehouse products have not been created',
+    description: ERROR.WAREHOUSE_PRODUCTS_NOT_CREATED,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
   async createWarehouseProducts(
     @Body() createWarehouseProductsDto: CreateWarehouseProductDto[],
-  ): Promise<IWarehouseProduct[] | null> {
+  ): Promise<IWarehouseProduct[]> {
     return await this.warehouseProductsService.createWarehouseProducts(
       createWarehouseProductsDto,
     );

@@ -10,4 +10,5 @@ export const SWAGGER_DESCRIPTION = {
   CREATE_WAREHOUSE: 'Warehouse has been created',
   UPDATE_WAREHOUSE: 'Warehouse has been updated',
   DELETE_WAREHOUSE: 'Warehouse has been deleted',
+  DROPDOWN_LIST: 'Dropdown list of warehouses',
 };
