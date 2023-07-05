@@ -8,10 +8,10 @@ import {
   GetWarehouseParameters,
   IWarehouseCreate,
   IWarehouseUpdate,
+  IWarehouseDelete,
 } from './interfaces/warehouses.interfaces';
 import { PartialEntity } from '../mongo/types/mongo-query.types';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
-import { DeleteWarehouseDto } from './dto/delete-warehouse.dto';
 import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 import { ERROR } from './constants/message.constants';
@@ -88,7 +88,7 @@ export class WarehousesService {
     }
   }
 
-  async deleteWarehouse(deleteWarehouseDto: DeleteWarehouseDto): Promise<void> {
+  async deleteWarehouse(deleteWarehouseDto: IWarehouseDelete): Promise<void> {
     await this.warehousesCollection.deleteOne({
       _id: new ObjectId(deleteWarehouseDto.id),
     });

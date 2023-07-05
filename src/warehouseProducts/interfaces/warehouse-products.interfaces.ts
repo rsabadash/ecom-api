@@ -27,12 +27,18 @@ export interface IWarehouseProduct {
   createdDate: Date;
   supplyIds: string[];
   warehouses: IWarehouseProductWarehouses[];
+  isDeleted: boolean;
 }
 
-export interface ICreateWarehouseProduct
+export interface IWarehouseProductCreate
   extends Omit<
     IWarehouseProduct,
-    '_id' | 'createdDate' | 'attributes' | 'supplies' | 'warehouses'
+    | '_id'
+    | 'createdDate'
+    | 'attributes'
+    | 'supplyIds'
+    | 'warehouses'
+    | 'isDeleted'
   > {
   attributes: null | Omit<IWarehouseProductAttribute, 'name'>[];
 }

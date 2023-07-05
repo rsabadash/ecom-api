@@ -4,13 +4,12 @@ import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
 import { WAREHOUSE_PRODUCTS_COLLECTION } from '../common/constants/collections.constants';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
 import {
-  ICreateWarehouseProduct,
+  IWarehouseProductCreate,
   INewWarehouseProduct,
   IWarehouseProduct,
   IWarehouseProductAttribute,
   IWarehouseProductVariant,
 } from './interfaces/warehouse-products.interfaces';
-import { CreateWarehouseProductDto } from './dto/create-warehouse-product.dto';
 import { AttributesService } from '../attributes/attributes.service';
 import {
   FindEntityOptions,
@@ -33,7 +32,7 @@ export class WarehouseProductsService {
   ) {}
 
   private getAttributeIds(
-    products: ICreateWarehouseProduct[],
+    products: IWarehouseProductCreate[],
   ): null | ObjectId[] {
     if (products.length > 0 && products[0].attributes) {
       return products[0].attributes.map(
@@ -45,7 +44,7 @@ export class WarehouseProductsService {
   }
 
   private async createWarehouseProductsWithAttributes(
-    products: ICreateWarehouseProduct[],
+    products: IWarehouseProductCreate[],
     attributeIds: ObjectId[],
   ): Promise<IWarehouseProduct[] | null> {
     const currentDate = new Date();
@@ -111,6 +110,7 @@ export class WarehouseProductsService {
           createdDate: currentDate,
           supplyIds: [],
           warehouses: [],
+          isDeleted: false,
         };
 
         acc.push(updatedProduct);
@@ -169,7 +169,7 @@ export class WarehouseProductsService {
   }
 
   private async createWarehouseProductWithoutAttributes(
-    products: ICreateWarehouseProduct[],
+    products: IWarehouseProductCreate[],
   ): Promise<IWarehouseProduct | null> {
     const product = products[0];
     const currentDate = new Date();
@@ -180,11 +180,12 @@ export class WarehouseProductsService {
       createdDate: currentDate,
       warehouses: [],
       supplyIds: [],
+      isDeleted: false,
     });
   }
 
   async createWarehouseProducts(
-    createWarehouseProductsDto: CreateWarehouseProductDto[],
+    createWarehouseProductsDto: IWarehouseProductCreate[],
   ): Promise<IWarehouseProduct[]> {
     const attributeIds = this.getAttributeIds(createWarehouseProductsDto);
 

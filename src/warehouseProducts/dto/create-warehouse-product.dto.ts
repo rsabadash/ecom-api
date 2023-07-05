@@ -2,7 +2,10 @@ import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { WarehouseProductDto } from './warehouse-product.dto';
-import { IWarehouseProductAttribute } from '../interfaces/warehouse-products.interfaces';
+import {
+  IWarehouseProductCreate,
+  IWarehouseProductAttribute,
+} from '../interfaces/warehouse-products.interfaces';
 import { AttributeWarehouseProductDto } from './attribute-warehouse-product.dto';
 
 class AttributeWarehouseProductCreateDto extends OmitType(
@@ -10,11 +13,17 @@ class AttributeWarehouseProductCreateDto extends OmitType(
   ['name'] as const,
 ) {}
 
-export class CreateWarehouseProductDto extends OmitType(WarehouseProductDto, [
-  '_id',
-  'createdDate',
-  'attributes',
-] as const) {
+export class CreateWarehouseProductDto
+  extends OmitType(WarehouseProductDto, [
+    '_id',
+    'createdDate',
+    'attributes',
+    'supplyIds',
+    'warehouses',
+    'isDeleted',
+  ] as const)
+  implements IWarehouseProductCreate
+{
   @ValidateNested({ each: true })
   @Type(() => AttributeWarehouseProductCreateDto)
   @ApiProperty({

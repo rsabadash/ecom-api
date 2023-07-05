@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsDate,
   IsEnum,
   IsMongoId,
@@ -92,4 +93,11 @@ export class WarehouseProductDto implements Omit<IWarehouseProduct, '_id'> {
     default: [],
   })
   readonly warehouses: IWarehouseProductWarehouses[] = [];
+
+  @IsBoolean()
+  @ApiPropertyOptional({
+    description: 'Define is product logically deleted',
+    default: false,
+  })
+  readonly isDeleted: boolean = false;
 }
