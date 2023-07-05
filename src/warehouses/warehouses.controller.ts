@@ -38,12 +38,12 @@ import { DROPDOWN_LIST_PATH } from '../common/constants/path.constants';
 import { DropdownListDto } from '../common/dto/dropdown-list.dto';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
-import { WAREHOUSES_MODULE_NAME } from '../common/constants/swagger.constants';
+import { MODULE_NAME } from '../common/constants/swagger.constants';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
 @Controller(WAREHOUSES_ROUTE)
-@ApiTags(WAREHOUSES_MODULE_NAME)
+@ApiTags(MODULE_NAME.WAREHOUSES)
 export class WarehousesController {
   constructor(private readonly warehousesService: WarehousesService) {}
 

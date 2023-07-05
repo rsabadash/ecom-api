@@ -36,13 +36,13 @@ import { Role } from '../iam/enums/role.enums';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
 import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
-import { USERS_MODULE_NAME } from '../common/constants/swagger.constants';
+import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { UserId } from './decorators/user-id.decorator';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
 @Controller(USERS_ROUTE)
-@ApiTags(USERS_MODULE_NAME)
+@ApiTags(MODULE_NAME.USERS)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

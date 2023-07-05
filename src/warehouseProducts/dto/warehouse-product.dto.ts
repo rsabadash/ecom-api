@@ -8,8 +8,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ObjectId } from 'mongodb';
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
@@ -41,7 +40,7 @@ export class WarehouseProductDto implements Omit<IWarehouseProduct, '_id'> {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'A unique SKU identifier of the warehouse product',
+    description: 'A unique SKU identifier of warehouse product',
   })
   readonly sku: string;
 
@@ -65,9 +64,10 @@ export class WarehouseProductDto implements Omit<IWarehouseProduct, '_id'> {
 
   @ValidateNested({ each: true })
   @Type(() => AttributeWarehouseProductDto)
-  @ApiPropertyOptional({
+  @ApiProperty({
     type: [AttributeWarehouseProductDto],
-    description: 'Attributes for the warehouse product',
+    description: 'Attributes for warehouse product',
+    nullable: true,
     default: [],
   })
   readonly attributes: IWarehouseProductAttribute[] = [];
@@ -78,24 +78,25 @@ export class WarehouseProductDto implements Omit<IWarehouseProduct, '_id'> {
   })
   readonly createdDate: Date;
 
-  @ValidateNested({ each: true })
-  @Type(() => ObjectId)
-  @ApiPropertyOptional({
-    description: 'Identifiers of supplies related to the warehouse product',
+  @IsMongoId({ each: true })
+  @ApiProperty({
+    description: 'Supply identifiers that is related to product',
+    nullable: true,
     default: [],
   })
   readonly supplyIds: string[] = [];
 
   @ValidateNested({ each: true })
   @Type(() => WarehouseProductWarehousesDto)
-  @ApiPropertyOptional({
-    description: 'List of warehouses to which the product belongs',
+  @ApiProperty({
+    description: 'List of warehouses to which product belongs',
+    nullable: true,
     default: [],
   })
   readonly warehouses: IWarehouseProductWarehouses[] = [];
 
   @IsBoolean()
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'Define is product logically deleted',
     default: false,
   })

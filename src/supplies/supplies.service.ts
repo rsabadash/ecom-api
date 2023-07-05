@@ -12,9 +12,11 @@ import { SUPPLIES_COLLECTION } from '../common/constants/collections.constants';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
 import {
   BulkUpdateFilter,
+  GetSupplyParameters,
   ISupply,
+  ISupplyCreate,
   ISupplyProduct,
-  ProductsToCreateSupply,
+  ISupplyProductToCreate,
 } from './interfaces/supplies.interfaces';
 import { WarehouseProductsService } from '../warehouseProducts/warehouse-products.service';
 import { MathService } from '../common/services/math.service';
@@ -24,7 +26,6 @@ import {
   IWarehouseProductWarehouses,
 } from '../warehouseProducts/interfaces/warehouse-products.interfaces';
 import { BulkResult } from '../mongo/types/colection-model.types';
-import { CreateSupplyDto } from './dto/create-supply.dto';
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
 import {
   ClientsMap,
@@ -32,8 +33,9 @@ import {
   PartialEntity,
 } from '../mongo/types/mongo-query.types';
 import { PaginationData } from '../common/interfaces/pagination.interface';
-import { GetSupplyParameters } from './types/supplies.types';
 import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
+import { getPaginationPipeline } from '../common/utils/getPaginationPipeline';
+import { ERROR } from './constants/message.constants';
 
 @Injectable()
 export class SuppliesService {
@@ -59,7 +61,7 @@ export class SuppliesService {
   }
 
   private async getWarehouseProductsToAdd(
-    products: ProductsToCreateSupply[],
+    products: ISupplyProductToCreate[],
   ): Promise<IWarehouseProduct[]> {
     const productToAddIds = products.map((product) => {
       return new ObjectId(product.productId);
@@ -78,7 +80,7 @@ export class SuppliesService {
 
   private addVariationsToSupplyProducts(
     warehouseProducts: IWarehouseProduct[],
-    productsToAdd: ProductsToCreateSupply[],
+    productsToAdd: ISupplyProductToCreate[],
   ): ISupplyProduct[] {
     const productsToSupplyCollection: ISupplyProduct[] = [];
 
@@ -88,8 +90,8 @@ export class SuppliesService {
       });
 
       if (productToSupply) {
-        let productAttributeIds: null | string[] = null;
-        let productVariantIds: null | string[] = null;
+        let productAttributeIds: string[] = [];
+        let productVariantIds: string[] = [];
 
         if (
           warehouseProduct.attributes &&
@@ -126,7 +128,7 @@ export class SuppliesService {
 
   private updateWarehouseProductsList(
     warehouseProducts: IWarehouseProduct[],
-    productsToAdd: ProductsToCreateSupply[],
+    productsToAdd: ISupplyProductToCreate[],
     warehouseIdToAdd: string,
     supplyIdToAdd: string,
   ): IWarehouseProduct[] {
@@ -218,30 +220,17 @@ export class SuppliesService {
   ): Promise<PaginationData<ISupply>> {
     const { skip, limit } = options;
 
+    const pipeline = getPaginationPipeline({
+      query,
+      filter: {
+        skip,
+        limit,
+      },
+    });
+
     const paginatedData = await this.supplyCollection.aggregate<
       PaginationData<ISupply>
-    >([
-      { $match: query },
-      {
-        $facet: {
-          data: [
-            {
-              $skip: skip,
-            },
-            {
-              $limit: limit,
-            },
-          ],
-          total: [{ $count: 'count' }],
-        },
-      },
-      {
-        $project: {
-          data: 1,
-          metadata: { total: { $arrayElemAt: ['$total.count', 0] } },
-        },
-      },
-    ]);
+    >(pipeline);
 
     return paginatedData[0];
   }
@@ -252,64 +241,28 @@ export class SuppliesService {
     });
 
     if (!supply) {
-      throw new EntityNotFoundException('The supply has not been found');
+      throw new EntityNotFoundException(ERROR.SUPPLY_NOT_FOUND);
     }
 
     return supply;
   }
 
-  async getSupplyProducts(
-    parameters: GetSupplyParameters,
-  ): Promise<PaginationData<ISupplyProduct>> {
-    const paginatedData = await this.supplyCollection.aggregate<
-      PaginationData<ISupplyProduct>
-    >([
-      { $match: { _id: new ObjectId(parameters.supplyId) } },
-      { $unwind: '$products' },
-      {
-        $facet: {
-          data: [
-            {
-              $skip: 0,
-            },
-            {
-              $limit: 10,
-            },
-          ],
-          total: [{ $count: 'count' }],
-        },
-      },
-      {
-        $project: {
-          data: 1,
-          metadata: { total: { $arrayElemAt: ['$total.count', 0] } },
-        },
-      },
-    ]);
-
-    return paginatedData[0];
-  }
-
-  async createSupply(createSupplyDto: CreateSupplyDto): Promise<any> {
+  async createSupply(createSupplyDto: ISupplyCreate): Promise<void> {
     // TODO check duplication
-    const productsToAdd: ProductsToCreateSupply[] = createSupplyDto.products;
+    const productsToAdd: ISupplyProductToCreate[] = createSupplyDto.products;
 
     const warehouseProducts: IWarehouseProduct[] =
       await this.getWarehouseProductsToAdd(productsToAdd);
 
     if (warehouseProducts.length < 1) {
-      throw new BadRequestException(
-        'Can not create a supply as no products were found',
-      );
+      throw new BadRequestException(ERROR.NO_PRODUCTS_FOUND);
     }
 
     const productsToSupplyWithVariations: ISupplyProduct[] =
       this.addVariationsToSupplyProducts(warehouseProducts, productsToAdd);
 
     if (productsToSupplyWithVariations.length < 1) {
-      throw new BadRequestException(
-        'The supply has not been created. No products to add',
-      );
+      throw new BadRequestException(ERROR.NO_PRODUCTS_TO_ADD);
     }
 
     const session = this.client.startSession();
@@ -326,7 +279,7 @@ export class SuppliesService {
         );
 
         if (!newSupply) {
-          throw new BadRequestException('The supply has not been created');
+          throw new BadRequestException(ERROR.SUPPLY_NOT_CREATED);
         }
 
         const updatedWarehouseProducts: IWarehouseProduct[] =
@@ -338,9 +291,7 @@ export class SuppliesService {
           );
 
         if (updatedWarehouseProducts.length < 1) {
-          throw new BadRequestException(
-            'The supply has not been created. No products to update',
-          );
+          throw new BadRequestException(ERROR.NO_PRODUCTS_TO_UPDATE);
         }
 
         const result = await this.bulkWarehouseProductsUpdate(
@@ -349,15 +300,11 @@ export class SuppliesService {
         );
 
         if (result.nModified < 1) {
-          throw new BadRequestException(
-            'The supply has not been created. No products were updated',
-          );
+          throw new BadRequestException(ERROR.NO_PRODUCTS_WERE_UPDATED);
         }
       });
     } finally {
       await session.endSession();
     }
-
-    return null;
   }
 }

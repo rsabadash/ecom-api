@@ -7,7 +7,6 @@ export interface ISupply {
   name: null | string;
   products: ISupplyProduct[];
   productsTotalCost: string;
-  productsTotalQuantity: string;
   supplierId: string;
   warehouseId: string;
   createdAt: Date;
@@ -19,15 +18,23 @@ export interface ISupplyProduct {
   quantity: string;
   price: string;
   totalCost: string;
-  attributeIds: null | string[];
-  variantIds: null | string[];
+  attributeIds: string[];
+  variantIds: string[];
 }
 
-export interface ProductsToCreateSupply
+export interface ISupplyProductToCreate
   extends Pick<
     ISupplyProduct,
     'productId' | 'quantity' | 'price' | 'totalCost'
   > {}
+
+export interface ISupplyCreate
+  extends Pick<
+    ISupply,
+    'name' | 'productsTotalCost' | 'supplierId' | 'warehouseId'
+  > {
+  products: ISupplyProductToCreate[];
+}
 
 export interface BulkUpdateFilter {
   updateOne: {
@@ -41,4 +48,8 @@ export interface BulkUpdateFilter {
       };
     };
   };
+}
+
+export interface GetSupplyParameters {
+  supplyId: string;
 }

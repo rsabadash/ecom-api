@@ -84,7 +84,7 @@ export class WarehousesService {
     );
 
     if (!updatedResult.isUpdated) {
-      throw new BadRequestException('The warehouse has not been updated');
+      throw new BadRequestException(ERROR.WAREHOUSE_NOT_UPDATED);
     }
   }
 

@@ -1,68 +1,28 @@
-import {
-  ArrayNotEmpty,
-  IsMongoId,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { ArrayNotEmpty, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 import {
-  ISupply,
-  ProductsToCreateSupply,
+  ISupplyCreate,
+  ISupplyProductToCreate,
 } from '../interfaces/supplies.interfaces';
-import { ProductsToCreateSupplyDto } from './products-to-create-supply.dto';
+import { SupplyProductToCreateDto } from './supply-product-to-create.dto';
+import { SupplyDto } from './supply.dto';
 
 export class CreateSupplyDto
-  implements
-    Pick<
-      ISupply,
-      | 'name'
-      | 'productsTotalCost'
-      | 'productsTotalQuantity'
-      | 'supplierId'
-      | 'warehouseId'
-    >
+  extends PickType(SupplyDto, [
+    'name',
+    'productsTotalCost',
+    'supplierId',
+    'warehouseId',
+  ])
+  implements ISupplyCreate
 {
-  @IsString()
-  @ApiProperty({
-    description: 'Name of supply',
-    nullable: true,
-    default: null,
-  })
-  readonly name: null | string = null;
-
   @ArrayNotEmpty()
   @ValidateNested({ each: true })
-  @Type(() => ProductsToCreateSupplyDto)
+  @Type(() => SupplyProductToCreateDto)
   @ApiProperty({
-    type: [ProductsToCreateSupplyDto],
-    description: 'List of products in the supply',
+    type: [SupplyProductToCreateDto],
+    description: 'List of products in supply',
   })
-  readonly products: ProductsToCreateSupply[];
-
-  // TODO validation
-  @IsString()
-  @ApiProperty({
-    description: 'Total cost of all products in the supply',
-  })
-  readonly productsTotalCost: string;
-
-  // TODO validation
-  @IsString()
-  @ApiProperty({
-    description: 'Total quantity of products in the supply',
-  })
-  readonly productsTotalQuantity: string;
-
-  @IsMongoId()
-  @ApiProperty({
-    description: 'Identifier of the supplier',
-  })
-  readonly supplierId: string;
-
-  @IsMongoId()
-  @ApiProperty({
-    description: 'Identifier of the warehouse',
-  })
-  readonly warehouseId: string;
+  readonly products: ISupplyProductToCreate[];
 }

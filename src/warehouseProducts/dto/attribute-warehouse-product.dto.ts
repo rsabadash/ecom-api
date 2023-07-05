@@ -1,4 +1,4 @@
-import { IsMongoId, ValidateNested } from 'class-validator';
+import { IsMongoId, IsNotEmptyObject, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
@@ -14,11 +14,12 @@ export class AttributeWarehouseProductDto
 {
   @IsMongoId()
   @ApiProperty({
-    description: 'Identifier of the attribute for the warehouse product',
+    description: 'Identifier of attribute related to warehouse product',
   })
   readonly attributeId: string;
 
   @ValidateNested()
+  @IsNotEmptyObject()
   @Type(() => TranslationsDto)
   @ApiProperty({
     type: TranslationsDto,
@@ -30,7 +31,7 @@ export class AttributeWarehouseProductDto
   @Type(() => VariantWarehouseProductDto)
   @ApiProperty({
     type: [VariantWarehouseProductDto],
-    description: 'Variants for the warehouse product',
+    description: 'Variants for warehouse product',
   })
   readonly variants: IWarehouseProductVariant[];
 }

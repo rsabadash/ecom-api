@@ -1,10 +1,11 @@
 import { HttpStatus } from '@nestjs/common';
 
-export const USERS_MODULE_NAME = 'Users module';
-
-export const WAREHOUSES_MODULE_NAME = 'Warehouses module';
-
-export const WAREHOUSE_PRODUCTS_MODULE_NAME = 'Warehouse products module';
+export const MODULE_NAME = {
+  SUPPLIES: 'Supplies module',
+  USERS: 'Users module',
+  WAREHOUSE_PRODUCTS: 'Warehouse products module',
+  WAREHOUSES: 'Warehouses module',
+};
 
 export const HttpStatusMessage = {
   [HttpStatus.CONTINUE]: 'Continue',

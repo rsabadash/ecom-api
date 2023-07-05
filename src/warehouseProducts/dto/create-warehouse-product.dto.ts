@@ -28,7 +28,8 @@ export class CreateWarehouseProductDto
   @Type(() => AttributeWarehouseProductCreateDto)
   @ApiProperty({
     type: [AttributeWarehouseProductCreateDto],
-    description: 'Attributes for the warehouse product',
+    description: 'Attributes for warehouse product',
+    nullable: true,
     default: [],
   })
   readonly attributes: Omit<IWarehouseProductAttribute, 'name'>[] = [];

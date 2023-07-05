@@ -2,6 +2,7 @@ import {
   IsBoolean,
   IsMongoId,
   IsNotEmpty,
+  IsNotEmptyObject,
   IsNumber,
   IsOptional,
   IsString,
@@ -25,7 +26,7 @@ export class VariantDto implements IVariant {
   readonly variantId: ObjectId;
 
   @ValidateNested()
-  @ValidateNested()
+  @IsNotEmptyObject()
   @Type(() => TranslationsDto)
   @ApiProperty({
     type: TranslationsDto,

@@ -25,13 +25,13 @@ import {
   PaginationParsedQuery,
 } from '../common/interfaces/pagination.interface';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
-import { WAREHOUSE_PRODUCTS_MODULE_NAME } from '../common/constants/swagger.constants';
+import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
 @Controller(WAREHOUSE_PRODUCTS_ROUTE)
-@ApiTags(WAREHOUSE_PRODUCTS_MODULE_NAME)
+@ApiTags(MODULE_NAME.WAREHOUSE_PRODUCTS)
 export class WarehouseProductsController {
   constructor(
     private readonly warehouseProductsService: WarehouseProductsService,
