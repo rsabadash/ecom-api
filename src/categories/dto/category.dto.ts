@@ -17,7 +17,7 @@ import { ICategory } from '../interfaces/categories.interfaces';
 export class CategoryDto implements Omit<ICategory, '_id'> {
   @IsMongoId()
   @ApiProperty({
-    description: 'Category identifier',
+    description: 'Category identifier (returned as ObjectId)',
   })
   readonly _id: string;
 
@@ -34,7 +34,7 @@ export class CategoryDto implements Omit<ICategory, '_id'> {
   @IsNotEmpty()
   @Matches(RegExp(URL_SLUG), {
     message:
-      'SEO name of the category should contains only number and Latin letters',
+      'SEO name of the category should contains only number and Latin lower case letters',
   })
   @ApiProperty({
     description: 'Name of category, that used for search engine optimization',
@@ -49,7 +49,7 @@ export class CategoryDto implements Omit<ICategory, '_id'> {
 
   @IsMongoId({ each: true })
   @ApiProperty({
-    description: 'Parents categories for the category',
+    description: 'Parent category identifiers for the category',
     nullable: true,
     default: [],
   })

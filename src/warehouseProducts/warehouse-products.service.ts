@@ -185,13 +185,13 @@ export class WarehouseProductsService {
   }
 
   async createWarehouseProducts(
-    createWarehouseProductsDto: IWarehouseProductCreate[],
+    createWarehouseProducts: IWarehouseProductCreate[],
   ): Promise<IWarehouseProduct[]> {
-    const attributeIds = this.getAttributeIds(createWarehouseProductsDto);
+    const attributeIds = this.getAttributeIds(createWarehouseProducts);
 
     if (attributeIds) {
       const newProducts = await this.createWarehouseProductsWithAttributes(
-        createWarehouseProductsDto,
+        createWarehouseProducts,
         attributeIds,
       );
 
@@ -203,7 +203,7 @@ export class WarehouseProductsService {
     }
 
     const newProduct = await this.createWarehouseProductWithoutAttributes(
-      createWarehouseProductsDto,
+      createWarehouseProducts,
     );
 
     if (!newProduct) {

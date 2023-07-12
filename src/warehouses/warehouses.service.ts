@@ -67,16 +67,13 @@ export class WarehousesService {
     return newWarehouse;
   }
 
-  async updateWarehouse(updateWarehouseDto: IWarehouseUpdate): Promise<void> {
+  async updateWarehouse(updateWarehouse: IWarehouseUpdate): Promise<void> {
     const warehouse = await this.getWarehouse({
-      warehouseId: updateWarehouseDto.id,
+      warehouseId: updateWarehouse.id,
     });
 
     const { _id, updatedFields } =
-      this.compareFieldsService.compare<IWarehouse>(
-        updateWarehouseDto,
-        warehouse,
-      );
+      this.compareFieldsService.compare<IWarehouse>(updateWarehouse, warehouse);
 
     const updatedResult = await this.warehousesCollection.updateOne(
       { _id },
@@ -88,9 +85,9 @@ export class WarehousesService {
     }
   }
 
-  async deleteWarehouse(deleteWarehouseDto: IWarehouseDelete): Promise<void> {
+  async deleteWarehouse(deleteWarehouse: IWarehouseDelete): Promise<void> {
     await this.warehousesCollection.deleteOne({
-      _id: new ObjectId(deleteWarehouseDto.id),
+      _id: new ObjectId(deleteWarehouse.id),
     });
   }
 }

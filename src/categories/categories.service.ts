@@ -108,8 +108,8 @@ export class CategoriesService {
     return category;
   }
 
-  async createCategory(createCategoryDto: ICategoryCreate): Promise<ICategory> {
-    const newCategory = await this.categoryCollection.create(createCategoryDto);
+  async createCategory(createCategory: ICategoryCreate): Promise<ICategory> {
+    const newCategory = await this.categoryCollection.create(createCategory);
 
     if (!newCategory) {
       throw new BadRequestException(ERROR.CATEGORY_NOT_CREATED);
@@ -118,9 +118,9 @@ export class CategoriesService {
     return newCategory;
   }
 
-  async updateCategory(updateCategoryDto: ICategoryUpdate): Promise<void> {
+  async updateCategory(updateCategory: ICategoryUpdate): Promise<void> {
     const category = await this.categoryCollection.findOne({
-      _id: new ObjectId(updateCategoryDto.id),
+      _id: new ObjectId(updateCategory.id),
     });
 
     if (!category) {
@@ -128,7 +128,7 @@ export class CategoriesService {
     }
 
     const comparedFields = this.compareFieldsService.compare<ICategory>(
-      updateCategoryDto,
+      updateCategory,
       category,
     );
 
@@ -136,7 +136,7 @@ export class CategoriesService {
 
     if (updatedFields.parentIds) {
       const filteredIds = updatedFields.parentIds.filter(
-        (listId) => listId !== updateCategoryDto.id,
+        (listId) => listId !== updateCategory.id,
       );
 
       updatedFields = {
@@ -155,18 +155,18 @@ export class CategoriesService {
     }
   }
 
-  async deleteCategory(deleteCategoryDto: ICategoryDelete): Promise<void> {
+  async deleteCategory(deleteCategory: ICategoryDelete): Promise<void> {
     const session = this.client.startSession();
 
     try {
       await session.withTransaction(async () => {
         await this.categoryCollection.deleteOne({
-          _id: new ObjectId(deleteCategoryDto.id),
+          _id: new ObjectId(deleteCategory.id),
         });
 
         await this.categoryCollection.updateMany(
-          { parentIds: { $in: [deleteCategoryDto.id] } },
-          { $pull: { parentIds: deleteCategoryDto.id } },
+          { parentIds: { $in: [deleteCategory.id] } },
+          { $pull: { parentIds: deleteCategory.id } },
         );
       });
     } finally {

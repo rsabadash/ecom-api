@@ -49,14 +49,14 @@ export class UsersService {
     return await this.usersCollection.findOne({ email });
   }
 
-  async createUser(createUserDto: IUserCreate): Promise<IUserPublic> {
-    const isUserWithEmailExist = await this.getUserByEmail(createUserDto.email);
+  async createUser(createUser: IUserCreate): Promise<IUserPublic> {
+    const isUserWithEmailExist = await this.getUserByEmail(createUser.email);
 
     if (isUserWithEmailExist) {
       throw new ConflictException(ERROR.EMAIL_EXISTS);
     }
 
-    const newUser = await this.usersCollection.create(createUserDto);
+    const newUser = await this.usersCollection.create(createUser);
 
     if (!newUser) {
       throw new BadRequestException(ERROR.USER_NOT_CREATED);
@@ -69,13 +69,11 @@ export class UsersService {
     };
   }
 
-  async updateUser(updateUserDto: IUserUpdate): Promise<void> {
-    const user = await this.getUser({ userId: updateUserDto.id });
+  async updateUser(updateUser: IUserUpdate): Promise<void> {
+    const user = await this.getUser({ userId: updateUser.id });
 
-    if (updateUserDto.email) {
-      const isUserWithEmailExists = await this.getUserByEmail(
-        updateUserDto.email,
-      );
+    if (updateUser.email) {
+      const isUserWithEmailExists = await this.getUserByEmail(updateUser.email);
 
       if (isUserWithEmailExists) {
         throw new ConflictException(ERROR.EMAIL_EXISTS);
@@ -83,7 +81,7 @@ export class UsersService {
     }
 
     const { _id, updatedFields } =
-      this.compareFieldsService.compare<IUserPublic>(updateUserDto, user);
+      this.compareFieldsService.compare<IUserPublic>(updateUser, user);
 
     const updateResult = await this.usersCollection.updateOne(
       { _id },

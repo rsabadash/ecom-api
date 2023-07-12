@@ -1,12 +1,11 @@
-import { ObjectId } from 'mongodb';
 import { IsMongoId } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IAttributeDelete } from '../interfaces/attribute.interfaces';
 
-export class DeleteAttributeDto {
+export class DeleteAttributeDto implements IAttributeDelete {
   @IsMongoId()
   @ApiProperty({
-    type: 'string',
-    description: 'Identifier of the attribute',
+    description: 'Attribute identifier',
   })
-  readonly id: ObjectId;
+  readonly id: string;
 }

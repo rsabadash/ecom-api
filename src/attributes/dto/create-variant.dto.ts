@@ -1,15 +1,15 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { ObjectId } from 'mongodb';
 import { IsMongoId } from 'class-validator';
 import { VariantDto } from './variant.dto';
+import { IVariantCreate } from '../interfaces/variant.interfaces';
 
-export class CreateVariantDto extends OmitType(VariantDto, [
-  'variantId',
-] as const) {
+export class CreateVariantDto
+  extends OmitType(VariantDto, ['variantId'] as const)
+  implements IVariantCreate
+{
   @IsMongoId()
   @ApiProperty({
-    type: 'string',
-    description: 'Identifier of the parent attribute',
+    description: 'Parent attribute identifier',
   })
-  readonly attributeId: ObjectId;
+  readonly attributeId: string;
 }

@@ -50,8 +50,8 @@ export class SuppliersService {
     return supplier;
   }
 
-  async createSupplier(createSupplierDto: ISupplierCreate): Promise<ISupplier> {
-    const newSupplier = await this.supplierCollection.create(createSupplierDto);
+  async createSupplier(createSupplier: ISupplierCreate): Promise<ISupplier> {
+    const newSupplier = await this.supplierCollection.create(createSupplier);
 
     if (!newSupplier) {
       throw new BadRequestException(ERROR.SUPPLIER_NOT_CREATED);
@@ -60,13 +60,13 @@ export class SuppliersService {
     return newSupplier;
   }
 
-  async updateSupplier(updateSupplierDto: ISupplierUpdate): Promise<void> {
+  async updateSupplier(updateSupplier: ISupplierUpdate): Promise<void> {
     const supplier = await this.getSupplier({
-      supplierId: updateSupplierDto.id,
+      supplierId: updateSupplier.id,
     });
 
     const { _id, updatedFields } = this.compareFieldsService.compare<ISupplier>(
-      updateSupplierDto,
+      updateSupplier,
       supplier,
     );
 
@@ -80,9 +80,9 @@ export class SuppliersService {
     }
   }
 
-  async deleteSupplier(deleteSupplierDto: ISupplierDelete): Promise<void> {
+  async deleteSupplier(deleteSupplier: ISupplierDelete): Promise<void> {
     await this.supplierCollection.deleteOne({
-      _id: new ObjectId(deleteSupplierDto.id),
+      _id: new ObjectId(deleteSupplier.id),
     });
   }
 }

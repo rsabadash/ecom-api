@@ -247,9 +247,9 @@ export class SuppliesService {
     return supply;
   }
 
-  async createSupply(createSupplyDto: ISupplyCreate): Promise<void> {
+  async createSupply(createSupply: ISupplyCreate): Promise<void> {
     // TODO check duplication
-    const productsToAdd: ISupplyProductToCreate[] = createSupplyDto.products;
+    const productsToAdd: ISupplyProductToCreate[] = createSupply.products;
 
     const warehouseProducts: IWarehouseProduct[] =
       await this.getWarehouseProductsToAdd(productsToAdd);
@@ -271,7 +271,7 @@ export class SuppliesService {
       await session.withTransaction(async () => {
         const newSupply = await this.supplyCollection.create(
           {
-            ...createSupplyDto,
+            ...createSupply,
             products: productsToSupplyWithVariations,
             createdAt: new Date(),
           },
@@ -286,7 +286,7 @@ export class SuppliesService {
           this.updateWarehouseProductsList(
             warehouseProducts,
             productsToAdd,
-            createSupplyDto.warehouseId,
+            createSupply.warehouseId,
             newSupply._id.toString(),
           );
 
