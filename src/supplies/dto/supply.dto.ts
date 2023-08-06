@@ -4,6 +4,7 @@ import {
   IsDate,
   IsMongoId,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Matches,
   ValidateNested,
@@ -21,7 +22,7 @@ export class SupplyDto implements Omit<ISupply, '_id'> {
   readonly _id: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @ApiProperty({
     description: 'Supply name',
     nullable: true,

@@ -20,7 +20,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CategoriesService } from './categories.service';
-import { ICategory, ICategoryDetail } from './interfaces/categories.interfaces';
+import { ICategory } from './interfaces/categories.interfaces';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import {
   CATEGORIES_ROUTE,
@@ -91,7 +91,7 @@ export class CategoriesController {
   @ApiNoAccessResponse()
   async getCategory(
     @Param(CATEGORY_ID_PARAM) categoryId: string,
-  ): Promise<ICategoryDetail> {
+  ): Promise<ICategory> {
     return await this.categoriesService.getCategory({ categoryId });
   }
 

@@ -1,4 +1,4 @@
-import { IsString, IsMongoId, IsNotEmpty } from 'class-validator';
+import { IsString, IsMongoId, IsNotEmpty, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ISupplier } from '../interfaces/suppliers.interfaces';
 
@@ -18,15 +18,7 @@ export class SupplierDto implements Omit<ISupplier, '_id'> {
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({
-    description: 'Supplier additional information',
-    nullable: true,
-    default: null,
-  })
-  readonly note: null | string = null;
-
-  @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @ApiProperty({
     description: 'Supplier address',
     nullable: true,
@@ -36,6 +28,7 @@ export class SupplierDto implements Omit<ISupplier, '_id'> {
 
   @IsString()
   @IsNotEmpty()
+  @IsOptional()
   @ApiProperty({
     description: 'Supplier phone number',
     nullable: true,

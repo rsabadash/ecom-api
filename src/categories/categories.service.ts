@@ -15,7 +15,6 @@ import {
   ICategory,
   ICategoryCreate,
   ICategoryDelete,
-  ICategoryDetail,
   ICategoryUpdate,
 } from './interfaces/categories.interfaces';
 import { GetCategoryParameters } from './types/categories.types';
@@ -80,26 +79,10 @@ export class CategoriesService {
     });
   }
 
-  async getCategory(
-    parameters: GetCategoryParameters,
-  ): Promise<ICategoryDetail> {
-    const pipeline = [
-      { $match: { _id: new ObjectId(parameters.categoryId) } },
-      {
-        $lookup: {
-          from: 'categories',
-          localField: 'parentIds',
-          foreignField: '_id',
-          as: 'parents',
-        },
-      },
-      { $project: { _id: 1, name: 1, isActive: 1, parents: 1, seoName: 1 } },
-    ];
-
-    const categoryDetail =
-      await this.categoryCollection.aggregate<ICategoryDetail>(pipeline);
-
-    const category = categoryDetail[0];
+  async getCategory(parameters: GetCategoryParameters): Promise<ICategory> {
+    const category = await this.categoryCollection.findOne({
+      _id: new ObjectId(parameters.categoryId),
+    });
 
     if (!category) {
       throw new EntityNotFoundException(ERROR.CATEGORY_NOT_FOUND);

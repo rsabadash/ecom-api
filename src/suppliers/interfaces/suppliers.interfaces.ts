@@ -3,7 +3,6 @@ import { ObjectId } from 'mongodb';
 export interface ISupplier {
   _id: ObjectId;
   name: string;
-  note: null | string;
   address: null | string;
   phoneNumber: null | string;
 }
