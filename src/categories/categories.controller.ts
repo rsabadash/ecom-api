@@ -45,6 +45,12 @@ import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
 import { DropdownListDto } from '../common/dto/dropdown-list.dto';
 import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
+import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
+import {
+  PaginationData,
+  PaginationParsedQuery,
+} from '../common/interfaces/pagination.interface';
+import { PaginationCategoryDto } from './dto/pagination-category.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -56,11 +62,21 @@ export class CategoriesController {
   @Get()
   @ApiOkResponse({
     description: SWAGGER_DESCRIPTION.GET_CATEGORIES,
-    type: [CategoryDto],
+    type: [PaginationCategoryDto],
   })
   @ApiNoAccessResponse()
-  async getCategories(): Promise<ICategory[]> {
-    return await this.categoriesService.getCategories();
+  async getCategories(
+    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
+  ): Promise<PaginationData<ICategory>> {
+    const { page, limit } = query;
+
+    return await this.categoriesService.getCategories(
+      {},
+      {
+        skip: page,
+        limit: limit,
+      },
+    );
   }
 
   @Get(DROPDOWN_LIST_PATH)

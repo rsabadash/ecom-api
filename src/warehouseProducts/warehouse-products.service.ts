@@ -49,7 +49,7 @@ export class WarehouseProductsService {
   ): Promise<IWarehouseProduct[] | null> {
     const currentDate = new Date();
 
-    const attributes = await this.attributesService.getAttributes(
+    const attributes = await this.attributesService.getAttributes2(
       {
         _id: { $in: attributeIds },
       },
@@ -144,16 +144,10 @@ export class WarehouseProductsService {
     return paginatedData[0];
   }
 
-  async getWarehouseProducts2(
-    query: PartialEntity<IWarehouseProduct> = {},
-  ): Promise<IWarehouseProduct[]> {
-    return await this.warehouseProductCollection.find(query);
-  }
-
   async getWarehouseProductsDropdownList(
     language: Language,
   ): Promise<DropdownListItem[]> {
-    const warehouseProducts = await this.getWarehouseProducts2();
+    const warehouseProducts = await this.warehouseProductCollection.find();
 
     return warehouseProducts.map((warehouseProduct) => {
       return {

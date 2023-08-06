@@ -5,7 +5,7 @@ export const ERROR = {
 };
 
 export const SWAGGER_DESCRIPTION = {
-  GET_CATEGORIES: 'List of categories',
+  GET_CATEGORIES: 'Pagination list of categories',
   GET_CATEGORY: 'Category data',
   CREATE_CATEGORY: 'Category has been created',
   UPDATE_CATEGORY: 'Category has been updated',

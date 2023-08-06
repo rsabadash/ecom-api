@@ -5,7 +5,7 @@ export const ERROR = {
 };
 
 export const SWAGGER_DESCRIPTION = {
-  GET_SUPPLIERS: 'List of suppliers',
+  GET_SUPPLIERS: 'Pagination list of suppliers',
   GET_SUPPLIER: 'Supplier data',
   CREATE_SUPPLIER: 'Supplier has been created',
   UPDATE_SUPPLIER: 'Supplier has been updated',

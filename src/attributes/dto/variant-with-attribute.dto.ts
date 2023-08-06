@@ -1,5 +1,5 @@
 import { VariantDto } from './variant.dto';
-import { IVariantWithAttribute } from '../interfaces/variant-with-attribute.interfaces';
+import { IVariantWithAttributeDto } from '../interfaces/variant-with-attribute.interfaces';
 import { IsMongoId, IsNotEmptyObject, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
@@ -8,7 +8,7 @@ import { Translations } from '../../common/types/i18n.types';
 
 export class VariantWithAttributeDto
   extends VariantDto
-  implements Omit<IVariantWithAttribute, 'attributeId'>
+  implements IVariantWithAttributeDto
 {
   @IsMongoId()
   @ApiProperty({

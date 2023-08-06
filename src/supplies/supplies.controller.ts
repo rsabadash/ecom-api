@@ -37,6 +37,7 @@ import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
 import { SupplyDto } from './dto/supply.dto';
 import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
 import { CreateSupplyDto } from './dto/create-supply.dto';
+import { PaginationSupplyDto } from './dto/pagination-supply.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -48,7 +49,7 @@ export class SuppliesController {
   @Get()
   @ApiOkResponse({
     description: SWAGGER_DESCRIPTION.GET_SUPPLIES,
-    type: [SupplyDto],
+    type: [PaginationSupplyDto],
   })
   @ApiNoAccessResponse()
   async getSupplies(

@@ -1,4 +1,4 @@
-import { ISupply, ISupplyProduct } from '../interfaces/supplies.interfaces';
+import { ISupplyDto, ISupplyProduct } from '../interfaces/supplies.interfaces';
 import {
   ArrayNotEmpty,
   IsDate,
@@ -14,7 +14,7 @@ import { DECIMAL_TWO_SIGN } from '../../common/constants/reg-exp.contants';
 import { Type } from 'class-transformer';
 import { SupplyProductDto } from './supply-product.dto';
 
-export class SupplyDto implements Omit<ISupply, '_id'> {
+export class SupplyDto implements ISupplyDto {
   @IsMongoId()
   @ApiProperty({
     description: 'Supply identifier (returned as ObjectId)',

@@ -27,6 +27,7 @@ import {
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
 import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message';
+import { PaginationWarehouseProductDto } from './dto/pagination-warehouse-product.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -40,7 +41,7 @@ export class WarehouseProductsController {
   @Get()
   @ApiOkResponse({
     description: SWAGGER_DESCRIPTION.GET_WAREHOUSES_PRODUCTS,
-    type: [WarehouseProductDto],
+    type: [PaginationWarehouseProductDto],
   })
   @ApiNoAccessResponse()
   async getWarehouseProducts(

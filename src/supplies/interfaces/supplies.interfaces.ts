@@ -12,6 +12,10 @@ export interface ISupply {
   createdAt: Date;
 }
 
+export interface ISupplyDto extends Omit<ISupply, '_id'> {
+  _id: string;
+}
+
 export interface ISupplyProduct {
   productId: string;
   productName: Translations;

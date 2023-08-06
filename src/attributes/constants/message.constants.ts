@@ -8,12 +8,12 @@ export const ERROR = {
 };
 
 export const SWAGGER_DESCRIPTION = {
-  GET_ATTRIBUTES: 'List of attributes',
+  GET_ATTRIBUTES: 'Pagination list of attributes',
   GET_ATTRIBUTE: 'Attribute data',
   CREATE_ATTRIBUTE: 'Attribute has been created',
   UPDATE_ATTRIBUTE: 'Attribute has been updated',
   DELETE_ATTRIBUTE: 'Attribute has been deleted',
-  GET_VARIANTS: 'List of variants',
+  GET_VARIANTS: 'Pagination list of variants',
   GET_VARIANT: 'Variant data',
   CREATE_VARIANT: 'Variant has been created',
   UPDATE_VARIANT: 'Variant has been updated',

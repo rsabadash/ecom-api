@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -48,7 +49,13 @@ import { Role } from '../iam/enums/role.enums';
 import { IVariantWithAttribute } from './interfaces/variant-with-attribute.interfaces';
 import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
-import { VariantWithAttributeDto } from './dto/variant-with-attribute.dto';
+import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
+import {
+  PaginationData,
+  PaginationParsedQuery,
+} from '../common/interfaces/pagination.interface';
+import { PaginationAttributeDto } from './dto/pagination-attribute.dto';
+import { PaginationVariantWithAttributeDto } from './dto/pagination-variant-with-attribute.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -60,21 +67,41 @@ export class AttributesController {
   @Get()
   @ApiOkResponse({
     description: SWAGGER_DESCRIPTION.GET_ATTRIBUTES,
-    type: [AttributeDto],
+    type: [PaginationAttributeDto],
   })
   @ApiNoAccessResponse()
-  async getAttributes(): Promise<IAttribute[]> {
-    return await this.attributesService.getAttributes();
+  async getAttributes(
+    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
+  ): Promise<PaginationData<IAttribute>> {
+    const { page, limit } = query;
+
+    return await this.attributesService.getAttributes(
+      {},
+      {
+        skip: page,
+        limit: limit,
+      },
+    );
   }
 
   @Get(VARIANTS_PATH)
   @ApiOkResponse({
     description: SWAGGER_DESCRIPTION.GET_VARIANTS,
-    type: [VariantWithAttributeDto],
+    type: [PaginationVariantWithAttributeDto],
   })
   @ApiNoAccessResponse()
-  async getVariants(): Promise<IVariantWithAttribute[]> {
-    return await this.attributesService.getVariants();
+  async getVariants(
+    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
+  ): Promise<PaginationData<IVariantWithAttribute>> {
+    const { page, limit } = query;
+
+    return await this.attributesService.getVariants(
+      {},
+      {
+        skip: page,
+        limit: limit,
+      },
+    );
   }
 
   @Get(GET_ATTRIBUTE_BY_ID_PATH)

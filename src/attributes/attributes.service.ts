@@ -25,6 +25,8 @@ import {
 } from '../mongo/types/mongo-query.types';
 import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
 import { ERROR } from './constants/message.constants';
+import { getPaginationPipeline } from '../common/utils/getPaginationPipeline';
+import { PaginationData } from '../common/interfaces/pagination.interface';
 
 @Injectable()
 export class AttributesService {
@@ -36,12 +38,49 @@ export class AttributesService {
 
   async getAttributes(
     query: PartialEntity<IAttribute> = {},
-    options?: FindEntityOptions<IAttribute>,
+    options: FindEntityOptions<IAttribute>,
+  ): Promise<PaginationData<IAttribute>> {
+    const { skip, limit } = options;
+
+    const pipeline = getPaginationPipeline<IAttribute>({
+      query,
+      filter: {
+        skip,
+        limit,
+      },
+    });
+
+    const paginatedData = await this.attributeCollection.aggregate<
+      PaginationData<IAttribute>
+    >(pipeline);
+
+    return paginatedData[0];
+  }
+
+  async getAttributes2(
+    query: PartialEntity<IAttribute> = {},
+    options: FindEntityOptions<IAttribute>,
   ): Promise<IAttribute[]> {
     return await this.attributeCollection.find(query, options);
   }
 
-  async getVariants(): Promise<IVariantWithAttribute[]> {
+  async getVariants(
+    query: PartialEntity<IVariantWithAttribute> = {},
+    options: FindEntityOptions<IVariantWithAttribute>,
+  ): Promise<PaginationData<IVariantWithAttribute>> {
+    const { skip, limit } = options;
+
+    const paginationPipeline = getPaginationPipeline<IVariantWithAttribute>({
+      query,
+      filter: {
+        skip,
+        limit,
+      },
+    });
+
+    // in current pipeline we have custom "match", so we have to avoid using it here
+    const [_, ...restPipeline] = paginationPipeline;
+
     const pipeline = [
       { $unwind: '$variants' },
       { $sort: { 'variants.isActive': -1, 'variants.sortOrder': 1 } },
@@ -61,11 +100,14 @@ export class AttributesService {
           },
         },
       },
+      ...restPipeline,
     ];
 
-    return await this.attributeCollection.aggregate<IVariantWithAttribute>(
-      pipeline,
-    );
+    const paginatedData = await this.attributeCollection.aggregate<
+      PaginationData<IVariantWithAttribute>
+    >(pipeline);
+
+    return paginatedData[0];
   }
 
   async getAttribute(

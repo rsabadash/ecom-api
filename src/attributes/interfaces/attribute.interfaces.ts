@@ -11,6 +11,10 @@ export interface IAttribute {
   variants: IVariant[];
 }
 
+export interface IAttributeDto extends Omit<IAttribute, '_id'> {
+  _id: string;
+}
+
 export interface IAttributeCreate extends Omit<IAttribute, '_id'> {}
 
 export interface IAttributeUpdate

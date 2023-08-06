@@ -3,7 +3,7 @@ export const ERROR = {
 };
 
 export const SWAGGER_DESCRIPTION = {
-  GET_WAREHOUSES_PRODUCTS: 'List of warehouses products',
+  GET_WAREHOUSES_PRODUCTS: 'Pagination list of warehouses products',
   CREATE_WAREHOUSE_PRODUCTS: 'Warehouse products have been created',
   DROPDOWN_LIST: 'Dropdown list of warehouses products',
 };

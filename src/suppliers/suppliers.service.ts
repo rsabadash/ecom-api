@@ -14,6 +14,12 @@ import { CompareFieldsService } from '../common/services/compare-fields.service'
 import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 import { ERROR } from './constants/message.constants';
+import { PaginationData } from '../common/interfaces/pagination.interface';
+import { getPaginationPipeline } from '../common/utils/getPaginationPipeline';
+import {
+  FindEntityOptions,
+  PartialEntity,
+} from '../mongo/types/mongo-query.types';
 
 @Injectable()
 export class SuppliersService {
@@ -23,12 +29,29 @@ export class SuppliersService {
     private readonly supplierCollection: ICollectionModel<ISupplier>,
   ) {}
 
-  async getSuppliers(): Promise<ISupplier[]> {
-    return await this.supplierCollection.find();
+  async getSuppliers(
+    query: PartialEntity<ISupplier> = {},
+    options: FindEntityOptions<ISupplier> = {},
+  ): Promise<PaginationData<ISupplier>> {
+    const { skip, limit } = options;
+
+    const pipeline = getPaginationPipeline<ISupplier>({
+      query,
+      filter: {
+        skip,
+        limit,
+      },
+    });
+
+    const paginatedData = await this.supplierCollection.aggregate<
+      PaginationData<ISupplier>
+    >(pipeline);
+
+    return paginatedData[0];
   }
 
   async getSuppliersDropdownList(): Promise<DropdownListItem[]> {
-    const suppliers = await this.getSuppliers();
+    const suppliers = await this.supplierCollection.find();
 
     return suppliers.map((supplier) => {
       return {

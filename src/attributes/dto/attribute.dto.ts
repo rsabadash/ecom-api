@@ -16,9 +16,9 @@ import { Translations } from '../../common/types/i18n.types';
 import { VariantDto } from './variant.dto';
 import { IVariant } from '../interfaces/variant.interfaces';
 import { URL_SLUG } from '../../common/constants/reg-exp.contants';
-import { IAttribute } from '../interfaces/attribute.interfaces';
+import { IAttributeDto } from '../interfaces/attribute.interfaces';
 
-export class AttributeDto implements Omit<IAttribute, '_id'> {
+export class AttributeDto implements IAttributeDto {
   @IsMongoId()
   @ApiProperty({
     description: 'Attribute identifier (returned as ObjectId)',

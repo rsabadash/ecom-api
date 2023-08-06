@@ -13,15 +13,15 @@ import { Type } from 'class-transformer';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
 import {
-  IWarehouseProduct,
   IWarehouseProductAttribute,
+  IWarehouseProductDto,
   IWarehouseProductWarehouses,
 } from '../interfaces/warehouse-products.interfaces';
 import { Unit } from '../enums/unit.enums';
 import { WarehouseProductWarehousesDto } from './warehouse-product-warehouses.dto';
 import { AttributeWarehouseProductDto } from './attribute-warehouse-product.dto';
 
-export class WarehouseProductDto implements Omit<IWarehouseProduct, '_id'> {
+export class WarehouseProductDto implements IWarehouseProductDto {
   @IsMongoId()
   @ApiProperty({
     description: 'Warehouse product identifier (returned as ObjectId)',

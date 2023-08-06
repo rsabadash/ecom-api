@@ -9,7 +9,7 @@ export const ERROR = {
 };
 
 export const SWAGGER_DESCRIPTION = {
-  GET_SUPPLIES: 'List of supplies',
+  GET_SUPPLIES: 'Pagination list of supplies',
   GET_SUPPLY: 'Supply data',
   CREATE_SUPPLY: 'Supply has been created',
 };

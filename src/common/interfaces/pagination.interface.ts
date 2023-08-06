@@ -8,9 +8,11 @@ export interface PaginationParsedQuery {
   limit: number;
 }
 
+export interface PaginationMetaData {
+  total: number;
+}
+
 export interface PaginationData<D> {
   data: D[];
-  metadata: {
-    total: number;
-  };
+  metadata: PaginationMetaData;
 }

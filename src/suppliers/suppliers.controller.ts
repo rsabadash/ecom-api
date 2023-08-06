@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { SuppliersService } from './suppliers.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
@@ -40,6 +41,12 @@ import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 import { DropdownListDto } from '../common/dto/dropdown-list.dto';
 import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
+import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
+import {
+  PaginationData,
+  PaginationParsedQuery,
+} from '../common/interfaces/pagination.interface';
+import { PaginationSupplierDto } from './dto/pagination-supplier.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -51,11 +58,21 @@ export class SuppliersController {
   @Get()
   @ApiOkResponse({
     description: SWAGGER_DESCRIPTION.GET_SUPPLIERS,
-    type: [SupplierDto],
+    type: [PaginationSupplierDto],
   })
   @ApiNoAccessResponse()
-  async getSuppliers(): Promise<ISupplier[]> {
-    return await this.suppliersService.getSuppliers();
+  async getSuppliers(
+    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
+  ): Promise<PaginationData<ISupplier>> {
+    const { page, limit } = query;
+
+    return await this.suppliersService.getSuppliers(
+      {},
+      {
+        skip: page,
+        limit: limit,
+      },
+    );
   }
 
   @Get(DROPDOWN_LIST_PATH)

@@ -30,6 +30,10 @@ export interface IWarehouseProduct {
   isDeleted: boolean;
 }
 
+export interface IWarehouseProductDto extends Omit<IWarehouseProduct, '_id'> {
+  _id: string;
+}
+
 export interface IWarehouseProductCreate
   extends Omit<
     IWarehouseProduct,

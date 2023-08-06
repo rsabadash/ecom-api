@@ -19,7 +19,11 @@ import {
 } from './interfaces/categories.interfaces';
 import { GetCategoryParameters } from './types/categories.types';
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
-import { ClientsMap, PartialEntity } from '../mongo/types/mongo-query.types';
+import {
+  ClientsMap,
+  FindEntityOptions,
+  PartialEntity,
+} from '../mongo/types/mongo-query.types';
 import {
   DropdownListItem,
   DropdownListQueryParams,
@@ -29,6 +33,8 @@ import { CompareFieldsService } from '../common/services/compare-fields.service'
 import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
 import { DEFAULT_LANGUAGE } from '../common/constants/internationalization.constants';
 import { ERROR } from './constants/message.constants';
+import { getPaginationPipeline } from '../common/utils/getPaginationPipeline';
+import { PaginationData } from '../common/interfaces/pagination.interface';
 
 @Injectable()
 export class CategoriesService {
@@ -53,8 +59,23 @@ export class CategoriesService {
 
   async getCategories(
     query: PartialEntity<ICategory> = {},
-  ): Promise<ICategory[]> {
-    return await this.categoryCollection.find(query);
+    options: FindEntityOptions<ICategory> = {},
+  ): Promise<PaginationData<ICategory>> {
+    const { skip, limit } = options;
+
+    const pipeline = getPaginationPipeline<ICategory>({
+      query,
+      filter: {
+        skip,
+        limit,
+      },
+    });
+
+    const paginatedData = await this.categoryCollection.aggregate<
+      PaginationData<ICategory>
+    >(pipeline);
+
+    return paginatedData[0];
   }
 
   async getCategoriesDropdownList(
@@ -69,7 +90,7 @@ export class CategoriesService {
       };
     }
 
-    const categories = await this.getCategories(query);
+    const categories = await this.categoryCollection.find(query);
 
     return categories.map((category) => {
       return {
