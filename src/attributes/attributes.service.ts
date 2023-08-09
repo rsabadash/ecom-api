@@ -9,15 +9,15 @@ import {
   IAttributeCreate,
   IAttributeDelete,
   IAttributeUpdate,
+  GetAttributeParameters,
 } from './interfaces/attribute.interfaces';
-import { GetAttributeParameters } from './types/attributes.types';
 import {
   IVariant,
   IVariantCreate,
   IVariantDelete,
   IVariantUpdate,
+  GetVariantParameters,
 } from './interfaces/variant.interfaces';
-import { GetVariant } from './types/variant.type';
 import { IVariantWithAttribute } from './interfaces/variant-with-attribute.interfaces';
 import {
   FindEntityOptions,
@@ -127,7 +127,7 @@ export class AttributesService {
     return attribute;
   }
 
-  async getVariant(parameters: GetVariant): Promise<IVariant> {
+  async getVariant(parameters: GetVariantParameters): Promise<IVariant> {
     const pipeline = [
       { $match: { _id: new ObjectId(parameters.attributeId) } },
       { $unwind: '$variants' },

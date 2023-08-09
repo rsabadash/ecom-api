@@ -1,4 +1,5 @@
 import { Translations } from '../../common/types/i18n.types';
+import { ATTRIBUTE_ID } from '../../common/constants/cross-entity-id.constants';
 
 export interface IVariant {
   variantId: string;
@@ -9,15 +10,20 @@ export interface IVariant {
 }
 
 export interface IVariantCreate extends Omit<IVariant, 'variantId'> {
-  attributeId: string;
+  [ATTRIBUTE_ID]: string;
 }
 
 export interface IVariantUpdate extends Partial<Omit<IVariant, 'variantId'>> {
-  attributeId: string;
+  [ATTRIBUTE_ID]: string;
   variantId: string;
 }
 
 export interface IVariantDelete {
-  attributeId: string;
+  [ATTRIBUTE_ID]: string;
+  variantId: string;
+}
+
+export interface GetVariantParameters {
+  [ATTRIBUTE_ID]: string;
   variantId: string;
 }

@@ -25,3 +25,7 @@ export interface IAttributeUpdate
 export interface IAttributeDelete {
   id: string;
 }
+
+export interface GetAttributeParameters {
+  attributeId: string;
+}

@@ -16,8 +16,8 @@ import {
   ICategoryCreate,
   ICategoryDelete,
   ICategoryUpdate,
+  GetCategoryParameters,
 } from './interfaces/categories.interfaces';
-import { GetCategoryParameters } from './types/categories.types';
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
 import {
   ClientsMap,

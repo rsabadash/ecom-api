@@ -24,3 +24,7 @@ export interface ICategoryUpdate extends Partial<ICategory> {
 export interface ICategoryDelete {
   id: string;
 }
+
+export interface GetCategoryParameters {
+  categoryId: string;
+}

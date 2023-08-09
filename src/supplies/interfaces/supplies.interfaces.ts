@@ -1,14 +1,21 @@
 import { ObjectId } from 'mongodb';
 import { IWarehouseProductWarehouses } from '../../warehouseProducts/interfaces/warehouse-products.interfaces';
 import { Translations } from '../../common/types/i18n.types';
+import {
+  ATTRIBUTE_IDS,
+  SUPPLIER_ID,
+  VARIANT_IDS,
+  WAREHOUSE_ID,
+  WAREHOUSE_PRODUCT_ID,
+} from '../../common/constants/cross-entity-id.constants';
 
 export interface ISupply {
   _id: ObjectId;
   name: null | string;
   products: ISupplyProduct[];
   productsTotalCost: string;
-  supplierId: string;
-  warehouseId: string;
+  [SUPPLIER_ID]: string;
+  [WAREHOUSE_ID]: string;
   createdAt: Date;
 }
 
@@ -17,13 +24,13 @@ export interface ISupplyDto extends Omit<ISupply, '_id'> {
 }
 
 export interface ISupplyProduct {
-  productId: string;
+  [WAREHOUSE_PRODUCT_ID]: string;
   productName: Translations;
   quantity: string;
   price: string;
   totalCost: string;
-  attributeIds: string[];
-  variantIds: string[];
+  [ATTRIBUTE_IDS]: string[];
+  [VARIANT_IDS]: string[];
 }
 
 export interface ISupplyProductToCreate
