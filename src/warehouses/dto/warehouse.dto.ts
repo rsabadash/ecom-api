@@ -1,33 +1,25 @@
-import {
-  IsEnum,
-  IsMongoId,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-} from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ObjectId } from 'mongodb';
+import { IsEnum, IsMongoId, IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 import { IWarehouse } from '../interfaces/warehouses.interfaces';
 import { WarehouseType } from '../enums/warehouse-types';
 
-export class WarehouseDto implements IWarehouse {
+export class WarehouseDto implements Omit<IWarehouse, '_id'> {
   @IsMongoId()
   @ApiProperty({
-    type: 'string',
-    description: 'Identifier of the warehouse',
+    description: 'Warehouse identifier (returned as ObjectId)',
   })
-  readonly _id: ObjectId;
+  readonly _id: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'Name of the warehouse',
+    description: 'Warehouse name',
   })
   readonly name: string;
 
   @IsEnum(WarehouseType)
   @ApiProperty({
-    description: 'Type of the warehouse',
+    description: 'Warehouse type',
     enum: WarehouseType,
     example: [
       WarehouseType.Shop,
@@ -39,9 +31,8 @@ export class WarehouseDto implements IWarehouse {
 
   @IsString()
   @IsNotEmpty()
-  @IsOptional()
-  @ApiPropertyOptional({
-    description: 'Address of the warehouse',
+  @ApiProperty({
+    description: 'Warehouse address',
     nullable: true,
     default: null,
   })

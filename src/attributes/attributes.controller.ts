@@ -8,7 +8,7 @@ import {
   Param,
   Patch,
   Post,
-  UsePipes,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -19,7 +19,6 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ObjectId } from 'mongodb';
 import {
   ATTRIBUTES_ROUTE,
   GET_ATTRIBUTE_BY_ID_PATH,
@@ -30,98 +29,121 @@ import { Auth } from '../iam/decorators/auth.decorator';
 import { AuthType } from '../iam/enums/auth-type.enum';
 import { AttributesService } from './attributes.service';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
-import {
-  IAttribute,
-  IDeleteAttribute,
-  IUpdateAttribute,
-} from './interfaces/attribute.interfaces';
+import { IAttribute } from './interfaces/attribute.interfaces';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
 import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
-import { ParseObjectIdPipe } from '../common/pipes/parse-objectId.pipe';
 import {
   ATTRIBUTE_ID_PARAM,
   VARIANT_ID_PARAM,
 } from './constants/param.constants';
 import { DeleteAttributeDto } from './dto/delete-attribute.dto';
-import { ParseObjectIdsPipe } from '../common/pipes/parse-body-objectId.pipe';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
 import { UpdateVariantDto } from './dto/update-variant.dto';
 import { CreateVariantDto } from './dto/create-variant.dto';
-import { ICreateVariant, IVariant } from './interfaces/variant.interfaces';
+import { IVariant } from './interfaces/variant.interfaces';
 import { DeleteVariantDto } from './dto/delete-variant.dto';
 import { AttributeDto } from './dto/attribute.dto';
 import { VariantDto } from './dto/variant.dto';
 import { Roles } from '../iam/decorators/roles.decorator';
-import { Role } from '../users/enums/role.enums';
-import { ATTRIBUTES_MODULE_NAME } from './constants/swagger.constants';
+import { Role } from '../iam/enums/role.enums';
 import { IVariantWithAttribute } from './interfaces/variant-with-attribute.interfaces';
+import { MODULE_NAME } from '../common/constants/swagger.constants';
+import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
+import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
+import {
+  PaginationData,
+  PaginationParsedQuery,
+} from '../common/interfaces/pagination.interface';
+import { PaginationAttributeDto } from './dto/pagination-attribute.dto';
+import { PaginationVariantWithAttributeDto } from './dto/pagination-variant-with-attribute.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
 @Controller(ATTRIBUTES_ROUTE)
-@ApiTags(ATTRIBUTES_MODULE_NAME)
+@ApiTags(MODULE_NAME.ATTRIBUTES)
 export class AttributesController {
   constructor(private readonly attributesService: AttributesService) {}
 
   @Get()
   @ApiOkResponse({
-    description: 'List of attributes was retrieved',
-    type: [AttributeDto],
+    description: SWAGGER_DESCRIPTION.GET_ATTRIBUTES,
+    type: [PaginationAttributeDto],
   })
   @ApiNoAccessResponse()
-  async getAttributes(): Promise<IAttribute[]> {
-    return await this.attributesService.getAttributes();
+  async getAttributes(
+    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
+  ): Promise<PaginationData<IAttribute>> {
+    const { page, limit } = query;
+
+    return await this.attributesService.getAttributes(
+      {},
+      {
+        skip: page,
+        limit: limit,
+      },
+    );
   }
 
   @Get(VARIANTS_PATH)
   @ApiOkResponse({
-    description: 'List of variants were of attributes retrieved',
-    type: [VariantDto],
+    description: SWAGGER_DESCRIPTION.GET_VARIANTS,
+    type: [PaginationVariantWithAttributeDto],
   })
   @ApiNoAccessResponse()
-  async getVariants(): Promise<IVariantWithAttribute[]> {
-    return await this.attributesService.getVariants();
+  async getVariants(
+    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
+  ): Promise<PaginationData<IVariantWithAttribute>> {
+    const { page, limit } = query;
+
+    return await this.attributesService.getVariants(
+      {},
+      {
+        skip: page,
+        limit: limit,
+      },
+    );
   }
 
   @Get(GET_ATTRIBUTE_BY_ID_PATH)
   @ApiOkResponse({
-    description: 'The attribute was retrieved',
+    description: SWAGGER_DESCRIPTION.GET_ATTRIBUTE,
     type: AttributeDto,
   })
   @ApiNotFoundResponse({
-    description: 'The attribute has not been found',
+    description: ERROR.ATTRIBUTE_NOT_FOUND,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
   async getAttribute(
-    @Param(ATTRIBUTE_ID_PARAM, ParseObjectIdPipe) attributeId: ObjectId,
+    @Param(ATTRIBUTE_ID_PARAM) attributeId: string,
   ): Promise<IAttribute> {
     return await this.attributesService.getAttribute({ attributeId });
   }
 
-  @Get(`${VARIANTS_PATH}${GET_VARIANT_BY_ID_PATH}`)
+  @Get(`${GET_ATTRIBUTE_BY_ID_PATH}${VARIANTS_PATH}${GET_VARIANT_BY_ID_PATH}`)
   @ApiOkResponse({
-    description: 'The variant of the attribute was retrieved',
+    description: SWAGGER_DESCRIPTION.GET_VARIANT,
     type: VariantDto,
   })
   @ApiNotFoundResponse({
-    description: 'The variant of the attribute has not been found',
+    description: ERROR.VARIANT_NOT_FOUND,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
   async getVariant(
-    @Param(VARIANT_ID_PARAM, ParseObjectIdPipe) variantId: ObjectId,
+    @Param(ATTRIBUTE_ID_PARAM) attributeId: string,
+    @Param(VARIANT_ID_PARAM) variantId: string,
   ): Promise<IVariant> {
-    return await this.attributesService.getVariant({ variantId });
+    return await this.attributesService.getVariant({ attributeId, variantId });
   }
 
   @Post()
   @ApiCreatedResponse({
-    description: 'The attribute has been created',
+    description: SWAGGER_DESCRIPTION.CREATE_ATTRIBUTE,
     type: AttributeDto,
   })
   @ApiBadRequestResponse({
-    description: 'The attribute has not been created',
+    description: ERROR.ATTRIBUTE_NOT_CREATED,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
@@ -133,16 +155,15 @@ export class AttributesController {
 
   @Patch()
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UsePipes(new ParseObjectIdsPipe<IUpdateAttribute>('id', 'string'))
   @ApiNoContentResponse({
-    description: 'The attribute has been updated',
+    description: SWAGGER_DESCRIPTION.UPDATE_ATTRIBUTE,
   })
   @ApiNotFoundResponse({
-    description: 'The attribute has not been found',
+    description: ERROR.ATTRIBUTE_NOT_FOUND,
     type: HttpErrorDto,
   })
   @ApiBadRequestResponse({
-    description: 'The attribute has not been updated',
+    description: ERROR.ATTRIBUTE_NOT_UPDATED,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
@@ -154,9 +175,8 @@ export class AttributesController {
 
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UsePipes(new ParseObjectIdsPipe<IDeleteAttribute>('id', 'string'))
   @ApiNoContentResponse({
-    description: 'The attribute has been deleted',
+    description: SWAGGER_DESCRIPTION.DELETE_ATTRIBUTE,
   })
   @ApiNoAccessResponse()
   async deleteAttribute(
@@ -166,32 +186,32 @@ export class AttributesController {
   }
 
   @Post(VARIANTS_PATH)
-  @UsePipes(new ParseObjectIdsPipe<ICreateVariant>('attributeId', 'string'))
   @ApiCreatedResponse({
-    description: 'The variant of the attribute has been created',
+    description: SWAGGER_DESCRIPTION.CREATE_VARIANT,
     type: AttributeDto,
   })
   @ApiBadRequestResponse({
-    description: 'The variant of the attribute has not been created',
+    description: ERROR.VARIANT_NOT_CREATED,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
-  async createVariant(@Body() createValueDto: CreateVariantDto): Promise<void> {
-    return this.attributesService.createVariant(createValueDto);
+  async createVariant(
+    @Body() createVariantDto: CreateVariantDto,
+  ): Promise<void> {
+    return this.attributesService.createVariant(createVariantDto);
   }
 
   @Patch(VARIANTS_PATH)
-  @UsePipes(new ParseObjectIdsPipe<IVariant>('variantId', 'string'))
-  @ApiCreatedResponse({
-    description: 'The variant of the attribute has been updated',
-    type: AttributeDto,
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description: SWAGGER_DESCRIPTION.UPDATE_VARIANT,
   })
   @ApiNotFoundResponse({
-    description: 'The variant of the attribute has not been found',
+    description: ERROR.VARIANT_NOT_FOUND,
     type: HttpErrorDto,
   })
   @ApiGoneResponse({
-    description: 'The variant of the attribute has not been updated',
+    description: ERROR.VARIANT_NOT_UPDATED,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
@@ -203,9 +223,8 @@ export class AttributesController {
 
   @Delete(VARIANTS_PATH)
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UsePipes(new ParseObjectIdsPipe<IVariant>('variantId', 'string'))
   @ApiNoContentResponse({
-    description: 'The variant of the attribute has been deleted',
+    description: SWAGGER_DESCRIPTION.DELETE_VARIANT,
   })
   @ApiNoAccessResponse()
   async deleteVariant(

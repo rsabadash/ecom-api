@@ -1,14 +1,29 @@
-import { ObjectId } from 'mongodb';
 import { Translations } from '../../common/types/i18n.types';
+import { ATTRIBUTE_ID } from '../../common/constants/cross-entity-id.constants';
 
 export interface IVariant {
-  variantId: ObjectId;
+  variantId: string;
   seoName: string;
   name: Translations;
   isActive: boolean;
-  sortOrder: number;
+  sortOrder: null | number;
 }
 
-export interface ICreateVariant extends IVariant {
-  attributeId: ObjectId;
+export interface IVariantCreate extends Omit<IVariant, 'variantId'> {
+  [ATTRIBUTE_ID]: string;
+}
+
+export interface IVariantUpdate extends Partial<Omit<IVariant, 'variantId'>> {
+  [ATTRIBUTE_ID]: string;
+  variantId: string;
+}
+
+export interface IVariantDelete {
+  [ATTRIBUTE_ID]: string;
+  variantId: string;
+}
+
+export interface GetVariantParameters {
+  [ATTRIBUTE_ID]: string;
+  variantId: string;
 }

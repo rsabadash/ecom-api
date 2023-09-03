@@ -17,5 +17,6 @@ import { CompareFieldsService } from '../common/services/compare-fields.service'
   ],
   controllers: [WarehousesController],
   providers: [WarehousesService, CompareFieldsService],
+  exports: [WarehousesService],
 })
 export class WarehousesModule {}

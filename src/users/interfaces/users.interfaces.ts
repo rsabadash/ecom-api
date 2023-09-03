@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { Role } from '../enums/role.enums';
+import { Role } from '../../iam/enums/role.enums';
 
 export interface IUser {
   _id: ObjectId;
@@ -11,12 +11,13 @@ export interface IUser {
 export interface IUserCreate
   extends Pick<IUser, 'email' | 'password' | 'roles'> {}
 
-export interface IUpdateUser extends Partial<Omit<IUser, '_id'>> {
+export interface IUserUpdate
+  extends Partial<Pick<IUser, 'email' | 'password' | 'roles'>> {
   id: string;
 }
 
 export interface IUserPublic extends Omit<IUser, 'password'> {}
 
 export interface GetUserParameters {
-  userId: ObjectId;
+  userId: string;
 }

@@ -27,25 +27,29 @@ import {
   GET_WAREHOUSE_BY_ID_PATH,
   WAREHOUSES_ROUTE,
 } from './constants/route.constants';
-import { WAREHOUSES_MODULE_NAME } from './constants/swagger.constants';
 import { WAREHOUSE_ID_PARAM } from './constants/param.constants';
 import { Roles } from '../iam/decorators/roles.decorator';
-import { Role } from '../users/enums/role.enums';
+import { Role } from '../iam/enums/role.enums';
 import { Auth } from '../iam/decorators/auth.decorator';
 import { AuthType } from '../iam/enums/auth-type.enum';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
 import { DeleteWarehouseDto } from './dto/delete-warehouse.dto';
+import { DROPDOWN_LIST_PATH } from '../common/constants/path.constants';
+import { DropdownListDto } from '../common/dto/dropdown-list.dto';
+import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
+import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
+import { MODULE_NAME } from '../common/constants/swagger.constants';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
 @Controller(WAREHOUSES_ROUTE)
-@ApiTags(WAREHOUSES_MODULE_NAME)
+@ApiTags(MODULE_NAME.WAREHOUSES)
 export class WarehousesController {
   constructor(private readonly warehousesService: WarehousesService) {}
 
   @Get()
   @ApiOkResponse({
-    description: 'List of warehouses was retrieved',
+    description: SWAGGER_DESCRIPTION.GET_WAREHOUSES,
     type: [WarehouseDto],
   })
   @ApiNoAccessResponse()
@@ -53,13 +57,23 @@ export class WarehousesController {
     return await this.warehousesService.getWarehouses();
   }
 
+  @Get(DROPDOWN_LIST_PATH)
+  @ApiOkResponse({
+    description: SWAGGER_DESCRIPTION.DROPDOWN_LIST,
+    type: DropdownListDto,
+  })
+  @ApiNoAccessResponse()
+  async getWarehousesDropdownList(): Promise<DropdownListItem[]> {
+    return await this.warehousesService.getWarehousesDropdownList();
+  }
+
   @Get(GET_WAREHOUSE_BY_ID_PATH)
   @ApiOkResponse({
-    description: 'The warehouse was retrieved',
+    description: SWAGGER_DESCRIPTION.GET_WAREHOUSE,
     type: WarehouseDto,
   })
   @ApiNotFoundResponse({
-    description: 'The warehouse has not been found',
+    description: ERROR.WAREHOUSE_NOT_FOUND,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
@@ -71,11 +85,11 @@ export class WarehousesController {
 
   @Post()
   @ApiCreatedResponse({
-    description: 'The warehouse has been created',
+    description: SWAGGER_DESCRIPTION.CREATE_WAREHOUSE,
     type: WarehouseDto,
   })
   @ApiBadRequestResponse({
-    description: 'The warehouse has not been created',
+    description: ERROR.WAREHOUSE_NOT_CREATED,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
@@ -88,14 +102,14 @@ export class WarehousesController {
   @Patch()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
-    description: 'The warehouse has been updated',
+    description: SWAGGER_DESCRIPTION.UPDATE_WAREHOUSE,
   })
   @ApiNotFoundResponse({
-    description: 'The warehouse has not been found',
+    description: ERROR.WAREHOUSE_NOT_FOUND,
     type: HttpErrorDto,
   })
   @ApiBadRequestResponse({
-    description: 'The warehouse has not been updated',
+    description: ERROR.WAREHOUSE_NOT_UPDATED,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
@@ -108,7 +122,7 @@ export class WarehousesController {
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
-    description: 'The warehouse has been deleted',
+    description: SWAGGER_DESCRIPTION.DELETE_WAREHOUSE,
   })
   @ApiNoAccessResponse()
   async deleteWarehouse(

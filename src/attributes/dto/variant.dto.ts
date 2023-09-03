@@ -2,6 +2,7 @@ import {
   IsBoolean,
   IsMongoId,
   IsNotEmpty,
+  IsNotEmptyObject,
   IsNumber,
   IsOptional,
   IsString,
@@ -9,7 +10,6 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ObjectId } from 'mongodb';
 import { ApiProperty } from '@nestjs/swagger';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
@@ -19,42 +19,41 @@ import { IVariant } from '../interfaces/variant.interfaces';
 export class VariantDto implements IVariant {
   @IsMongoId()
   @ApiProperty({
-    type: 'string',
-    description: 'Identifier of the variant',
+    description: 'Variant identifier',
   })
-  readonly variantId: ObjectId;
+  readonly variantId: string;
 
   @ValidateNested()
-  @ValidateNested()
+  @IsNotEmptyObject()
   @Type(() => TranslationsDto)
   @ApiProperty({
     type: TranslationsDto,
-    description: 'Translation object for the variant name',
+    description: 'variant name translations',
   })
   readonly name: Translations;
 
   @IsString()
   @IsNotEmpty()
   @Matches(RegExp(URL_SLUG), {
-    message:
-      'SEO name of the variant should contains only number and Latin letters',
+    message: 'SEO variant name should contains only number and Latin letters',
   })
   @ApiProperty({
-    description:
-      'Name of the variant, that used for search engine optimization',
+    description: 'Variant name that is used for search engine optimization',
   })
   readonly seoName: string;
 
   @IsBoolean()
   @ApiProperty({
-    description: 'Is the variant publicly visible',
+    description: 'Is variant visible for public users',
   })
-  readonly isActive: boolean = false;
+  readonly isActive: boolean;
 
   @IsNumber()
   @IsOptional()
   @ApiProperty({
-    description: 'Sort order of the variant',
+    description: 'Variant sort order',
+    nullable: true,
+    default: null,
   })
-  readonly sortOrder: number = 0;
+  readonly sortOrder: null | number = null;
 }

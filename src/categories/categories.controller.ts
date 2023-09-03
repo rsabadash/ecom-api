@@ -10,7 +10,6 @@ import {
   Patch,
   Post,
   Query,
-  UsePipes,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -20,23 +19,14 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ObjectId } from 'mongodb';
 import { CategoriesService } from './categories.service';
-import {
-  ICategory,
-  ICategoryDetail,
-  ICreateCategory,
-  IDeleteCategory,
-  IUpdateCategory,
-} from './interfaces/categories.interfaces';
+import { ICategory } from './interfaces/categories.interfaces';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { ParseObjectIdsPipe } from '../common/pipes/parse-body-objectId.pipe';
 import {
   CATEGORIES_ROUTE,
   GET_CATEGORY_BY_ID_PATH,
 } from './constants/route.constants';
 import { CATEGORY_ID_PARAM } from './constants/param.constants';
-import { ParseObjectIdPipe } from '../common/pipes/parse-objectId.pipe';
 import { DeleteCategoryDto } from './dto/delete-category.dto';
 import { Language } from '../common/types/i18n.types';
 import {
@@ -46,33 +36,55 @@ import {
 import { DROPDOWN_LIST_PATH } from '../common/constants/path.constants';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Roles } from '../iam/decorators/roles.decorator';
-import { Role } from '../users/enums/role.enums';
+import { Role } from '../iam/enums/role.enums';
 import { Auth } from '../iam/decorators/auth.decorator';
 import { AuthType } from '../iam/enums/auth-type.enum';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
 import { CategoryDto } from './dto/category.dto';
-import { CATEGORIES_MODULE_NAME } from './constants/swagger.constants';
 import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
+import { DropdownListDto } from '../common/dto/dropdown-list.dto';
+import { MODULE_NAME } from '../common/constants/swagger.constants';
+import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
+import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
+import {
+  PaginationData,
+  PaginationParsedQuery,
+} from '../common/interfaces/pagination.interface';
+import { PaginationCategoryDto } from './dto/pagination-category.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
 @Controller(CATEGORIES_ROUTE)
-@ApiTags(CATEGORIES_MODULE_NAME)
+@ApiTags(MODULE_NAME.CATEGORIES)
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Get()
   @ApiOkResponse({
-    description: 'List of categories was retrieved',
-    type: [CategoryDto],
+    description: SWAGGER_DESCRIPTION.GET_CATEGORIES,
+    type: [PaginationCategoryDto],
   })
   @ApiNoAccessResponse()
-  async getCategories(): Promise<ICategory[]> {
-    return await this.categoriesService.getCategories();
+  async getCategories(
+    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
+  ): Promise<PaginationData<ICategory>> {
+    const { page, limit } = query;
+
+    return await this.categoriesService.getCategories(
+      {},
+      {
+        skip: page,
+        limit: limit,
+      },
+    );
   }
 
   @Get(DROPDOWN_LIST_PATH)
-  @UsePipes(new ParseObjectIdsPipe<ICategory>('_id', 'string'))
+  @ApiOkResponse({
+    description: SWAGGER_DESCRIPTION.DROPDOWN_LIST,
+    type: DropdownListDto,
+  })
+  @ApiNoAccessResponse()
   async getCategoriesDropdownList(
     @Query() queryParams: DropdownListQueryParams,
     @Headers('accept-language') language: Language,
@@ -85,28 +97,27 @@ export class CategoriesController {
 
   @Get(GET_CATEGORY_BY_ID_PATH)
   @ApiOkResponse({
-    description: 'The category was retrieved',
+    description: SWAGGER_DESCRIPTION.GET_CATEGORY,
     type: CategoryDto,
   })
   @ApiNotFoundResponse({
-    description: 'The category has not been found',
+    description: ERROR.CATEGORY_NOT_FOUND,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
   async getCategory(
-    @Param(CATEGORY_ID_PARAM, ParseObjectIdPipe) categoryId: ObjectId,
-  ): Promise<ICategoryDetail> {
+    @Param(CATEGORY_ID_PARAM) categoryId: string,
+  ): Promise<ICategory> {
     return await this.categoriesService.getCategory({ categoryId });
   }
 
   @Post()
-  @UsePipes(new ParseObjectIdsPipe<ICreateCategory>('parentIds', 'array'))
   @ApiCreatedResponse({
-    description: 'The category has been created',
+    description: SWAGGER_DESCRIPTION.CREATE_CATEGORY,
     type: CategoryDto,
   })
   @ApiBadRequestResponse({
-    description: 'The category has not been created',
+    description: ERROR.CATEGORY_NOT_CREATED,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
@@ -117,22 +128,16 @@ export class CategoriesController {
   }
 
   @Patch()
-  @UsePipes(
-    new ParseObjectIdsPipe<IUpdateCategory>(
-      ['id', 'parentIds'],
-      ['string', 'array'],
-    ),
-  )
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
-    description: 'The category has been updated',
+    description: SWAGGER_DESCRIPTION.UPDATE_CATEGORY,
   })
   @ApiNotFoundResponse({
-    description: 'The category has not been found',
+    description: ERROR.CATEGORY_NOT_FOUND,
     type: HttpErrorDto,
   })
   @ApiBadRequestResponse({
-    description: 'The category has not been updated',
+    description: ERROR.CATEGORY_NOT_UPDATED,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
@@ -144,9 +149,8 @@ export class CategoriesController {
 
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UsePipes(new ParseObjectIdsPipe<IDeleteCategory>('id', 'string'))
   @ApiNoContentResponse({
-    description: 'The category has been deleted',
+    description: SWAGGER_DESCRIPTION.DELETE_CATEGORY,
   })
   @ApiNoAccessResponse()
   async deleteCategory(

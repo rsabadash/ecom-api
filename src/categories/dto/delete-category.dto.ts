@@ -1,12 +1,11 @@
-import { ObjectId } from 'mongodb';
 import { IsMongoId } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { ICategoryDelete } from '../interfaces/categories.interfaces';
 
-export class DeleteCategoryDto {
+export class DeleteCategoryDto implements ICategoryDelete {
   @IsMongoId()
   @ApiProperty({
-    type: 'string',
-    description: 'Identifier of the category',
+    description: 'Category identifier',
   })
-  readonly id: ObjectId;
+  readonly id: string;
 }

@@ -6,3 +6,8 @@ export interface IVariantWithAttribute extends IVariant {
   attributeId: ObjectId;
   attributeName: Translations;
 }
+
+export interface IVariantWithAttributeDto
+  extends Omit<IVariantWithAttribute, 'attributeId'> {
+  attributeId: string;
+}

@@ -1,5 +1,15 @@
 import { HttpStatus } from '@nestjs/common';
 
+export const MODULE_NAME = {
+  ATTRIBUTES: 'Attributes module',
+  CATEGORIES: 'Categories module',
+  SUPPLIERS: 'Suppliers module',
+  SUPPLIES: 'Supplies module',
+  USERS: 'Users module',
+  WAREHOUSE_PRODUCTS: 'Warehouse products module',
+  WAREHOUSES: 'Warehouses module',
+};
+
 export const HttpStatusMessage = {
   [HttpStatus.CONTINUE]: 'Continue',
   [HttpStatus.SWITCHING_PROTOCOLS]: 'Switching Protocols',

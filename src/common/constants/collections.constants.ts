@@ -1,4 +1,6 @@
-export const SUPPLIER_COLLECTION = 'suppliers';
+export const SUPPLIERS_COLLECTION = 'suppliers';
+
+export const SUPPLIES_COLLECTION = 'supplies';
 
 export const CATEGORIES_COLLECTION = 'categories';
 

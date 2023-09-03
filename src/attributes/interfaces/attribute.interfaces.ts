@@ -7,14 +7,25 @@ export interface IAttribute {
   name: Translations;
   seoName: string;
   isActive: boolean;
-  sortOrder: number;
+  sortOrder: null | number;
   variants: IVariant[];
 }
 
-export interface IUpdateAttribute extends Omit<IAttribute, '_id' | 'variants'> {
+export interface IAttributeDto extends Omit<IAttribute, '_id'> {
+  _id: string;
+}
+
+export interface IAttributeCreate extends Omit<IAttribute, '_id'> {}
+
+export interface IAttributeUpdate
+  extends Partial<Omit<IAttribute, '_id' | 'variants'>> {
   id: string;
 }
 
-export interface IDeleteAttribute {
+export interface IAttributeDelete {
   id: string;
+}
+
+export interface GetAttributeParameters {
+  attributeId: string;
 }

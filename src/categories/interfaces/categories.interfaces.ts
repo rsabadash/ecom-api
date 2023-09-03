@@ -6,21 +6,25 @@ export interface ICategory {
   name: Translations;
   seoName: string;
   isActive: boolean;
-  parentIds: ObjectId[];
-}
-
-export interface ICategoryDetail extends Omit<ICategory, 'parentIds'> {
-  parents: ICategory[];
-}
-
-export interface ICreateCategory extends Omit<ICategory, '_id' | 'parentIds'> {
   parentIds: string[];
 }
 
-export interface IUpdateCategory extends Partial<ICreateCategory> {
+export interface ICategoryDto extends Omit<ICategory, '_id'> {
+  _id: string;
+}
+
+export interface ICategoryCreate extends Omit<ICategory, '_id' | 'parentIds'> {
+  parentIds: string[];
+}
+
+export interface ICategoryUpdate extends Partial<ICategory> {
   id: string;
 }
 
-export interface IDeleteCategory {
+export interface ICategoryDelete {
   id: string;
+}
+
+export interface GetCategoryParameters {
+  categoryId: string;
 }

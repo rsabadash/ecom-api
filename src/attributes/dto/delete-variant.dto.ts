@@ -1,12 +1,17 @@
-import { ObjectId } from 'mongodb';
 import { IsMongoId } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IVariantDelete } from '../interfaces/variant.interfaces';
 
-export class DeleteVariantDto {
+export class DeleteVariantDto implements IVariantDelete {
   @IsMongoId()
   @ApiProperty({
-    type: 'string',
-    description: 'Identifier of the variant',
+    description: 'Attribute identifier',
   })
-  readonly variantId: ObjectId;
+  readonly attributeId: string;
+
+  @IsMongoId()
+  @ApiProperty({
+    description: 'Variant identifier',
+  })
+  readonly variantId: string;
 }

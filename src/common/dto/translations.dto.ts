@@ -8,7 +8,6 @@ export class TranslationsDto {
     message: ({ property }) => `${property} should not be empty`,
   })
   @ApiProperty({
-    type: 'string',
     description: 'Ukrainian translation',
   })
   readonly uk: string;

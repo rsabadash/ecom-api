@@ -1,15 +1,15 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
 import { IsMongoId } from 'class-validator';
-import { ObjectId } from 'mongodb';
 import { AttributeDto } from './attribute.dto';
+import { IAttributeUpdate } from '../interfaces/attribute.interfaces';
 
-export class UpdateAttributeDto extends PartialType(
-  OmitType(AttributeDto, ['_id', 'variants'] as const),
-) {
+export class UpdateAttributeDto
+  extends PartialType(OmitType(AttributeDto, ['_id', 'variants'] as const))
+  implements IAttributeUpdate
+{
   @IsMongoId()
   @ApiProperty({
-    type: 'string',
-    description: 'Identifier of the attribute',
+    description: 'Attribute identifier',
   })
-  readonly id: ObjectId;
+  readonly id: string;
 }

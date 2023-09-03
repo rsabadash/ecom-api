@@ -1,30 +1,36 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import {
-  AttributeWarehouseProductDto,
-  WarehouseProductDto,
-} from './warehouse-product.dto';
 import { ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { IWarehouseProductAttribute } from '../interfaces/warehouse-products.interfaces';
+import { WarehouseProductDto } from './warehouse-product.dto';
+import {
+  IWarehouseProductCreate,
+  IWarehouseProductAttribute,
+} from '../interfaces/warehouse-products.interfaces';
+import { AttributeWarehouseProductDto } from './attribute-warehouse-product.dto';
 
 class AttributeWarehouseProductCreateDto extends OmitType(
   AttributeWarehouseProductDto,
   ['name'] as const,
 ) {}
 
-export class CreateWarehouseProductDto extends OmitType(WarehouseProductDto, [
-  '_id',
-  'groupId',
-  'createdDate',
-  'attributes',
-] as const) {
+export class CreateWarehouseProductDto
+  extends OmitType(WarehouseProductDto, [
+    '_id',
+    'createdDate',
+    'attributes',
+    'supplyIds',
+    'warehouses',
+    'isDeleted',
+  ] as const)
+  implements IWarehouseProductCreate
+{
   @ValidateNested({ each: true })
   @Type(() => AttributeWarehouseProductCreateDto)
   @ApiProperty({
     type: [AttributeWarehouseProductCreateDto],
-    description: 'Attributes for the warehouses product',
+    description: 'Attributes for warehouse product',
     nullable: true,
-    default: null,
+    default: [],
   })
-  readonly attributes: null | Omit<IWarehouseProductAttribute, 'name'>[] = null;
+  readonly attributes: Omit<IWarehouseProductAttribute, 'name'>[] = [];
 }

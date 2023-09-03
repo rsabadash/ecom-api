@@ -1,12 +1,11 @@
-import { ObjectId } from 'mongodb';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsMongoId } from 'class-validator';
+import { ISupplierDelete } from '../interfaces/suppliers.interfaces';
 
-export class DeleteSupplierDto {
+export class DeleteSupplierDto implements ISupplierDelete {
   @IsMongoId()
   @ApiProperty({
-    type: 'string',
-    description: 'Identifier of the supplier',
+    description: 'Supplier identifier',
   })
-  readonly id: ObjectId;
+  readonly id: string;
 }

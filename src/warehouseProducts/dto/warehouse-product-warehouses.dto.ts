@@ -1,0 +1,28 @@
+import { IsMongoId, IsNotEmpty, IsString, Matches } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IWarehouseProductWarehouses } from '../interfaces/warehouse-products.interfaces';
+import { DECIMAL_TWO_SIGN } from '../../common/constants/reg-exp.contants';
+
+export class WarehouseProductWarehousesDto
+  implements IWarehouseProductWarehouses
+{
+  @IsMongoId()
+  @ApiProperty({
+    description: 'Warehouse identifier',
+  })
+  readonly warehouseId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Matches(RegExp(DECIMAL_TWO_SIGN), {
+    message:
+      'Quantity of product should be integer or decimal with a maximum of two sign',
+  })
+  @ApiProperty({
+    type: 'string',
+    description: 'Quantity of product in warehouse',
+    nullable: true,
+    default: null,
+  })
+  readonly totalQuantity: null | string = null;
+}

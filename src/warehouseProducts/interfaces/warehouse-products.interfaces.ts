@@ -1,31 +1,54 @@
 import { ObjectId } from 'mongodb';
 import { Translations } from '../../common/types/i18n.types';
+import { Unit } from '../enums/unit.enums';
+import {
+  ATTRIBUTE_ID,
+  SUPPLY_IDS,
+  VARIANT_ID,
+  WAREHOUSE_ID,
+} from '../../common/constants/cross-entity-id.constants';
 
 export interface IWarehouseProductVariant {
-  variantId: string;
+  [VARIANT_ID]: string;
   name: Translations;
 }
 
 export interface IWarehouseProductAttribute {
-  attributeId: string;
+  [ATTRIBUTE_ID]: string;
   name: Translations;
   variants: IWarehouseProductVariant[];
+}
+
+export interface IWarehouseProductWarehouses {
+  [WAREHOUSE_ID]: string;
+  totalQuantity: string | null;
 }
 
 export interface IWarehouseProduct {
   _id: ObjectId;
   name: Translations;
   sku: string;
-  attributes: null | IWarehouseProductAttribute[];
-  groupId: null | ObjectId;
-  groupName: null | string;
+  unit: Unit;
+  attributes: IWarehouseProductAttribute[];
   createdDate: Date;
+  [SUPPLY_IDS]: string[];
+  warehouses: IWarehouseProductWarehouses[];
+  isDeleted: boolean;
 }
 
-export interface ICreateWarehouseProduct
+export interface IWarehouseProductDto extends Omit<IWarehouseProduct, '_id'> {
+  _id: string;
+}
+
+export interface IWarehouseProductCreate
   extends Omit<
     IWarehouseProduct,
-    '_id' | 'groupId' | 'createdDate' | 'attributes'
+    | '_id'
+    | 'createdDate'
+    | 'attributes'
+    | 'supplyIds'
+    | 'warehouses'
+    | 'isDeleted'
   > {
   attributes: null | Omit<IWarehouseProductAttribute, 'name'>[];
 }

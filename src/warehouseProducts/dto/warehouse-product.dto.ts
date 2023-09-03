@@ -1,119 +1,104 @@
 import {
+  IsBoolean,
   IsDate,
+  IsEnum,
   IsMongoId,
+  IsNotEmpty,
   IsNotEmptyObject,
-  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ObjectId } from 'mongodb';
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
 import {
-  IWarehouseProduct,
   IWarehouseProductAttribute,
-  IWarehouseProductVariant,
+  IWarehouseProductDto,
+  IWarehouseProductWarehouses,
 } from '../interfaces/warehouse-products.interfaces';
+import { Unit } from '../enums/unit.enums';
+import { WarehouseProductWarehousesDto } from './warehouse-product-warehouses.dto';
+import { AttributeWarehouseProductDto } from './attribute-warehouse-product.dto';
 
-class VariantWarehouseProductDto implements IWarehouseProductVariant {
+export class WarehouseProductDto implements IWarehouseProductDto {
   @IsMongoId()
   @ApiProperty({
-    description: 'Identifier of the variant for the warehouses product',
+    description: 'Warehouse product identifier (returned as ObjectId)',
   })
-  readonly variantId: string;
-
-  @ValidateNested()
-  @Type(() => TranslationsDto)
-  @ApiProperty({
-    type: TranslationsDto,
-    description: 'Translation object for the warehouses product variant',
-  })
-  readonly name: Translations;
-}
-
-export class AttributeWarehouseProductDto
-  implements IWarehouseProductAttribute
-{
-  @IsMongoId()
-  @ApiProperty({
-    description: 'Identifier of the attribute for the warehouses product',
-  })
-  readonly attributeId: string;
-
-  @ValidateNested()
-  @Type(() => TranslationsDto)
-  @ApiProperty({
-    type: TranslationsDto,
-    description: 'Translation object for the warehouses product attribute',
-  })
-  readonly name: Translations;
-
-  @ValidateNested({ each: true })
-  @Type(() => VariantWarehouseProductDto)
-  @ApiProperty({
-    type: [VariantWarehouseProductDto],
-    description: 'Variants for the warehouses product',
-  })
-  readonly variants: IWarehouseProductVariant[];
-}
-
-export class WarehouseProductDto implements IWarehouseProduct {
-  @IsMongoId()
-  @ApiProperty({
-    type: 'string',
-    description: 'Identifier of the warehouses product',
-  })
-  readonly _id: ObjectId;
+  readonly _id: string;
 
   @ValidateNested()
   @IsNotEmptyObject()
   @Type(() => TranslationsDto)
   @ApiProperty({
     type: TranslationsDto,
-    description: 'Translation object for the warehouses product name',
+    description: 'Warehouse product name translations',
   })
   readonly name: Translations;
 
   @IsString()
+  @IsNotEmpty()
   @ApiProperty({
-    description: 'A unique SKU identifier of the warehouses product',
+    description: 'A unique SKU identifier of warehouse product',
   })
   readonly sku: string;
+
+  @IsEnum(Unit)
+  @ApiProperty({
+    description: 'Warehouse product measurement unit',
+    enum: Unit,
+    example: [
+      Unit.Meter,
+      Unit.Centimetre,
+      Unit.Millimetre,
+      Unit.Liter,
+      Unit.Milliliter,
+      Unit.Kilogram,
+      Unit.Gram,
+      Unit.Milligram,
+      Unit.Item,
+    ],
+  })
+  readonly unit: Unit;
 
   @ValidateNested({ each: true })
   @Type(() => AttributeWarehouseProductDto)
   @ApiProperty({
     type: [AttributeWarehouseProductDto],
-    description: 'Attributes for the warehouses product',
+    description: 'Attributes for warehouse product',
     nullable: true,
-    default: null,
+    default: [],
   })
-  readonly attributes: null | IWarehouseProductAttribute[] = null;
-
-  @IsMongoId()
-  @IsOptional()
-  @ApiPropertyOptional({
-    type: 'string',
-    description: 'Identifier of the warehouses product group',
-    nullable: true,
-    default: null,
-  })
-  readonly groupId: null | ObjectId = null;
-
-  @IsString()
-  @IsOptional()
-  @ApiPropertyOptional({
-    description: 'Name of the warehouses product group',
-    nullable: true,
-    default: null,
-  })
-  readonly groupName: null | string = null;
+  readonly attributes: IWarehouseProductAttribute[] = [];
 
   @IsDate()
   @ApiProperty({
-    description: 'Date of the warehouses product creation',
+    description: 'Warehouse product creation date',
   })
-  createdDate: Date;
+  readonly createdDate: Date;
+
+  @IsMongoId({ each: true })
+  @ApiProperty({
+    description: 'Supply identifiers that is related to product',
+    nullable: true,
+    default: [],
+  })
+  readonly supplyIds: string[] = [];
+
+  @ValidateNested({ each: true })
+  @Type(() => WarehouseProductWarehousesDto)
+  @ApiProperty({
+    description: 'List of warehouses to which product belongs',
+    nullable: true,
+    default: [],
+  })
+  readonly warehouses: IWarehouseProductWarehouses[] = [];
+
+  @IsBoolean()
+  @ApiProperty({
+    description: 'Define is product logically deleted',
+    default: false,
+  })
+  readonly isDeleted: boolean = false;
 }

@@ -6,6 +6,7 @@ import {
   OnlyFieldsOfType,
   WithId,
 } from 'mongodb';
+import { Document } from 'bson';
 
 export type EntityWithId<Entity> = WithId<Entity>;
 
@@ -15,7 +16,7 @@ export type PartialEntityUpdate<Entity> = MatchKeysAndValues<Entity>;
 
 export type PartialEntityRemoveFields<Entity> = OnlyFieldsOfType<Entity>;
 
-export type FindEntityOptions<Entity> = FindOptions<Entity>;
+export type FindEntityOptions<Entity extends Document> = FindOptions<Entity>;
 
 export type ClientMapKey = string;
 

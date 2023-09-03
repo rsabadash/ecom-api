@@ -4,22 +4,29 @@ import { CompareFieldsService } from '../common/services/compare-fields.service'
 import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
 import { ATTRIBUTES_COLLECTION } from '../common/constants/collections.constants';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
-import { IAttribute } from './interfaces/attribute.interfaces';
-import { CreateAttributeDto } from './dto/create-attribute.dto';
-import { GetAttributeParameters } from './types/attributes.types';
-import { DeleteAttributeDto } from './dto/delete-attribute.dto';
-import { UpdateAttributeDto } from './dto/update-attribute.dto';
-import { UpdateVariantDto } from './dto/update-variant.dto';
-import { DeleteVariantDto } from './dto/delete-variant.dto';
-import { CreateVariantDto } from './dto/create-variant.dto';
-import { IVariant } from './interfaces/variant.interfaces';
-import { GetVariant } from './types/variant.type';
+import {
+  IAttribute,
+  IAttributeCreate,
+  IAttributeDelete,
+  IAttributeUpdate,
+  GetAttributeParameters,
+} from './interfaces/attribute.interfaces';
+import {
+  IVariant,
+  IVariantCreate,
+  IVariantDelete,
+  IVariantUpdate,
+  GetVariantParameters,
+} from './interfaces/variant.interfaces';
 import { IVariantWithAttribute } from './interfaces/variant-with-attribute.interfaces';
 import {
   FindEntityOptions,
   PartialEntity,
 } from '../mongo/types/mongo-query.types';
-import { EntityNotFoundException } from '../common/exeptions/EntityNotFoundException';
+import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
+import { ERROR } from './constants/message.constants';
+import { getPaginationPipeline } from '../common/utils/getPaginationPipeline';
+import { PaginationData } from '../common/interfaces/pagination.interface';
 
 @Injectable()
 export class AttributesService {
@@ -31,12 +38,49 @@ export class AttributesService {
 
   async getAttributes(
     query: PartialEntity<IAttribute> = {},
-    options?: FindEntityOptions<IAttribute>,
+    options: FindEntityOptions<IAttribute>,
+  ): Promise<PaginationData<IAttribute>> {
+    const { skip, limit } = options;
+
+    const pipeline = getPaginationPipeline<IAttribute>({
+      query,
+      filter: {
+        skip,
+        limit,
+      },
+    });
+
+    const paginatedData = await this.attributeCollection.aggregate<
+      PaginationData<IAttribute>
+    >(pipeline);
+
+    return paginatedData[0];
+  }
+
+  async getAttributes2(
+    query: PartialEntity<IAttribute> = {},
+    options: FindEntityOptions<IAttribute>,
   ): Promise<IAttribute[]> {
     return await this.attributeCollection.find(query, options);
   }
 
-  async getVariants(): Promise<IVariantWithAttribute[]> {
+  async getVariants(
+    query: PartialEntity<IVariantWithAttribute> = {},
+    options: FindEntityOptions<IVariantWithAttribute>,
+  ): Promise<PaginationData<IVariantWithAttribute>> {
+    const { skip, limit } = options;
+
+    const paginationPipeline = getPaginationPipeline<IVariantWithAttribute>({
+      query,
+      filter: {
+        skip,
+        limit,
+      },
+    });
+
+    // in current pipeline we have custom "match", so we have to avoid using it here
+    const [_, ...restPipeline] = paginationPipeline;
+
     const pipeline = [
       { $unwind: '$variants' },
       { $sort: { 'variants.isActive': -1, 'variants.sortOrder': 1 } },
@@ -56,11 +100,14 @@ export class AttributesService {
           },
         },
       },
+      ...restPipeline,
     ];
 
-    return await this.attributeCollection.aggregate<IVariantWithAttribute>(
-      pipeline,
-    );
+    const paginatedData = await this.attributeCollection.aggregate<
+      PaginationData<IVariantWithAttribute>
+    >(pipeline);
+
+    return paginatedData[0];
   }
 
   async getAttribute(
@@ -69,20 +116,20 @@ export class AttributesService {
   ): Promise<IAttribute> {
     const attribute = await this.attributeCollection.findOne(
       {
-        _id: parameters.attributeId,
+        _id: new ObjectId(parameters.attributeId),
       },
       options,
     );
-
     if (!attribute) {
-      throw new EntityNotFoundException('The attribute has not been found');
+      throw new EntityNotFoundException(ERROR.ATTRIBUTE_NOT_FOUND);
     }
 
     return attribute;
   }
 
-  async getVariant(parameters: GetVariant): Promise<IVariant> {
+  async getVariant(parameters: GetVariantParameters): Promise<IVariant> {
     const pipeline = [
+      { $match: { _id: new ObjectId(parameters.attributeId) } },
       { $unwind: '$variants' },
       {
         $replaceRoot: {
@@ -101,41 +148,35 @@ export class AttributesService {
     const variant = variantDetail[0];
 
     if (!variant) {
-      throw new EntityNotFoundException(
-        'The variant of the attribute has not been found',
-      );
+      throw new EntityNotFoundException(ERROR.VARIANT_NOT_FOUND);
     }
 
     return variant;
   }
 
   async createAttribute(
-    createAttributeDto: CreateAttributeDto,
+    createAttribute: IAttributeCreate,
   ): Promise<IAttribute> {
-    const newAttribute = await this.attributeCollection.create(
-      createAttributeDto,
-    );
+    const newAttribute = await this.attributeCollection.create(createAttribute);
 
     if (!newAttribute) {
-      throw new BadRequestException('The attribute has not been created');
+      throw new BadRequestException(ERROR.ATTRIBUTE_NOT_CREATED);
     }
 
     return newAttribute;
   }
 
-  async updateAttribute(
-    updateAttributesDto: UpdateAttributeDto,
-  ): Promise<void> {
+  async updateAttribute(updateAttributes: IAttributeUpdate): Promise<void> {
     const attribute = await this.getAttribute(
       {
-        attributeId: updateAttributesDto.id,
+        attributeId: updateAttributes.id,
       },
       { projection: { variants: 0 } },
     );
 
     const { _id, updatedFields } =
       this.compareFieldsService.compare<IAttribute>(
-        updateAttributesDto,
+        updateAttributes,
         attribute,
       );
 
@@ -145,28 +186,26 @@ export class AttributesService {
     );
 
     if (!updatedResult.isUpdated) {
-      throw new BadRequestException('The attribute has not been updated');
+      throw new BadRequestException(ERROR.ATTRIBUTE_NOT_UPDATED);
     }
   }
 
-  async deleteAttribute(deleteAttributeDto: DeleteAttributeDto): Promise<void> {
+  async deleteAttribute(deleteAttribute: IAttributeDelete): Promise<void> {
     await this.attributeCollection.deleteOne({
-      _id: deleteAttributeDto.id,
+      _id: new ObjectId(deleteAttribute.id),
     });
   }
 
-  async createVariant(
-    createAttributeValueDto: CreateVariantDto,
-  ): Promise<void> {
-    const { attributeId, ...rest } = createAttributeValueDto;
+  async createVariant(createVariant: IVariantCreate): Promise<void> {
+    const { attributeId, ...rest } = createVariant;
 
     const variant: IVariant = {
       ...rest,
-      variantId: new ObjectId(),
+      variantId: new ObjectId().toString(),
     };
 
     const updateResult = await this.attributeCollection.updateWithOperator(
-      { _id: attributeId },
+      { _id: new ObjectId(attributeId) },
       {
         $push: {
           variants: variant,
@@ -175,68 +214,48 @@ export class AttributesService {
     );
 
     if (!updateResult.isUpdated) {
-      throw new BadRequestException(
-        'The variant of the attribute has not been created',
-      );
+      throw new BadRequestException(ERROR.VARIANT_NOT_CREATED);
     }
   }
 
-  async updateVariant(
-    updateAttributeVariantDto: UpdateVariantDto,
-  ): Promise<void> {
-    const attribute = await this.attributeCollection.find({
-      'variants.variantId': {
-        $in: [updateAttributeVariantDto.variantId],
-      },
-    });
-
-    if (attribute.length === 0) {
-      throw new EntityNotFoundException(
-        'The variant of the attribute has not been found',
-      );
-    }
-
-    const variant = attribute[0].variants.find((variant) => {
-      return (
-        variant.variantId.toString() ===
-        updateAttributeVariantDto.variantId.toString()
-      );
+  async updateVariant(updateAttributeVariant: IVariantUpdate): Promise<void> {
+    const variant = await this.getVariant({
+      attributeId: updateAttributeVariant.attributeId,
+      variantId: updateAttributeVariant.variantId,
     });
 
     const { updatedFields } = this.compareFieldsService.compare<IVariant>(
-      updateAttributeVariantDto,
+      updateAttributeVariant,
       variant,
     );
 
     const updateResult = await this.attributeCollection.updateOne(
       {
+        _id: new ObjectId(updateAttributeVariant.attributeId),
         'variants.variantId': {
-          $in: [updateAttributeVariantDto.variantId],
+          $in: [updateAttributeVariant.variantId],
         },
       },
       { 'variants.$': { ...variant, ...updatedFields } },
     );
 
     if (!updateResult.isUpdated) {
-      throw new GoneException(
-        'The variant of the attribute has not been updated',
-      );
+      throw new GoneException(ERROR.VARIANT_NOT_UPDATED);
     }
   }
 
-  async deleteVariant(
-    deleteAttributeVariantDto: DeleteVariantDto,
-  ): Promise<void> {
+  async deleteVariant(deleteAttributeVariant: IVariantDelete): Promise<void> {
     await this.attributeCollection.updateWithOperator(
       {
+        _id: new ObjectId(deleteAttributeVariant.attributeId),
         'variants.variantId': {
-          $in: [deleteAttributeVariantDto.variantId],
+          $in: [deleteAttributeVariant.variantId],
         },
       },
       {
         $pull: {
           variants: {
-            variantId: deleteAttributeVariantDto.variantId,
+            variantId: deleteAttributeVariant.variantId,
           },
         },
       },
