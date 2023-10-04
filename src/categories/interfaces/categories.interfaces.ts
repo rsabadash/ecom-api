@@ -9,7 +9,16 @@ export interface ICategory {
   parentIds: string[];
 }
 
+export interface ICategoryWithFullParents extends Omit<ICategory, 'parentIds'> {
+  parents: ICategory[];
+}
+
 export interface ICategoryDto extends Omit<ICategory, '_id'> {
+  _id: string;
+}
+
+export interface ICategoryWithFullParentsDto
+  extends Omit<ICategoryWithFullParents, '_id'> {
   _id: string;
 }
 

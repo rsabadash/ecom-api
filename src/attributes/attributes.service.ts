@@ -17,6 +17,7 @@ import {
   IVariantDelete,
   IVariantUpdate,
   GetVariantParameters,
+  IVariantWithAttributeId,
 } from './interfaces/variant.interfaces';
 import { IVariantWithAttribute } from './interfaces/variant-with-attribute.interfaces';
 import {
@@ -79,7 +80,7 @@ export class AttributesService {
     });
 
     // in current pipeline we have custom "match", so we have to avoid using it here
-    const [_, ...restPipeline] = paginationPipeline;
+    const [_match, ...restPipeline] = paginationPipeline;
 
     const pipeline = [
       { $unwind: '$variants' },
@@ -196,7 +197,9 @@ export class AttributesService {
     });
   }
 
-  async createVariant(createVariant: IVariantCreate): Promise<void> {
+  async createVariant(
+    createVariant: IVariantCreate,
+  ): Promise<IVariantWithAttributeId> {
     const { attributeId, ...rest } = createVariant;
 
     const variant: IVariant = {
@@ -216,6 +219,11 @@ export class AttributesService {
     if (!updateResult.isUpdated) {
       throw new BadRequestException(ERROR.VARIANT_NOT_CREATED);
     }
+
+    return {
+      ...variant,
+      attributeId,
+    };
   }
 
   async updateVariant(updateAttributeVariant: IVariantUpdate): Promise<void> {

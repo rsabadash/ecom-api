@@ -1,5 +1,11 @@
-import { IsEnum, IsMongoId, IsNotEmpty, IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsEnum,
+  IsMongoId,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IWarehouse } from '../interfaces/warehouses.interfaces';
 import { WarehouseType } from '../enums/warehouse-types';
 
@@ -29,9 +35,10 @@ export class WarehouseDto implements Omit<IWarehouse, '_id'> {
   })
   readonly type: WarehouseType;
 
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Warehouse address',
     nullable: true,
     default: null,
