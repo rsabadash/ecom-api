@@ -247,7 +247,7 @@ export class SuppliesService {
     return supply;
   }
 
-  async createSupply(createSupply: ISupplyCreate): Promise<void> {
+  async createSupply(createSupply: ISupplyCreate): Promise<ISupply> {
     // TODO check duplication
     const productsToAdd: ISupplyProductToCreate[] = createSupply.products;
 
@@ -267,9 +267,11 @@ export class SuppliesService {
 
     const session = this.client.startSession();
 
+    let newSupply: ISupply | null = null;
+
     try {
       await session.withTransaction(async () => {
-        const newSupply = await this.supplyCollection.create(
+        newSupply = await this.supplyCollection.create(
           {
             ...createSupply,
             products: productsToSupplyWithVariations,
@@ -303,6 +305,12 @@ export class SuppliesService {
           throw new BadRequestException(ERROR.NO_PRODUCTS_WERE_UPDATED);
         }
       });
+
+      if (!newSupply) {
+        throw new BadRequestException(ERROR.SUPPLY_NOT_CREATED);
+      }
+
+      return newSupply;
     } finally {
       await session.endSession();
     }

@@ -30,7 +30,7 @@ export interface IWarehouseProduct {
   sku: string;
   unit: Unit;
   attributes: IWarehouseProductAttribute[];
-  createdDate: Date;
+  createdAt: Date;
   [SUPPLY_IDS]: string[];
   warehouses: IWarehouseProductWarehouses[];
   isDeleted: boolean;
@@ -44,7 +44,7 @@ export interface IWarehouseProductCreate
   extends Omit<
     IWarehouseProduct,
     | '_id'
-    | 'createdDate'
+    | 'createdAt'
     | 'attributes'
     | 'supplyIds'
     | 'warehouses'

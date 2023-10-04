@@ -76,7 +76,7 @@ export class WarehouseProductDto implements IWarehouseProductDto {
   @ApiProperty({
     description: 'Warehouse product creation date',
   })
-  readonly createdDate: Date;
+  readonly createdAt: Date;
 
   @IsMongoId({ each: true })
   @ApiProperty({

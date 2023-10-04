@@ -1,16 +1,7 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
-  ApiNoContentResponse,
+  ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
@@ -81,9 +72,9 @@ export class SuppliesController {
   }
 
   @Post()
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiNoContentResponse({
+  @ApiCreatedResponse({
     description: SWAGGER_DESCRIPTION.CREATE_SUPPLY,
+    type: SupplyDto,
   })
   @ApiBadRequestResponse({
     description: ERROR.NO_PRODUCTS_FOUND,
@@ -101,7 +92,9 @@ export class SuppliesController {
     description: ERROR.NO_PRODUCTS_WERE_UPDATED,
   })
   @ApiNoAccessResponse()
-  async createSupply(@Body() createSupplyDto: CreateSupplyDto): Promise<void> {
+  async createSupply(
+    @Body() createSupplyDto: CreateSupplyDto,
+  ): Promise<ISupply> {
     return await this.suppliesService.createSupply(createSupplyDto);
   }
 }

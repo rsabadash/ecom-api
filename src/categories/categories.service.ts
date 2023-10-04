@@ -17,6 +17,7 @@ import {
   ICategoryDelete,
   ICategoryUpdate,
   GetCategoryParameters,
+  ICategoryWithFullParents,
 } from './interfaces/categories.interfaces';
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
 import {
@@ -55,6 +56,19 @@ export class CategoriesService {
     }
 
     this.client = client;
+  }
+
+  private findMissingIdsInDB(
+    parentsFullData: ICategory[],
+    parentIds: string[],
+  ): string[] {
+    const convertedFullDataToIds = parentsFullData.map((parent) =>
+      parent._id.toString(),
+    );
+
+    return parentIds.filter(
+      (parentId) => !convertedFullDataToIds.includes(parentId),
+    );
   }
 
   async getCategories(
@@ -100,26 +114,90 @@ export class CategoriesService {
     });
   }
 
-  async getCategory(parameters: GetCategoryParameters): Promise<ICategory> {
-    const category = await this.categoryCollection.findOne({
-      _id: new ObjectId(parameters.categoryId),
-    });
+  async getCategory(
+    parameters: GetCategoryParameters,
+  ): Promise<ICategoryWithFullParents> {
+    const pipeline = [
+      { $match: { _id: new ObjectId(parameters.categoryId) } },
+      {
+        $addFields: {
+          parentIds: {
+            $map: {
+              input: '$parentIds',
+              as: 'parentId',
+              in: { $toObjectId: '$$parentId' },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'parentIds',
+          foreignField: '_id',
+          as: 'parents',
+        },
+      },
+      {
+        $project: {
+          parentIds: 0,
+        },
+      },
+    ];
 
-    if (!category) {
+    const category =
+      await this.categoryCollection.aggregate<ICategoryWithFullParents>(
+        pipeline,
+      );
+
+    if (!category.length) {
       throw new EntityNotFoundException(ERROR.CATEGORY_NOT_FOUND);
     }
 
-    return category;
+    return category[0];
   }
 
-  async createCategory(createCategory: ICategoryCreate): Promise<ICategory> {
+  async createCategory(
+    createCategory: ICategoryCreate,
+  ): Promise<ICategoryWithFullParents> {
+    let parents: ICategory[] = [];
+    const { parentIds } = createCategory;
+
+    if (parentIds.length > 0) {
+      const parentObjectIds = parentIds.map(
+        (parentId) => new ObjectId(parentId),
+      );
+
+      parents = await this.categoryCollection.find({
+        _id: { $in: parentObjectIds },
+      });
+
+      const missingIdsInDB = this.findMissingIdsInDB(parents, parentIds);
+
+      if (missingIdsInDB.length > 0) {
+        throw new BadRequestException(
+          `${
+            ERROR.CATEGORY_NOT_CREATED_WRONG_PARENT_IDS
+          } (${missingIdsInDB.toString()})`,
+        );
+      }
+    }
+
     const newCategory = await this.categoryCollection.create(createCategory);
 
     if (!newCategory) {
       throw new BadRequestException(ERROR.CATEGORY_NOT_CREATED);
     }
 
-    return newCategory;
+    const { _id, name, seoName, isActive } = newCategory;
+
+    return {
+      _id,
+      name,
+      seoName,
+      isActive,
+      parents,
+    };
   }
 
   async updateCategory(updateCategory: ICategoryUpdate): Promise<void> {

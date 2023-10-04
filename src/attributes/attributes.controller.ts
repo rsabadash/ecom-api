@@ -40,7 +40,10 @@ import { DeleteAttributeDto } from './dto/delete-attribute.dto';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
 import { UpdateVariantDto } from './dto/update-variant.dto';
 import { CreateVariantDto } from './dto/create-variant.dto';
-import { IVariant } from './interfaces/variant.interfaces';
+import {
+  IVariant,
+  IVariantWithAttributeId,
+} from './interfaces/variant.interfaces';
 import { DeleteVariantDto } from './dto/delete-variant.dto';
 import { AttributeDto } from './dto/attribute.dto';
 import { VariantDto } from './dto/variant.dto';
@@ -197,7 +200,7 @@ export class AttributesController {
   @ApiNoAccessResponse()
   async createVariant(
     @Body() createVariantDto: CreateVariantDto,
-  ): Promise<void> {
+  ): Promise<IVariantWithAttributeId> {
     return this.attributesService.createVariant(createVariantDto);
   }
 

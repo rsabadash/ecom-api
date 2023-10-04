@@ -20,7 +20,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CategoriesService } from './categories.service';
-import { ICategory } from './interfaces/categories.interfaces';
+import {
+  ICategory,
+  ICategoryWithFullParents,
+} from './interfaces/categories.interfaces';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import {
   CATEGORIES_ROUTE,
@@ -40,7 +43,6 @@ import { Role } from '../iam/enums/role.enums';
 import { Auth } from '../iam/decorators/auth.decorator';
 import { AuthType } from '../iam/enums/auth-type.enum';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
-import { CategoryDto } from './dto/category.dto';
 import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
 import { DropdownListDto } from '../common/dto/dropdown-list.dto';
 import { MODULE_NAME } from '../common/constants/swagger.constants';
@@ -51,6 +53,7 @@ import {
   PaginationParsedQuery,
 } from '../common/interfaces/pagination.interface';
 import { PaginationCategoryDto } from './dto/pagination-category.dto';
+import { CategoryWithFullParentsDto } from './dto/category-with-full-parents.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -98,7 +101,7 @@ export class CategoriesController {
   @Get(GET_CATEGORY_BY_ID_PATH)
   @ApiOkResponse({
     description: SWAGGER_DESCRIPTION.GET_CATEGORY,
-    type: CategoryDto,
+    type: CategoryWithFullParentsDto,
   })
   @ApiNotFoundResponse({
     description: ERROR.CATEGORY_NOT_FOUND,
@@ -107,14 +110,18 @@ export class CategoriesController {
   @ApiNoAccessResponse()
   async getCategory(
     @Param(CATEGORY_ID_PARAM) categoryId: string,
-  ): Promise<ICategory> {
+  ): Promise<ICategoryWithFullParents> {
     return await this.categoriesService.getCategory({ categoryId });
   }
 
   @Post()
   @ApiCreatedResponse({
     description: SWAGGER_DESCRIPTION.CREATE_CATEGORY,
-    type: CategoryDto,
+    type: CategoryWithFullParentsDto,
+  })
+  @ApiBadRequestResponse({
+    description: ERROR.CATEGORY_NOT_CREATED_WRONG_PARENT_IDS,
+    type: HttpErrorDto,
   })
   @ApiBadRequestResponse({
     description: ERROR.CATEGORY_NOT_CREATED,
@@ -123,7 +130,7 @@ export class CategoriesController {
   @ApiNoAccessResponse()
   async createCategory(
     @Body() createCategoryDto: CreateCategoryDto,
-  ): Promise<ICategory> {
+  ): Promise<ICategoryWithFullParents> {
     return await this.categoriesService.createCategory(createCategoryDto);
   }
 

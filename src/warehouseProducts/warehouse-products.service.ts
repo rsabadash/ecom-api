@@ -107,7 +107,7 @@ export class WarehouseProductsService {
         const updatedProduct: INewWarehouseProduct = {
           ...restProductValues,
           attributes: productAttributes,
-          createdDate: currentDate,
+          createdAt: currentDate,
           supplyIds: [],
           warehouses: [],
           isDeleted: false,
@@ -171,7 +171,7 @@ export class WarehouseProductsService {
     return await this.warehouseProductCollection.create({
       ...product,
       attributes: [],
-      createdDate: currentDate,
+      createdAt: currentDate,
       warehouses: [],
       supplyIds: [],
       isDeleted: false,

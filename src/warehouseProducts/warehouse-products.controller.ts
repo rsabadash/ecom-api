@@ -64,7 +64,7 @@ export class WarehouseProductsController {
     type: DropdownListDto,
   })
   @ApiNoAccessResponse()
-  async getCategoriesDropdownList(
+  async getWarehouseProductsDropdownList(
     @Headers('accept-language') language: Language,
   ): Promise<DropdownListItem[]> {
     return this.warehouseProductsService.getWarehouseProductsDropdownList(

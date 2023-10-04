@@ -16,7 +16,7 @@ class AttributeWarehouseProductCreateDto extends OmitType(
 export class CreateWarehouseProductDto
   extends OmitType(WarehouseProductDto, [
     '_id',
-    'createdDate',
+    'createdAt',
     'attributes',
     'supplyIds',
     'warehouses',
