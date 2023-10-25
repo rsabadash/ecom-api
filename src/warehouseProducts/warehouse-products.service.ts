@@ -120,7 +120,7 @@ export class WarehouseProductsService {
       [],
     );
 
-    return await this.warehouseProductCollection.createMany(newProducts);
+    return this.warehouseProductCollection.createMany(newProducts);
   }
 
   async getWarehouseProducts(
@@ -168,7 +168,7 @@ export class WarehouseProductsService {
     const product = products[0];
     const currentDate = new Date();
 
-    return await this.warehouseProductCollection.create({
+    return this.warehouseProductCollection.create({
       ...product,
       attributes: [],
       createdAt: currentDate,
@@ -211,6 +211,6 @@ export class WarehouseProductsService {
     operations: BulkOperations<IWarehouseProduct>[],
     options: BulkWriteOptions,
   ): Promise<BulkWriteResult> {
-    return await this.warehouseProductCollection.bulkWrite(operations, options);
+    return this.warehouseProductCollection.bulkWrite(operations, options);
   }
 }

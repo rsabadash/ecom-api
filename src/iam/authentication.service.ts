@@ -50,7 +50,7 @@ export class AuthenticationService {
       ...(payload || {}),
     };
 
-    return await this.jwtService.signAsync(signPayload, {
+    return this.jwtService.signAsync(signPayload, {
       audience,
       issuer,
       secret,
@@ -66,7 +66,7 @@ export class AuthenticationService {
       password: hashedPassword,
     };
 
-    return await this.usersService.createUser(user);
+    return this.usersService.createUser(user);
   }
 
   async signIn(signInDto: SignInDto): Promise<Tokens> {
@@ -85,7 +85,7 @@ export class AuthenticationService {
       throw new UnauthorizedException('Email or password do not match');
     }
 
-    return await this.generateTokens(user);
+    return this.generateTokens(user);
   }
 
   async refreshToken(
@@ -112,6 +112,6 @@ export class AuthenticationService {
       userId,
     });
 
-    return await this.generateTokens(user);
+    return this.generateTokens(user);
   }
 }

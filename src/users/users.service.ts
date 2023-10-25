@@ -28,7 +28,7 @@ export class UsersService {
   ) {}
 
   async getUsers(): Promise<IUserPublic[]> {
-    return await this.usersCollection.find({}, { projection: { password: 0 } });
+    return this.usersCollection.find({}, { projection: { password: 0 } });
   }
 
   async getUser(parameters: GetUserParameters): Promise<IUserPublic> {
@@ -46,7 +46,7 @@ export class UsersService {
 
   async getUserByEmail(email: string): Promise<IUser | null> {
     // No Found did not handle as in different scenarios it handled in a different way
-    return await this.usersCollection.findOne({ email });
+    return this.usersCollection.findOne({ email });
   }
 
   async createUser(createUser: IUserCreate): Promise<IUserPublic> {

@@ -62,7 +62,7 @@ export class AttributesService {
     query: PartialEntity<IAttribute> = {},
     options: FindEntityOptions<IAttribute>,
   ): Promise<IAttribute[]> {
-    return await this.attributeCollection.find(query, options);
+    return this.attributeCollection.find(query, options);
   }
 
   async getVariants(

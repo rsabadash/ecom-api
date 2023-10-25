@@ -53,7 +53,7 @@ export class UsersController {
   })
   @ApiNoAccessResponse()
   async getUsers(): Promise<IUserPublic[]> {
-    return await this.usersService.getUsers();
+    return this.usersService.getUsers();
   }
 
   @Get(GET_USER_VERIFICATION)
@@ -67,7 +67,7 @@ export class UsersController {
   })
   @ApiNoAccessResponse()
   async getUserVerification(@UserId() userId: string): Promise<IUserPublic> {
-    return await this.usersService.getUser({ userId });
+    return this.usersService.getUser({ userId });
   }
 
   @Get(GET_USER_BY_ID_PATH)
@@ -81,7 +81,7 @@ export class UsersController {
   })
   @ApiNoAccessResponse()
   async getUser(@Param(USER_ID_PARAM) userId: string): Promise<IUserPublic> {
-    return await this.usersService.getUser({ userId });
+    return this.usersService.getUser({ userId });
   }
 
   @Post()
@@ -99,7 +99,7 @@ export class UsersController {
   })
   @ApiNoAccessResponse()
   async createUser(@Body() createUserDto: CreateUserDto): Promise<IUserPublic> {
-    return await this.usersService.createUser(createUserDto);
+    return this.usersService.createUser(createUserDto);
   }
 
   @Patch()

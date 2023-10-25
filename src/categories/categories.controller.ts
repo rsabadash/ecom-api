@@ -73,7 +73,7 @@ export class CategoriesController {
   ): Promise<PaginationData<ICategory>> {
     const { page, limit } = query;
 
-    return await this.categoriesService.getCategories(
+    return this.categoriesService.getCategories(
       {},
       {
         skip: page,
@@ -111,7 +111,7 @@ export class CategoriesController {
   async getCategory(
     @Param(CATEGORY_ID_PARAM) categoryId: string,
   ): Promise<ICategoryWithFullParents> {
-    return await this.categoriesService.getCategory({ categoryId });
+    return this.categoriesService.getCategory({ categoryId });
   }
 
   @Post()
@@ -131,7 +131,7 @@ export class CategoriesController {
   async createCategory(
     @Body() createCategoryDto: CreateCategoryDto,
   ): Promise<ICategoryWithFullParents> {
-    return await this.categoriesService.createCategory(createCategoryDto);
+    return this.categoriesService.createCategory(createCategoryDto);
   }
 
   @Patch()
