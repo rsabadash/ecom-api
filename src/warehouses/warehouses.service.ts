@@ -27,7 +27,7 @@ export class WarehousesService {
   async getWarehouses(
     query: PartialEntity<IWarehouse> = {},
   ): Promise<IWarehouse[]> {
-    return await this.warehousesCollection.find(query);
+    return this.warehousesCollection.find(query);
   }
 
   async getWarehousesDropdownList(): Promise<DropdownListItem[]> {

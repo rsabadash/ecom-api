@@ -54,7 +54,7 @@ export class WarehousesController {
   })
   @ApiNoAccessResponse()
   async getWarehouses(): Promise<IWarehouse[]> {
-    return await this.warehousesService.getWarehouses();
+    return this.warehousesService.getWarehouses();
   }
 
   @Get(DROPDOWN_LIST_PATH)
@@ -64,7 +64,7 @@ export class WarehousesController {
   })
   @ApiNoAccessResponse()
   async getWarehousesDropdownList(): Promise<DropdownListItem[]> {
-    return await this.warehousesService.getWarehousesDropdownList();
+    return this.warehousesService.getWarehousesDropdownList();
   }
 
   @Get(GET_WAREHOUSE_BY_ID_PATH)
@@ -80,7 +80,7 @@ export class WarehousesController {
   async getWarehouse(
     @Param(WAREHOUSE_ID_PARAM) warehouseId: string,
   ): Promise<IWarehouse> {
-    return await this.warehousesService.getWarehouse({ warehouseId });
+    return this.warehousesService.getWarehouse({ warehouseId });
   }
 
   @Post()
@@ -96,7 +96,7 @@ export class WarehousesController {
   async createWarehouse(
     @Body() createWarehouse: CreateWarehouseDto,
   ): Promise<IWarehouse> {
-    return await this.warehousesService.createWarehouse(createWarehouse);
+    return this.warehousesService.createWarehouse(createWarehouse);
   }
 
   @Patch()
@@ -116,7 +116,7 @@ export class WarehousesController {
   async updateWarehouse(
     @Body() updateWarehouseDto: UpdateWarehouseDto,
   ): Promise<void> {
-    return await this.warehousesService.updateWarehouse(updateWarehouseDto);
+    return this.warehousesService.updateWarehouse(updateWarehouseDto);
   }
 
   @Delete()

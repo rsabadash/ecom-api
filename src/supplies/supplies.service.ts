@@ -208,7 +208,7 @@ export class SuppliesService {
         };
       });
 
-    return await this.warehouseProductsService.bulkWrite(
+    return this.warehouseProductsService.bulkWrite(
       preparedBulkUpdateFilter,
       options,
     );

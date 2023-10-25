@@ -66,7 +66,7 @@ export class SuppliersController {
   ): Promise<PaginationData<ISupplier>> {
     const { page, limit } = query;
 
-    return await this.suppliersService.getSuppliers(
+    return this.suppliersService.getSuppliers(
       {},
       {
         skip: page,
@@ -82,7 +82,7 @@ export class SuppliersController {
   })
   @ApiNoAccessResponse()
   async getSuppliersDropdownList(): Promise<DropdownListItem[]> {
-    return await this.suppliersService.getSuppliersDropdownList();
+    return this.suppliersService.getSuppliersDropdownList();
   }
 
   @Get(GET_SUPPLIER_BY_ID_PATH)
@@ -98,7 +98,7 @@ export class SuppliersController {
   async getSupplier(
     @Param(SUPPLIER_ID_PARAM) supplierId: string,
   ): Promise<ISupplier> {
-    return await this.suppliersService.getSupplier({ supplierId });
+    return this.suppliersService.getSupplier({ supplierId });
   }
 
   @Post()
@@ -114,7 +114,7 @@ export class SuppliersController {
   async createSupplier(
     @Body() createSupplierDto: CreateSupplierDto,
   ): Promise<ISupplier> {
-    return await this.suppliersService.createSupplier(createSupplierDto);
+    return this.suppliersService.createSupplier(createSupplierDto);
   }
 
   @Patch()

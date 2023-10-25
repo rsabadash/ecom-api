@@ -48,7 +48,7 @@ export class SuppliesController {
   ): Promise<PaginationData<ISupply>> {
     const { page, limit } = query;
 
-    return await this.suppliesService.getSupplies(
+    return this.suppliesService.getSupplies(
       {},
       {
         skip: page,
@@ -95,6 +95,6 @@ export class SuppliesController {
   async createSupply(
     @Body() createSupplyDto: CreateSupplyDto,
   ): Promise<ISupply> {
-    return await this.suppliesService.createSupply(createSupplyDto);
+    return this.suppliesService.createSupply(createSupplyDto);
   }
 }

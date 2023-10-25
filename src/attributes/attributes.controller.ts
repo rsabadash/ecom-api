@@ -78,7 +78,7 @@ export class AttributesController {
   ): Promise<PaginationData<IAttribute>> {
     const { page, limit } = query;
 
-    return await this.attributesService.getAttributes(
+    return this.attributesService.getAttributes(
       {},
       {
         skip: page,
@@ -98,7 +98,7 @@ export class AttributesController {
   ): Promise<PaginationData<IVariantWithAttribute>> {
     const { page, limit } = query;
 
-    return await this.attributesService.getVariants(
+    return this.attributesService.getVariants(
       {},
       {
         skip: page,
@@ -120,7 +120,7 @@ export class AttributesController {
   async getAttribute(
     @Param(ATTRIBUTE_ID_PARAM) attributeId: string,
   ): Promise<IAttribute> {
-    return await this.attributesService.getAttribute({ attributeId });
+    return this.attributesService.getAttribute({ attributeId });
   }
 
   @Get(`${GET_ATTRIBUTE_BY_ID_PATH}${VARIANTS_PATH}${GET_VARIANT_BY_ID_PATH}`)
@@ -137,7 +137,7 @@ export class AttributesController {
     @Param(ATTRIBUTE_ID_PARAM) attributeId: string,
     @Param(VARIANT_ID_PARAM) variantId: string,
   ): Promise<IVariant> {
-    return await this.attributesService.getVariant({ attributeId, variantId });
+    return this.attributesService.getVariant({ attributeId, variantId });
   }
 
   @Post()

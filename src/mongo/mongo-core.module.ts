@@ -63,7 +63,7 @@ export class MongoCoreModule implements OnModuleDestroy {
         const client = new MongoClient(uri, connectionOptions);
         clients.set(connectionName, client);
 
-        return await client.connect();
+        return client.connect();
       },
       inject: [getClientToken(connectionName)],
     };
@@ -115,7 +115,7 @@ export class MongoCoreModule implements OnModuleDestroy {
         const client = new MongoClient(uri, connectionOptions);
         clients.set(connectionName, client);
 
-        return await client.connect();
+        return client.connect();
       },
       inject: [getClientToken(connectionName), MONGO_MODULE_OPTIONS],
     };

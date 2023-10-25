@@ -49,7 +49,7 @@ export class WarehouseProductsController {
   ): Promise<PaginationData<IWarehouseProduct>> {
     const { page, limit } = query;
 
-    return await this.warehouseProductsService.getWarehouseProducts(
+    return this.warehouseProductsService.getWarehouseProducts(
       {},
       {
         skip: page,
@@ -85,7 +85,7 @@ export class WarehouseProductsController {
   async createWarehouseProducts(
     @Body() createWarehouseProductsDto: CreateWarehouseProductDto[],
   ): Promise<IWarehouseProduct[]> {
-    return await this.warehouseProductsService.createWarehouseProducts(
+    return this.warehouseProductsService.createWarehouseProducts(
       createWarehouseProductsDto,
     );
   }

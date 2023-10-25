@@ -39,7 +39,7 @@ export class CollectionModel<CollectionEntity extends Document>
   ): Promise<EntityWithId<CollectionEntity> | null> {
     const findOptions = options || {};
 
-    return await this.collection.findOne(entityQuery, findOptions);
+    return this.collection.findOne(entityQuery, findOptions);
   }
 
   async find(
@@ -53,7 +53,7 @@ export class CollectionModel<CollectionEntity extends Document>
         }
       : DEFAULT_FIND_OPTIONS;
 
-    return await this.collection.find(entityQuery, findOptions).toArray();
+    return this.collection.find(entityQuery, findOptions).toArray();
   }
 
   async updateOne(
@@ -86,7 +86,7 @@ export class CollectionModel<CollectionEntity extends Document>
     filter: Filter<CollectionEntity>,
     update: UpdateFilter<CollectionEntity>,
   ) {
-    return await this.collection.updateMany(filter, update);
+    return this.collection.updateMany(filter, update);
   }
 
   async removeField(
@@ -164,13 +164,13 @@ export class CollectionModel<CollectionEntity extends Document>
     pipeline: Pipeline,
     options?: AggregateOptions,
   ): Promise<Result[]> {
-    return await this.collection.aggregate<Result>(pipeline, options).toArray();
+    return this.collection.aggregate<Result>(pipeline, options).toArray();
   }
 
   async bulkWrite(
     operations: BulkOperations<CollectionEntity>[],
     options: BulkWriteOptions = {},
   ): Promise<BulkResult> {
-    return await this.collection.bulkWrite(operations, options);
+    return this.collection.bulkWrite(operations, options);
   }
 }
