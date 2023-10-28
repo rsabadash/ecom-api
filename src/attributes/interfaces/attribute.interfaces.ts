@@ -7,7 +7,6 @@ export interface IAttribute {
   name: Translations;
   seoName: string;
   isActive: boolean;
-  sortOrder: null | number;
   variants: IVariant[];
 }
 

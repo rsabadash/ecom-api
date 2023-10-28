@@ -3,8 +3,6 @@ import {
   IsMongoId,
   IsNotEmpty,
   IsNotEmptyObject,
-  IsNumber,
-  IsOptional,
   IsString,
   Matches,
   ValidateNested,
@@ -49,15 +47,6 @@ export class AttributeDto implements IAttributeDto {
     description: 'Is attribute visible for public users',
   })
   readonly isActive: boolean;
-
-  @IsNumber()
-  @IsOptional()
-  @ApiProperty({
-    description: 'Attribute sort order',
-    nullable: true,
-    default: null,
-  })
-  readonly sortOrder: null | number = null;
 
   @ValidateNested({ each: true })
   @Type(() => VariantDto)

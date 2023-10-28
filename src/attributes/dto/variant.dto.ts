@@ -3,8 +3,6 @@ import {
   IsMongoId,
   IsNotEmpty,
   IsNotEmptyObject,
-  IsNumber,
-  IsOptional,
   IsString,
   Matches,
   ValidateNested,
@@ -47,13 +45,4 @@ export class VariantDto implements IVariant {
     description: 'Is variant visible for public users',
   })
   readonly isActive: boolean;
-
-  @IsNumber()
-  @IsOptional()
-  @ApiProperty({
-    description: 'Variant sort order',
-    nullable: true,
-    default: null,
-  })
-  readonly sortOrder: null | number = null;
 }

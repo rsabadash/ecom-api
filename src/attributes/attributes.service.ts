@@ -84,7 +84,7 @@ export class AttributesService {
 
     const pipeline = [
       { $unwind: '$variants' },
-      { $sort: { 'variants.isActive': -1, 'variants.sortOrder': 1 } },
+      { $sort: { 'variants.isActive': -1 } },
       {
         $project: {
           variants: 1,
