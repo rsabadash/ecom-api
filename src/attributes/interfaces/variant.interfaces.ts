@@ -9,7 +9,6 @@ export interface IVariant {
   seoName: string;
   name: Translations;
   isActive: boolean;
-  sortOrder: null | number;
 }
 
 export interface IVariantWithAttributeId extends IVariant {
