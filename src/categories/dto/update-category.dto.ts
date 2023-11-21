@@ -5,7 +5,7 @@ import { CategoryDto } from './category.dto';
 import { ICategoryUpdate } from '../interfaces/categories.interfaces';
 
 export class UpdateCategoryDto
-  extends PartialType(OmitType(CategoryDto, ['_id', 'parentIds'] as const))
+  extends PartialType(OmitType(CategoryDto, ['_id', 'childrenIds', 'parentIdsHierarchy'] as const))
   implements ICategoryUpdate
 {
   @IsMongoId()
@@ -14,10 +14,12 @@ export class UpdateCategoryDto
   })
   readonly id: string;
 
-  @IsMongoId({ each: true })
   @IsOptional()
+  @IsMongoId()
   @ApiProperty({
-    description: 'Parent category identifiers for the category',
+    description: 'Parent category identifier for the category',
+    nullable: true,
+    default: null,
   })
-  readonly parentIds: string[];
+  readonly parentId: string | null = null;
 }

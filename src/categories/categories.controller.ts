@@ -48,10 +48,9 @@ import { DropdownListDto } from '../common/dto/dropdown-list.dto';
 import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
-import {
-  PaginationData,
-  PaginationParsedQuery,
-} from '../common/interfaces/pagination.interface';
+import { PaginationData } from '../common/interfaces/pagination.interface';
+import { QueryWithPaginationParsed} from '../common/types/query.types';
+import { IQueryCategory } from './interfaces/query.interface';
 import { PaginationCategoryDto } from './dto/pagination-category.dto';
 import { CategoryWithFullParentsDto } from './dto/category-with-full-parents.dto';
 
@@ -69,12 +68,12 @@ export class CategoriesController {
   })
   @ApiNoAccessResponse()
   async getCategories(
-    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
+    @Query(ParsePaginationPipe) query: QueryWithPaginationParsed<IQueryCategory>,
   ): Promise<PaginationData<ICategory>> {
-    const { page, limit } = query;
+    const { page, limit, ...restQuery } = query;
 
     return this.categoriesService.getCategories(
-      {},
+      restQuery,
       {
         skip: page,
         limit: limit,
@@ -120,7 +119,7 @@ export class CategoriesController {
     type: CategoryWithFullParentsDto,
   })
   @ApiBadRequestResponse({
-    description: ERROR.CATEGORY_NOT_CREATED_WRONG_PARENT_IDS,
+    description: ERROR.CATEGORY_NOT_CREATED_WRONG_PARENT_ID,
     type: HttpErrorDto,
   })
   @ApiBadRequestResponse({

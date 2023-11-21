@@ -6,13 +6,12 @@ import {
 import { CategoryDto } from './category.dto';
 
 export class CategoryWithFullParentsDto
-  extends OmitType(CategoryDto, ['parentIds'] as const)
+  extends OmitType(CategoryDto, ['parentIdsHierarchy'] as const)
   implements ICategoryWithFullParentsDto
 {
   @ApiProperty({
     type: [CategoryDto],
-    description: 'Parent categorise with full data',
-    nullable: true,
+    description: 'Parent categories with full data in hierarchy order',
     default: [],
   })
   readonly parents: ICategory[] = [];

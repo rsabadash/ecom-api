@@ -17,10 +17,8 @@ import {
 import { SuppliesService } from './supplies.service';
 import { ISupply } from './interfaces/supplies.interfaces';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
-import {
-  PaginationData,
-  PaginationParsedQuery,
-} from '../common/interfaces/pagination.interface';
+import { PaginationData } from '../common/interfaces/pagination.interface';
+import { QueryWithPaginationParsed } from '../common/types/query.types';
 import { SUPPLY_ID_PARAM } from './constants/param.constants';
 import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
@@ -44,7 +42,7 @@ export class SuppliesController {
   })
   @ApiNoAccessResponse()
   async getSupplies(
-    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
+    @Query(ParsePaginationPipe) query: QueryWithPaginationParsed,
   ): Promise<PaginationData<ISupply>> {
     const { page, limit } = query;
 

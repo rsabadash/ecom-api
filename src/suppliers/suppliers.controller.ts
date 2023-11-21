@@ -42,10 +42,8 @@ import { DropdownListDto } from '../common/dto/dropdown-list.dto';
 import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
-import {
-  PaginationData,
-  PaginationParsedQuery,
-} from '../common/interfaces/pagination.interface';
+import { PaginationData } from '../common/interfaces/pagination.interface';
+import { QueryWithPaginationParsed } from '../common/types/query.types';
 import { PaginationSupplierDto } from './dto/pagination-supplier.dto';
 
 @Roles(Role.Admin)
@@ -62,7 +60,7 @@ export class SuppliersController {
   })
   @ApiNoAccessResponse()
   async getSuppliers(
-    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
+    @Query(ParsePaginationPipe) query: QueryWithPaginationParsed,
   ): Promise<PaginationData<ISupplier>> {
     const { page, limit } = query;
 

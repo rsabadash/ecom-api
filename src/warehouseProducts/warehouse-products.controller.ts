@@ -20,10 +20,8 @@ import { DROPDOWN_LIST_PATH } from '../common/constants/path.constants';
 import { DropdownListDto } from '../common/dto/dropdown-list.dto';
 import { Language } from '../common/types/i18n.types';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
-import {
-  PaginationData,
-  PaginationParsedQuery,
-} from '../common/interfaces/pagination.interface';
+import { PaginationData } from '../common/interfaces/pagination.interface';
+import { QueryWithPaginationParsed } from '../common/types/query.types';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
 import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message';
@@ -45,7 +43,7 @@ export class WarehouseProductsController {
   })
   @ApiNoAccessResponse()
   async getWarehouseProducts(
-    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
+    @Query(ParsePaginationPipe) query: QueryWithPaginationParsed,
   ): Promise<PaginationData<IWarehouseProduct>> {
     const { page, limit } = query;
 
