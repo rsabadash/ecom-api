@@ -235,10 +235,11 @@ export class CategoriesService {
   }
 
   async updateCategory(updateCategory: ICategoryUpdate): Promise<void> {
-    const { parentId: newParentId, id: currentCategoryId } = updateCategory;
+    const { parentId: newParentId, id: currentCategoryId, ...restUpdateCategoryValues } = updateCategory;
+    const currentCategoryObjectId = new ObjectId(currentCategoryId);
 
     const category = await this.categoryCollection.findOne({
-      _id: new ObjectId(currentCategoryId),
+      _id: currentCategoryObjectId,
     });
 
     if (!category) {
@@ -257,9 +258,11 @@ export class CategoriesService {
     // if new parentId potentially has to be changed and current direct parentId is not equal to the new one
     if (directCurrentParentId !== newParentId) {
       if (newParentId) {
+        const newParentObjectId = new ObjectId(newParentId);
+
         // check if new parent is not a child of the current category
         const isNewParentAsChild = await this.categoryCollection.findOne({
-          _id: new ObjectId(newParentId),
+          _id: newParentObjectId,
           parentIdsHierarchy: currentCategoryId,
         });
 
@@ -267,7 +270,7 @@ export class CategoriesService {
           throw new BadRequestException('You have selected as a parent category the one that is a child for the current category');
         }
 
-        parent = await this.categoryCollection.findOne({ _id: new ObjectId(newParentId) });
+        parent = await this.categoryCollection.findOne({ _id: newParentObjectId });
 
         if (!parent) {
           throw new BadRequestException(`${ERROR.CATEGORY_NOT_CREATED_WRONG_PARENT_ID} (${newParentId})`);
@@ -275,7 +278,7 @@ export class CategoriesService {
 
         // add to the new direct parent the current category as a child
         const updateNewParentResult = await this.categoryCollection.updateWithOperator(
-            { _id: new ObjectId(newParentId) },
+            { _id: newParentObjectId },
             { $push: { childrenIds: currentCategoryId } },
         );
 
@@ -330,7 +333,7 @@ export class CategoriesService {
         // if no direct parent id for the category it means that category was a direct parent for other categories
         // or direct parent for the current category was removed
         await this.categoryCollection.updateMany(
-    { $or: [ { 'parentIdsHierarchy.0': currentCategoryId }, { _id: new ObjectId(currentCategoryId) } ] },
+    { $or: [ { 'parentIdsHierarchy.0': currentCategoryId }, { _id: currentCategoryObjectId } ] },
   [
             { $set: { parentIdsHierarchy: { $concatArrays: [ newFulHierarchy, '$parentIdsHierarchy' ] } } },
           ],
@@ -338,7 +341,14 @@ export class CategoriesService {
       }
     }
 
+    const updateResult = await this.categoryCollection.updateOne(
+        { _id: currentCategoryObjectId },
+        restUpdateCategoryValues,
+    );
 
+    if (!updateResult.isUpdated && !updateResult.isFound) {
+      throw new GoneException(ERROR.CATEGORY_NOT_UPDATED);
+    }
   }
 
   async deleteCategory(deleteCategory: ICategoryDelete): Promise<void> {
