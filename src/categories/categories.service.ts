@@ -65,18 +65,25 @@ export class CategoriesService {
   ): Promise<PaginationData<ICategory>> {
     const { skip, limit } = options;
 
-    let pipelineMatchQuery: IQueryPipelineCategory = {};
+    let pipelineMatchQuery: IQueryPipelineCategory = {
+      '$and': [],
+    };
 
     if (query.parentIds) {
       if (query.parentIds === 'root') {
-        pipelineMatchQuery.parentIdsHierarchy = [];
+        pipelineMatchQuery.$and.push({ parentIdsHierarchy: [] });
       }
     }
 
     if (query.ids) {
       const objectIdIds = query.ids.split(',').map((id) => new ObjectId(id));
 
-      pipelineMatchQuery._id = { '$in': objectIdIds };
+      pipelineMatchQuery.$and.push({ _id: { '$in': objectIdIds } });
+    }
+
+    // if no query specified, get all items
+    if (pipelineMatchQuery.$and.length < 1) {
+      pipelineMatchQuery.$and.push({});
     }
 
     const pipeline = getPaginationPipeline<IQueryPipelineCategory>({

@@ -5,7 +5,10 @@ export interface IQueryCategory {
     parentIds?: 'root';
 }
 
+type QueryPipelineCategoryItem =
+    { _id?: ObjectId | { $in: ObjectId[] } } |
+    { parentIdsHierarchy?: string | [] };
+
 export interface IQueryPipelineCategory {
-    _id?: ObjectId | { $in: ObjectId[] };
-    parentIdsHierarchy?: string | [];
+    $and: QueryPipelineCategoryItem[];
 }
