@@ -291,7 +291,7 @@ export class CategoriesService {
         // remove from previous direct parent the current category as a child
         const updateOldParentResult = await this.categoryCollection.updateWithOperator(
             { _id: new ObjectId(directCurrentParentId) },
-            { $pull: { childrenIds: { $in: [currentCategoryId] } } },
+            { $pull: { childrenIds: currentCategoryId } },
         );
 
         if (!updateOldParentResult.isUpdated) {
@@ -352,17 +352,44 @@ export class CategoriesService {
   }
 
   async deleteCategory(deleteCategory: ICategoryDelete): Promise<void> {
+    const { id: deleteCategoryId } = deleteCategory;
+    const deleteCategoryObjectId = new ObjectId(deleteCategoryId);
+
+    const category = await this.categoryCollection.findOne({
+      _id: deleteCategoryObjectId,
+    });
+
+    if (!category) {
+      throw new EntityNotFoundException(ERROR.CATEGORY_NOT_FOUND);
+    }
+
     const session = this.client.startSession();
+
+    const { parentIdsHierarchy: parentCurrentIdsHierarchy, childrenIds: childrenCurrentIds } = category;
+    const hasCurrentParentIds = parentCurrentIdsHierarchy.length > 0;
+    const hasCurrentChildrenIds = childrenCurrentIds.length > 0;
+
+    // direct parent id always the last in hierarchy (index 0 - highest parent, last index - lowest (direct) parent)
+    const directCurrentParentId: string | null = hasCurrentParentIds ? parentCurrentIdsHierarchy[parentCurrentIdsHierarchy.length - 1] : null;
 
     try {
       await session.withTransaction(async () => {
-        await this.categoryCollection.deleteOne({
-          _id: new ObjectId(deleteCategory.id),
-        });
+        if (directCurrentParentId && hasCurrentChildrenIds) {
+          // direct parent of the category that will be deleted becomes a direct parent to children of the deleted category
+          // children should be re-assigned from deleted to the new direct parent category
+          await this.categoryCollection.updateWithOperator({
+            _id: new ObjectId(directCurrentParentId),
+          }, {
+            $push: { childrenIds: { $each: childrenCurrentIds } },
+          });
+        }
 
+        await this.categoryCollection.deleteOne({ _id: deleteCategoryObjectId });
+
+        // find and remove the category id that will be deleted in all parentIdsHierarchy or childrenIds
         await this.categoryCollection.updateMany(
-          { parentIds: { $in: [deleteCategory.id] } },
-          { $pull: { parentIds: deleteCategory.id } },
+          { $or: [ { 'parentIdsHierarchy': deleteCategory.id }, { childrenIds: deleteCategory.id } ] },
+          { $pull: { parentIdsHierarchy: deleteCategory.id, childrenIds: deleteCategory.id } },
         );
       });
     } finally {
