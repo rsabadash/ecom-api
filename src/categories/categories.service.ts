@@ -313,9 +313,15 @@ export class CategoriesService {
       const newParentHierarchy = parent?.parentIdsHierarchy || [];
       const newFulHierarchy = newParentId ? [...newParentHierarchy, newParentId] : newParentHierarchy;
 
-      if (directCurrentParentId) {
+      if (directCurrentParentId ) {
+        // add new hierarchy to all items that contain directCurrentParentId in parentIdsHierarchy
+        const filter = newParentId
+          // but not to the new direct parent itself
+          ? { _id: { $not: { $eq: new ObjectId(newParentId) } }, 'parentIdsHierarchy': directCurrentParentId }
+          : { 'parentIdsHierarchy': directCurrentParentId };
+
         await this.categoryCollection.updateMany(
-          { 'parentIdsHierarchy': directCurrentParentId },
+            filter,
           [
             { $set: {
               parentIdsHierarchy: {
