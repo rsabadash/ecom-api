@@ -1,8 +1,8 @@
 export const ERROR = {
   CATEGORY_NOT_FOUND: 'Category has not been found',
   CATEGORY_NOT_CREATED: 'Category has not been created',
-  CATEGORY_NOT_CREATED_WRONG_PARENT_IDS:
-    'Category has not been created. Wrong parent ids for the category',
+  CATEGORY_NOT_CREATED_WRONG_PARENT_ID:
+    'Category has not been created. Wrong parent id for the category',
   CATEGORY_NOT_UPDATED: 'Category has not been updated',
 };
 

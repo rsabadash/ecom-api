@@ -49,9 +49,15 @@ export class CategoryDto implements ICategoryDto {
 
   @IsMongoId({ each: true })
   @ApiProperty({
-    description: 'Parent category identifiers for the category',
-    nullable: true,
+    description: 'Children category identifiers for the category',
     default: [],
   })
-  readonly parentIds: string[] = [];
+  readonly childrenIds: string[] = [];
+
+  @IsMongoId({ each: true })
+  @ApiProperty({
+    description: 'Parent category identifiers of the category in hierarchy order (index 0 - highest parent, last index - lowest parent)',
+    default: [],
+  })
+  readonly parentIdsHierarchy: string[] = [];
 }

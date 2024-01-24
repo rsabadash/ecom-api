@@ -6,15 +6,16 @@ export interface ICategory {
   name: Translations;
   seoName: string;
   isActive: boolean;
-  parentIds: string[];
-}
-
-export interface ICategoryWithFullParents extends Omit<ICategory, 'parentIds'> {
-  parents: ICategory[];
+  childrenIds: string[];
+  parentIdsHierarchy: string[];
 }
 
 export interface ICategoryDto extends Omit<ICategory, '_id'> {
   _id: string;
+}
+
+export interface ICategoryWithFullParents extends Omit<ICategory, 'parentIdsHierarchy'> {
+  parents: ICategory[];
 }
 
 export interface ICategoryWithFullParentsDto
@@ -22,12 +23,13 @@ export interface ICategoryWithFullParentsDto
   _id: string;
 }
 
-export interface ICategoryCreate extends Omit<ICategory, '_id' | 'parentIds'> {
-  parentIds: string[];
+export interface ICategoryCreate extends Omit<ICategory, '_id' | 'childrenIds' | 'parentIdsHierarchy'> {
+  parentId: string | null;
 }
 
-export interface ICategoryUpdate extends Partial<ICategory> {
+export interface ICategoryUpdate extends Partial<Omit<ICategory, '_id' | 'childrenIds' | 'parentIdsHierarchy'>> {
   id: string;
+  parentId: string | null;
 }
 
 export interface ICategoryDelete {

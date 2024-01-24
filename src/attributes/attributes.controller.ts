@@ -53,10 +53,8 @@ import { IVariantWithAttribute } from './interfaces/variant-with-attribute.inter
 import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
-import {
-  PaginationData,
-  PaginationParsedQuery,
-} from '../common/interfaces/pagination.interface';
+import { PaginationData } from '../common/interfaces/pagination.interface';
+import { QueryWithPaginationParsed } from '../common/types/query.types';
 import { PaginationAttributeDto } from './dto/pagination-attribute.dto';
 import { PaginationVariantWithAttributeDto } from './dto/pagination-variant-with-attribute.dto';
 
@@ -74,7 +72,7 @@ export class AttributesController {
   })
   @ApiNoAccessResponse()
   async getAttributes(
-    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
+    @Query(ParsePaginationPipe) query: QueryWithPaginationParsed,
   ): Promise<PaginationData<IAttribute>> {
     const { page, limit } = query;
 
@@ -94,7 +92,7 @@ export class AttributesController {
   })
   @ApiNoAccessResponse()
   async getVariants(
-    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
+    @Query(ParsePaginationPipe) query: QueryWithPaginationParsed,
   ): Promise<PaginationData<IVariantWithAttribute>> {
     const { page, limit } = query;
 
