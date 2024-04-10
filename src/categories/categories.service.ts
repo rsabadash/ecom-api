@@ -174,12 +174,11 @@ export class CategoriesService {
 
   async createCategory(
     createCategory: ICategoryCreate,
-  ): Promise<ICategoryWithFullParents> {
+  ): Promise<ICategoryWithFullParents | void> {
     let parent: ICategory | null = null;
     const { parentId, ...restCreateCategory } = createCategory;
 
     if (parentId) {
-      // check if parent category exists
       parent = await this.categoryCollection.findOne({ _id: new ObjectId(parentId) });
 
       if (!parent) {
@@ -188,7 +187,7 @@ export class CategoriesService {
     }
 
     const higherParentIds = parent ? parent.parentIdsHierarchy : [];
-    // add all parent ids from the direct parent to the category to keep hierarchy
+    // add all hierarchy ids from parent to the category
     const newParentIdsHierarchy = parentId ? [...higherParentIds, parentId] : [];
 
     const newCategoryData: Omit<ICategory, '_id'> = {
@@ -197,48 +196,58 @@ export class CategoriesService {
       parentIdsHierarchy: newParentIdsHierarchy,
     };
 
-    const newCategory = await this.categoryCollection.create(newCategoryData);
+    const session = this.client.startSession();
 
-    if (!newCategory) {
-      throw new BadRequestException(ERROR.CATEGORY_NOT_CREATED);
+    try {
+      await session.withTransaction(async () => {
+        const newCategory = await this.categoryCollection.create(newCategoryData, { session });
+
+        if (!newCategory) {
+          throw new BadRequestException(ERROR.CATEGORY_NOT_CREATED);
+        }
+
+        if (parent) {
+          // add the new category as a child to the direct parent
+          const updatedFields: Partial<ICategory> = {
+            childrenIds: [...parent.childrenIds, newCategory._id.toString()],
+          };
+
+          const updateResult = await this.categoryCollection.updateWithOperator(
+              { _id: new ObjectId(parent._id) },
+              { $set: updatedFields },
+              { session },
+          );
+
+          // TODO update error
+          if (!updateResult.isUpdated) {
+            throw new GoneException(ERROR.CATEGORY_NOT_UPDATED);
+          }
+        }
+
+        const { _id, name, seoName, isActive, childrenIds } = newCategory;
+
+        const parents: ICategory[] = parent
+            ? [{
+              ...parent,
+              childrenIds: [
+                ...parent.childrenIds,
+                _id.toString()
+              ]
+            }]
+            : [];
+
+        return {
+          _id,
+          name,
+          seoName,
+          parents,
+          isActive,
+          childrenIds,
+        };
+      });
+    } finally {
+      await session.endSession();
     }
-
-    if (parent) {
-      // add the new category as a child to the direct parent
-      const updatedFields: Partial<ICategory> = {
-        childrenIds: [...parent.childrenIds, newCategory._id.toString()],
-      };
-
-      const updateResult = await this.categoryCollection.updateOne(
-        { _id: new ObjectId(parent._id) },
-        updatedFields,
-      );
-
-      // TODO update error
-      if (!updateResult.isUpdated) {
-        throw new GoneException(ERROR.CATEGORY_NOT_UPDATED);
-      }
-    }
-
-    const { _id, name, seoName, isActive, childrenIds } = newCategory;
-    const parents: ICategory[] = parent
-        ? [{
-            ...parent,
-            childrenIds: [
-              ...parent.childrenIds,
-              _id.toString()
-            ]
-          }]
-        : [];
-
-    return {
-      _id,
-      name,
-      seoName,
-      parents,
-      isActive,
-      childrenIds,
-    };
   }
 
   async updateCategory(updateCategory: ICategoryUpdate): Promise<void> {
@@ -397,12 +406,13 @@ export class CategoriesService {
           });
         }
 
-        await this.categoryCollection.deleteOne({ _id: deleteCategoryObjectId });
+        await this.categoryCollection.deleteOne({ _id: deleteCategoryObjectId }, { session });
 
         // find and remove the category id that will be deleted in all parentIdsHierarchy or childrenIds
         await this.categoryCollection.updateMany(
           { $or: [ { 'parentIdsHierarchy': deleteCategory.id }, { childrenIds: deleteCategory.id } ] },
           { $pull: { parentIdsHierarchy: deleteCategory.id, childrenIds: deleteCategory.id } },
+            { session },
         );
       });
     } finally {

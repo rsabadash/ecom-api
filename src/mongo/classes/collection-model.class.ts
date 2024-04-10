@@ -1,12 +1,12 @@
 import {
   AggregateOptions,
   BulkWriteOptions,
-  Collection,
+  Collection, DeleteOptions,
   Filter,
   InsertOneOptions,
   OptionalId,
   OptionalUnlessRequiredId,
-  UpdateFilter,
+  UpdateFilter, UpdateOptions, UpdateResult,
 } from 'mongodb';
 import { Document } from 'bson';
 import {
@@ -73,8 +73,9 @@ export class CollectionModel<CollectionEntity extends Document>
   async updateWithOperator(
     entityQuery: PartialEntity<CollectionEntity>,
     filter: UpdateFilter<CollectionEntity>,
+    options: UpdateOptions,
   ): Promise<UpdateOneResult> {
-    const updatedEntity = await this.collection.updateOne(entityQuery, filter);
+    const updatedEntity = await this.collection.updateOne(entityQuery, filter, options);
 
     return {
       isFound: updatedEntity.matchedCount > 0,
@@ -85,8 +86,9 @@ export class CollectionModel<CollectionEntity extends Document>
   async updateMany(
     filter: Filter<CollectionEntity>,
     update: UpdateFilter<CollectionEntity>,
-  ) {
-    return this.collection.updateMany(filter, update);
+    options: UpdateOptions,
+  ): Promise<UpdateResult | Document> {
+    return this.collection.updateMany(filter, update, options);
   }
 
   async removeField(
@@ -150,8 +152,9 @@ export class CollectionModel<CollectionEntity extends Document>
 
   async deleteOne(
     entityQuery: PartialEntity<CollectionEntity>,
+    options: DeleteOptions,
   ): Promise<DeleteOneResult> {
-    const deletedEntity = await this.collection.deleteOne(entityQuery);
+    const deletedEntity = await this.collection.deleteOne(entityQuery, options);
 
     return {
       isDeleted: deletedEntity.deletedCount > 0,
