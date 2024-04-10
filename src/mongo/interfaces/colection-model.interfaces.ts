@@ -1,11 +1,11 @@
 import {
   AggregateOptions,
   BulkWriteOptions,
-  Collection, DeleteOptions,
+  Collection,
   Filter,
   InsertOneOptions,
   OptionalId,
-  UpdateFilter, UpdateOptions, UpdateResult,
+  UpdateFilter,
 } from 'mongodb';
 import { Document } from 'bson';
 import {
@@ -50,15 +50,16 @@ export interface ICollectionModel<Entity extends Document> {
 
   updateWithOperator(
     entityQuery: PartialEntity<Entity>,
-    filter: UpdateFilter<Entity>,
-    options?: UpdateOptions,
+    options: UpdateFilter<Entity>,
   ): Promise<UpdateOneResult>;
 
-  updateMany(
-      filter: Filter<Entity>,
-      update: UpdateFilter<Entity>,
-      options?: UpdateOptions
-  ): Promise<UpdateResult | Document>;
+  updateMany(filter: Filter<Entity>, update: UpdateFilter<Entity>);
+
+  // updateOneArray(
+  //   entityQuery: PartialEntity<Entity>,
+  //   updateData: PartialEntityUpdateArray<Entity>,
+  //   options: UpdateOneArrayOptions,
+  // ): Promise<EntityWithId<Entity> | null>;
 
   removeField(
     entityQuery: PartialEntity<Entity>,
@@ -79,10 +80,7 @@ export interface ICollectionModel<Entity extends Document> {
     entity: OptionalId<Entity>[],
   ): Promise<EntityWithId<Entity>[] | null>;
 
-  deleteOne(
-    entityQuery: PartialEntity<Entity>,
-    options?: DeleteOptions,
-  ): Promise<DeleteOneResult>;
+  deleteOne(entityQuery: PartialEntity<Entity>): Promise<DeleteOneResult>;
 
   aggregate<Result>(
     pipeline: Pipeline,

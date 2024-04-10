@@ -129,7 +129,7 @@ export class CategoriesController {
   @ApiNoAccessResponse()
   async createCategory(
     @Body() createCategoryDto: CreateCategoryDto,
-  ): Promise<ICategoryWithFullParents | void> {
+  ): Promise<ICategoryWithFullParents> {
     return this.categoriesService.createCategory(createCategoryDto);
   }
 
