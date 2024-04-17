@@ -20,14 +20,12 @@ export class SupplyProductDto implements ISupplyProduct {
   })
   readonly productId: string;
 
-  @ValidateNested()
-  @IsNotEmptyObject()
-  @Type(() => TranslationsDto)
+  @IsString()
+  @IsNotEmpty()
   @ApiProperty({
-    type: TranslationsDto,
-    description: 'Product translations',
+    description: 'Product name',
   })
-  readonly productName: Translations;
+  readonly productName: string;
 
   @IsString()
   @IsNotEmpty()

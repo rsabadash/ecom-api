@@ -2,19 +2,19 @@ import { IsMongoId, IsNotEmptyObject, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  IWarehouseProductAttribute,
-  IWarehouseProductVariant,
-} from '../interfaces/warehouse-products.interfaces';
+  IProductAttribute,
+  IProductVariant,
+} from '../interfaces/products.interfaces';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
-import { VariantWarehouseProductDto } from './variant-warehouse-product.dto';
+import { VariantProductDto } from './variant-product.dto';
 
-export class AttributeWarehouseProductDto
-  implements IWarehouseProductAttribute
+export class AttributeProductDto
+  implements IProductAttribute
 {
   @IsMongoId()
   @ApiProperty({
-    description: 'Identifier of attribute related to warehouse product',
+    description: 'Identifier of attribute related to product',
   })
   readonly attributeId: string;
 
@@ -23,15 +23,15 @@ export class AttributeWarehouseProductDto
   @Type(() => TranslationsDto)
   @ApiProperty({
     type: TranslationsDto,
-    description: 'Warehouse product attribute translations',
+    description: 'Product attribute translations',
   })
   readonly name: Translations;
 
   @ValidateNested({ each: true })
-  @Type(() => VariantWarehouseProductDto)
+  @Type(() => VariantProductDto)
   @ApiProperty({
-    type: [VariantWarehouseProductDto],
-    description: 'Variants for warehouse product',
+    type: [VariantProductDto],
+    description: 'Variants for product',
   })
-  readonly variants: IWarehouseProductVariant[];
+  readonly variants: IProductVariant[];
 }

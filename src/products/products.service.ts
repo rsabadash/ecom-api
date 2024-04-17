@@ -1,15 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { BulkWriteOptions, BulkWriteResult, ObjectId } from 'mongodb';
 import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
-import { WAREHOUSE_PRODUCTS_COLLECTION } from '../common/constants/collections.constants';
+import { PRODUCTS_COLLECTION } from '../common/constants/collections.constants';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
 import {
-  IWarehouseProductCreate,
-  INewWarehouseProduct,
-  IWarehouseProduct,
-  IWarehouseProductAttribute,
-  IWarehouseProductVariant,
-} from './interfaces/warehouse-products.interfaces';
+  IProductCreate,
+  INewProduct,
+  IProduct,
+  IProductAttribute,
+  IProductVariant,
+} from './interfaces/products.interfaces';
 import { AttributesService } from '../attributes/attributes.service';
 import {
   FindEntityOptions,
@@ -24,15 +24,15 @@ import { getPaginationPipeline } from '../common/utils/getPaginationPipeline';
 import { ERROR } from './constants/message';
 
 @Injectable()
-export class WarehouseProductsService {
+export class ProductsService {
   constructor(
-    @InjectCollectionModel(WAREHOUSE_PRODUCTS_COLLECTION)
-    private readonly warehouseProductCollection: ICollectionModel<IWarehouseProduct>,
+    @InjectCollectionModel(PRODUCTS_COLLECTION)
+    private readonly productCollection: ICollectionModel<IProduct>,
     private readonly attributesService: AttributesService,
   ) {}
 
   private getAttributeIds(
-    products: IWarehouseProductCreate[],
+    products: IProductCreate[],
   ): null | ObjectId[] {
     if (products.length > 0 && products[0].attributes) {
       return products[0].attributes.map(
@@ -43,10 +43,10 @@ export class WarehouseProductsService {
     return null;
   }
 
-  private async createWarehouseProductsWithAttributes(
-    products: IWarehouseProductCreate[],
+  private async createProductsWithAttributes(
+    products: IProductCreate[],
     attributeIds: ObjectId[],
-  ): Promise<IWarehouseProduct[] | null> {
+  ): Promise<IProduct[] | null> {
     const currentDate = new Date();
 
     const attributes = await this.attributesService.getAttributes2(
@@ -56,24 +56,24 @@ export class WarehouseProductsService {
       { projection: { name: 1, variants: { name: 1, variantId: 1 } } },
     );
 
-    const newProducts = products.reduce<INewWarehouseProduct[]>(
+    const newProducts = products.reduce<INewProduct[]>(
       (acc, product) => {
-        const { attributes: warehouseProductAttributes, ...restProductValues } =
+        const { attributes: newProductAttributes, ...restProductValues } =
           product;
 
-        const productAttributes: IWarehouseProductAttribute[] = [];
+        const productAttributes: IProductAttribute[] = [];
 
         if (
-          warehouseProductAttributes &&
-          warehouseProductAttributes?.length > 0
+          newProductAttributes &&
+          newProductAttributes?.length > 0
         ) {
-          warehouseProductAttributes.map((productAttribute) => {
+          newProductAttributes.map((productAttribute) => {
             const foundAttribute = attributes.find(
               (attribute) =>
                 attribute._id.toString() === productAttribute.attributeId,
             );
 
-            const productVariants: IWarehouseProductVariant[] = [];
+            const productVariants: IProductVariant[] = [];
 
             if (
               foundAttribute &&
@@ -104,7 +104,7 @@ export class WarehouseProductsService {
           });
         }
 
-        const updatedProduct: INewWarehouseProduct = {
+        const updatedProduct: INewProduct = {
           ...restProductValues,
           attributes: productAttributes,
           createdAt: currentDate,
@@ -120,16 +120,16 @@ export class WarehouseProductsService {
       [],
     );
 
-    return this.warehouseProductCollection.createMany(newProducts);
+    return this.productCollection.createMany(newProducts);
   }
 
-  async getWarehouseProducts(
-    query: PartialEntity<IWarehouseProduct> = {},
-    options: FindEntityOptions<IWarehouseProduct> = {},
-  ): Promise<PaginationData<IWarehouseProduct>> {
+  async getProducts(
+    query: PartialEntity<IProduct> = {},
+    options: FindEntityOptions<IProduct> = {},
+  ): Promise<PaginationData<IProduct>> {
     const { skip, limit } = options;
 
-    const pipeline = getPaginationPipeline<IWarehouseProduct>({
+    const pipeline = getPaginationPipeline<IProduct>({
       query,
       filter: {
         skip,
@@ -137,38 +137,34 @@ export class WarehouseProductsService {
       },
     });
 
-    const paginatedData = await this.warehouseProductCollection.aggregate<
-      PaginationData<IWarehouseProduct>
+    const paginatedData = await this.productCollection.aggregate<
+      PaginationData<IProduct>
     >(pipeline);
 
     return paginatedData[0];
   }
 
-  async getWarehouseProductsDropdownList(
-    language: Language,
-  ): Promise<DropdownListItem[]> {
-    const warehouseProducts = await this.warehouseProductCollection.find();
+  async getProductsDropdownList(): Promise<DropdownListItem[]> {
+    const products = await this.productCollection.find();
 
-    return warehouseProducts.map((warehouseProduct) => {
+    return products.map((product) => {
       return {
-        id: warehouseProduct._id.toString(),
-        value:
-          warehouseProduct.name[language] ||
-          warehouseProduct.name[DEFAULT_LANGUAGE],
+        id: product._id.toString(),
+        value: product.name,
         meta: {
-          unit: warehouseProduct.unit,
+          unit: product.unit,
         },
       };
     });
   }
 
-  private async createWarehouseProductWithoutAttributes(
-    products: IWarehouseProductCreate[],
-  ): Promise<IWarehouseProduct | null> {
+  private async createProductWithoutAttributes(
+    products: IProductCreate[],
+  ): Promise<IProduct | null> {
     const product = products[0];
     const currentDate = new Date();
 
-    return this.warehouseProductCollection.create({
+    return this.productCollection.create({
       ...product,
       attributes: [],
       createdAt: currentDate,
@@ -178,39 +174,39 @@ export class WarehouseProductsService {
     });
   }
 
-  async createWarehouseProducts(
-    createWarehouseProducts: IWarehouseProductCreate[],
-  ): Promise<IWarehouseProduct[]> {
-    const attributeIds = this.getAttributeIds(createWarehouseProducts);
+  async createProducts(
+    createProducts: IProductCreate[],
+  ): Promise<IProduct[]> {
+    const attributeIds = this.getAttributeIds(createProducts);
 
     if (attributeIds) {
-      const newProducts = await this.createWarehouseProductsWithAttributes(
-        createWarehouseProducts,
+      const newProducts = await this.createProductsWithAttributes(
+        createProducts,
         attributeIds,
       );
 
       if (!newProducts) {
-        throw new BadRequestException(ERROR.WAREHOUSE_PRODUCTS_NOT_CREATED);
+        throw new BadRequestException(ERROR.PRODUCTS_NOT_CREATED);
       }
 
       return newProducts;
     }
 
-    const newProduct = await this.createWarehouseProductWithoutAttributes(
-      createWarehouseProducts,
+    const newProduct = await this.createProductWithoutAttributes(
+      createProducts,
     );
 
     if (!newProduct) {
-      throw new BadRequestException(ERROR.WAREHOUSE_PRODUCTS_NOT_CREATED);
+      throw new BadRequestException(ERROR.PRODUCTS_NOT_CREATED);
     }
 
     return [newProduct];
   }
 
   async bulkWrite(
-    operations: BulkOperations<IWarehouseProduct>[],
+    operations: BulkOperations<IProduct>[],
     options: BulkWriteOptions,
   ): Promise<BulkWriteResult> {
-    return this.warehouseProductCollection.bulkWrite(operations, options);
+    return this.productCollection.bulkWrite(operations, options);
   }
 }

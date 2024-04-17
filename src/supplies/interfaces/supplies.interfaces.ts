@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { IWarehouseProductWarehouses } from '../../warehouseProducts/interfaces/warehouse-products.interfaces';
+import { IProductWarehouses } from '../../products/interfaces/products.interfaces';
 import { Translations } from '../../common/types/i18n.types';
 import {
   ATTRIBUTE_IDS,
@@ -25,7 +25,7 @@ export interface ISupplyDto extends Omit<ISupply, '_id'> {
 
 export interface ISupplyProduct {
   [WAREHOUSE_PRODUCT_ID]: string;
-  productName: Translations;
+  productName: string;
   quantity: string;
   price: string;
   totalCost: string;
@@ -55,7 +55,7 @@ export interface BulkUpdateFilter {
     update: {
       $set: {
         supplyIds: string[];
-        warehouses: IWarehouseProductWarehouses[];
+        warehouses: IProductWarehouses[];
       };
     };
   };

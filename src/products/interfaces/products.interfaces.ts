@@ -8,41 +8,41 @@ import {
   WAREHOUSE_ID,
 } from '../../common/constants/cross-entity-id.constants';
 
-export interface IWarehouseProductVariant {
+export interface IProductVariant {
   [VARIANT_ID]: string;
   name: Translations;
 }
 
-export interface IWarehouseProductAttribute {
+export interface IProductAttribute {
   [ATTRIBUTE_ID]: string;
   name: Translations;
-  variants: IWarehouseProductVariant[];
+  variants: IProductVariant[];
 }
 
-export interface IWarehouseProductWarehouses {
+export interface IProductWarehouses {
   [WAREHOUSE_ID]: string;
   totalQuantity: string | null;
 }
 
-export interface IWarehouseProduct {
+export interface IProduct {
   _id: ObjectId;
-  name: Translations;
+  name: string;
   sku: string;
   unit: Unit;
-  attributes: IWarehouseProductAttribute[];
+  attributes: IProductAttribute[];
   createdAt: Date;
   [SUPPLY_IDS]: string[];
-  warehouses: IWarehouseProductWarehouses[];
+  warehouses: IProductWarehouses[];
   isDeleted: boolean;
 }
 
-export interface IWarehouseProductDto extends Omit<IWarehouseProduct, '_id'> {
+export interface IProductDto extends Omit<IProduct, '_id'> {
   _id: string;
 }
 
-export interface IWarehouseProductCreate
+export interface IProductCreate
   extends Omit<
-    IWarehouseProduct,
+    IProduct,
     | '_id'
     | 'createdAt'
     | 'attributes'
@@ -50,7 +50,7 @@ export interface IWarehouseProductCreate
     | 'warehouses'
     | 'isDeleted'
   > {
-  attributes: null | Omit<IWarehouseProductAttribute, 'name'>[];
+  attributes: null | Omit<IProductAttribute, 'name'>[];
 }
 
-export interface INewWarehouseProduct extends Omit<IWarehouseProduct, '_id'> {}
+export interface INewProduct extends Omit<IProduct, '_id'> {}
