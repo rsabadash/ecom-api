@@ -1,14 +1,14 @@
 import { IsMongoId, IsNotEmptyObject, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IWarehouseProductVariant } from '../interfaces/warehouse-products.interfaces';
+import { IProductVariant } from '../interfaces/products.interfaces';
 import { TranslationsDto } from '../../common/dto/translations.dto';
 import { Translations } from '../../common/types/i18n.types';
 
-export class VariantWarehouseProductDto implements IWarehouseProductVariant {
+export class VariantProductDto implements IProductVariant {
   @IsMongoId()
   @ApiProperty({
-    description: 'Identifier of variant for warehouse product',
+    description: 'Identifier of variant for product',
   })
   readonly variantId: string;
 
@@ -17,7 +17,7 @@ export class VariantWarehouseProductDto implements IWarehouseProductVariant {
   @Type(() => TranslationsDto)
   @ApiProperty({
     type: TranslationsDto,
-    description: 'Warehouse product variant translations',
+    description: 'Product variant translations',
   })
   readonly name: Translations;
 }

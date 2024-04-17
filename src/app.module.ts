@@ -7,7 +7,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { AttributesModule } from './attributes/attributes.module';
 import { UsersModule } from './users/users.module';
 import { IamModule } from './iam/iam.module';
-import { WarehouseProductsModule } from './warehouseProducts/warehouse-products.module';
+import { ProductsModule } from './products/products.module';
 import { WarehousesModule } from './warehouses/warehouses.module';
 import { getEnvPath } from './common/utils/env.utils';
 
@@ -23,7 +23,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     AttributesModule,
     SuppliersModule,
     SuppliesModule,
-    WarehouseProductsModule,
+    ProductsModule,
     WarehousesModule,
   ],
 })

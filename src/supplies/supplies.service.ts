@@ -18,13 +18,13 @@ import {
   ISupplyProduct,
   ISupplyProductToCreate,
 } from './interfaces/supplies.interfaces';
-import { WarehouseProductsService } from '../warehouseProducts/warehouse-products.service';
+import { ProductsService } from '../products/products.service';
 import { MathService } from '../common/services/math.service';
 import { SuppliersService } from '../suppliers/suppliers.service';
 import {
-  IWarehouseProduct,
-  IWarehouseProductWarehouses,
-} from '../warehouseProducts/interfaces/warehouse-products.interfaces';
+  IProduct,
+  IProductWarehouses,
+} from '../products/interfaces/products.interfaces';
 import { BulkResult } from '../mongo/types/colection-model.types';
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
 import {
@@ -43,7 +43,7 @@ export class SuppliesService {
   constructor(
     @InjectCollectionModel(SUPPLIES_COLLECTION)
     private readonly supplyCollection: ICollectionModel<ISupply>,
-    private readonly warehouseProductsService: WarehouseProductsService,
+    private readonly productsService: ProductsService,
     private readonly suppliersService: SuppliersService,
     private readonly mathService: MathService,
     @InjectClients(CONNECTION_DB_NAME)
@@ -60,33 +60,33 @@ export class SuppliesService {
     this.client = client;
   }
 
-  private async getWarehouseProductsToAdd(
+  private async getProductsToAdd(
     products: ISupplyProductToCreate[],
-  ): Promise<IWarehouseProduct[]> {
+  ): Promise<IProduct[]> {
     const productToAddIds = products.map((product) => {
       return new ObjectId(product.productId);
     });
 
-    const warehouseProductsPagination =
-      await this.warehouseProductsService.getWarehouseProducts(
+    const productsPagination =
+      await this.productsService.getProducts(
         {
           _id: { $in: productToAddIds },
         },
         { skip: 0, limit: productToAddIds.length },
       );
 
-    return warehouseProductsPagination.data;
+    return productsPagination.data;
   }
 
   private addVariationsToSupplyProducts(
-    warehouseProducts: IWarehouseProduct[],
+    products: IProduct[],
     productsToAdd: ISupplyProductToCreate[],
   ): ISupplyProduct[] {
     const productsToSupplyCollection: ISupplyProduct[] = [];
 
-    warehouseProducts.forEach((warehouseProduct) => {
-      const productToSupply = productsToAdd.find((product) => {
-        return warehouseProduct._id.toString() === product.productId;
+    products.forEach((product) => {
+      const productToSupply = productsToAdd.find((productToAdd) => {
+        return product._id.toString() === productToAdd.productId;
       });
 
       if (productToSupply) {
@@ -94,13 +94,13 @@ export class SuppliesService {
         let productVariantIds: string[] = [];
 
         if (
-          warehouseProduct.attributes &&
-          warehouseProduct.attributes?.length > 0
+          product.attributes &&
+          product.attributes?.length > 0
         ) {
           const productAttributeIdsSet = new Set<string>();
           const productVariantIdsSet = new Set<string>();
 
-          warehouseProduct.attributes.forEach((attribute) => {
+          product.attributes.forEach((attribute) => {
             productAttributeIdsSet.add(attribute.attributeId);
 
             if (attribute.variants && attribute.variants.length > 0) {
@@ -116,7 +116,7 @@ export class SuppliesService {
 
         productsToSupplyCollection.push({
           ...productToSupply,
-          productName: warehouseProduct.name,
+          productName: product.name,
           attributeIds: productAttributeIds,
           variantIds: productVariantIds,
         });
@@ -126,28 +126,28 @@ export class SuppliesService {
     return productsToSupplyCollection;
   }
 
-  private updateWarehouseProductsList(
-    warehouseProducts: IWarehouseProduct[],
+  private updateProductsList(
+    products: IProduct[],
     productsToAdd: ISupplyProductToCreate[],
     warehouseIdToAdd: string,
     supplyIdToAdd: string,
-  ): IWarehouseProduct[] {
-    const updateWarehouseProductsList: IWarehouseProduct[] = [];
+  ): IProduct[] {
+    const updateProductsList: IProduct[] = [];
 
-    warehouseProducts.forEach((warehouseProduct) => {
-      const productToAdd = productsToAdd.find((product) => {
-        return warehouseProduct._id.toString() === product.productId;
+    products.forEach((product) => {
+      const productToAdd = productsToAdd.find((productToAdd) => {
+        return product._id.toString() === productToAdd.productId;
       });
 
-      const hasWarehouse = warehouseProduct.warehouses.some((warehouse) => {
+      const hasWarehouse = product.warehouses.some((warehouse) => {
         return warehouse.warehouseId === warehouseIdToAdd;
       });
 
       if (productToAdd) {
-        let updatedWarehouses: IWarehouseProductWarehouses[];
+        let updatedWarehouses: IProductWarehouses[];
 
         if (hasWarehouse) {
-          updatedWarehouses = warehouseProduct.warehouses.map((warehouse) => {
+          updatedWarehouses = product.warehouses.map((warehouse) => {
             if (warehouse.warehouseId === warehouseIdToAdd) {
               const newTotalQuantity = this.mathService.add(
                 warehouse.totalQuantity,
@@ -165,7 +165,7 @@ export class SuppliesService {
           });
         } else {
           updatedWarehouses = [
-            ...warehouseProduct.warehouses,
+            ...product.warehouses,
             {
               warehouseId: warehouseIdToAdd,
               totalQuantity: productToAdd.quantity,
@@ -174,27 +174,27 @@ export class SuppliesService {
         }
 
         const updatedSupplyIds =
-          warehouseProduct?.supplyIds?.length > 0
-            ? [...warehouseProduct.supplyIds, supplyIdToAdd]
+          product?.supplyIds?.length > 0
+            ? [...product.supplyIds, supplyIdToAdd]
             : [supplyIdToAdd];
 
-        updateWarehouseProductsList.push({
-          ...warehouseProduct,
+        updateProductsList.push({
+          ...product,
           warehouses: updatedWarehouses,
           supplyIds: updatedSupplyIds,
         });
       }
     });
 
-    return updateWarehouseProductsList;
+    return updateProductsList;
   }
 
-  private async bulkWarehouseProductsUpdate(
-    warehouseProductsToUpdate: IWarehouseProduct[],
+  private async bulkProductsUpdate(
+    productsToUpdate: IProduct[],
     options: BulkWriteOptions,
   ): Promise<BulkResult> {
     const preparedBulkUpdateFilter: BulkUpdateFilter[] =
-      warehouseProductsToUpdate.map(({ _id, supplyIds, warehouses }) => {
+      productsToUpdate.map(({ _id, supplyIds, warehouses }) => {
         return {
           updateOne: {
             filter: { _id },
@@ -208,7 +208,7 @@ export class SuppliesService {
         };
       });
 
-    return this.warehouseProductsService.bulkWrite(
+    return this.productsService.bulkWrite(
       preparedBulkUpdateFilter,
       options,
     );
@@ -251,15 +251,15 @@ export class SuppliesService {
     // TODO check duplication
     const productsToAdd: ISupplyProductToCreate[] = createSupply.products;
 
-    const warehouseProducts: IWarehouseProduct[] =
-      await this.getWarehouseProductsToAdd(productsToAdd);
+    const products: IProduct[] =
+      await this.getProductsToAdd(productsToAdd);
 
-    if (warehouseProducts.length < 1) {
+    if (products.length < 1) {
       throw new BadRequestException(ERROR.NO_PRODUCTS_FOUND);
     }
 
     const productsToSupplyWithVariations: ISupplyProduct[] =
-      this.addVariationsToSupplyProducts(warehouseProducts, productsToAdd);
+      this.addVariationsToSupplyProducts(products, productsToAdd);
 
     if (productsToSupplyWithVariations.length < 1) {
       throw new BadRequestException(ERROR.NO_PRODUCTS_TO_ADD);
@@ -284,20 +284,20 @@ export class SuppliesService {
           throw new BadRequestException(ERROR.SUPPLY_NOT_CREATED);
         }
 
-        const updatedWarehouseProducts: IWarehouseProduct[] =
-          this.updateWarehouseProductsList(
-            warehouseProducts,
+        const updatedProducts: IProduct[] =
+          this.updateProductsList(
+            products,
             productsToAdd,
             createSupply.warehouseId,
             newSupply._id.toString(),
           );
 
-        if (updatedWarehouseProducts.length < 1) {
+        if (updatedProducts.length < 1) {
           throw new BadRequestException(ERROR.NO_PRODUCTS_TO_UPDATE);
         }
 
-        const result = await this.bulkWarehouseProductsUpdate(
-          updatedWarehouseProducts,
+        const result = await this.bulkProductsUpdate(
+          updatedProducts,
           { session },
         );
 
