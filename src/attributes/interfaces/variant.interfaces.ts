@@ -1,4 +1,3 @@
-import { Translations } from '../../common/types/i18n.types';
 import {
   ATTRIBUTE_ID,
   VARIANT_ID,
@@ -7,7 +6,7 @@ import {
 export interface IVariant {
   [VARIANT_ID]: string;
   seoName: string;
-  name: Translations;
+  name: string;
   isActive: boolean;
 }
 

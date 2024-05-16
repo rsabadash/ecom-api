@@ -8,10 +8,9 @@ import {
 } from '../interfaces/products.interfaces';
 import { AttributeProductDto } from './attribute-product.dto';
 
-class AttributeProductCreateDto extends OmitType(
-  AttributeProductDto,
-  ['name'] as const,
-) {}
+class AttributeProductCreateDto extends OmitType(AttributeProductDto, [
+  'name',
+] as const) {}
 
 export class CreateProductDto
   extends OmitType(ProductDto, [

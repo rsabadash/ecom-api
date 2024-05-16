@@ -1,5 +1,4 @@
 import { ObjectId } from 'mongodb';
-import { Translations } from '../../common/types/i18n.types';
 import { Unit } from '../enums/unit.enums';
 import {
   ATTRIBUTE_ID,
@@ -10,12 +9,12 @@ import {
 
 export interface IProductVariant {
   [VARIANT_ID]: string;
-  name: Translations;
+  name: string;
 }
 
 export interface IProductAttribute {
   [ATTRIBUTE_ID]: string;
-  name: Translations;
+  name: string;
   variants: IProductVariant[];
 }
 

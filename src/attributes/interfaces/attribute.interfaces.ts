@@ -1,10 +1,9 @@
 import { ObjectId } from 'mongodb';
-import { Translations } from '../../common/types/i18n.types';
 import { IVariant } from './variant.interfaces';
 
 export interface IAttribute {
   _id: ObjectId;
-  name: Translations;
+  name: string;
   seoName: string;
   isActive: boolean;
   variants: IVariant[];

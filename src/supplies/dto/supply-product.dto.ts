@@ -1,17 +1,7 @@
-import {
-  IsMongoId,
-  IsNotEmpty,
-  IsNotEmptyObject,
-  IsString,
-  Matches,
-  ValidateNested,
-} from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsString, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ISupplyProduct } from '../interfaces/supplies.interfaces';
 import { DECIMAL_TWO_SIGN } from '../../common/constants/reg-exp.contants';
-import { Type } from 'class-transformer';
-import { TranslationsDto } from '../../common/dto/translations.dto';
-import { Translations } from '../../common/types/i18n.types';
 
 export class SupplyProductDto implements ISupplyProduct {
   @IsMongoId()

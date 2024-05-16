@@ -1,9 +1,6 @@
-import { IsMongoId, IsNotEmptyObject, ValidateNested } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import { IProductVariant } from '../interfaces/products.interfaces';
-import { TranslationsDto } from '../../common/dto/translations.dto';
-import { Translations } from '../../common/types/i18n.types';
 
 export class VariantProductDto implements IProductVariant {
   @IsMongoId()
@@ -12,12 +9,10 @@ export class VariantProductDto implements IProductVariant {
   })
   readonly variantId: string;
 
-  @ValidateNested()
-  @IsNotEmptyObject()
-  @Type(() => TranslationsDto)
+  @IsString()
+  @IsNotEmpty()
   @ApiProperty({
-    type: TranslationsDto,
-    description: 'Product variant translations',
+    description: 'Product variant name',
   })
-  readonly name: Translations;
+  readonly name: string;
 }

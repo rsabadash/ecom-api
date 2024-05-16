@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   HttpCode,
   HttpStatus,
   Param,
@@ -31,7 +30,6 @@ import {
 } from './constants/route.constants';
 import { CATEGORY_ID_PARAM } from './constants/param.constants';
 import { DeleteCategoryDto } from './dto/delete-category.dto';
-import { Language } from '../common/types/i18n.types';
 import {
   DropdownListItem,
   DropdownListQueryParams,
@@ -49,7 +47,7 @@ import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
 import { PaginationData } from '../common/interfaces/pagination.interface';
-import { QueryWithPaginationParsed} from '../common/types/query.types';
+import { QueryWithPaginationParsed } from '../common/types/query.types';
 import { IQueryCategory } from './interfaces/query.interface';
 import { PaginationCategoryDto } from './dto/pagination-category.dto';
 import { CategoryWithFullParentsDto } from './dto/category-with-full-parents.dto';
@@ -68,17 +66,15 @@ export class CategoriesController {
   })
   @ApiNoAccessResponse()
   async getCategories(
-    @Query(ParsePaginationPipe) query: QueryWithPaginationParsed<IQueryCategory>,
+    @Query(ParsePaginationPipe)
+    query: QueryWithPaginationParsed<IQueryCategory>,
   ): Promise<PaginationData<ICategory>> {
     const { page, limit, ...restQuery } = query;
 
-    return this.categoriesService.getCategories(
-      restQuery,
-      {
-        skip: page,
-        limit: limit,
-      },
-    );
+    return this.categoriesService.getCategories(restQuery, {
+      skip: page,
+      limit: limit,
+    });
   }
 
   @Get(DROPDOWN_LIST_PATH)
@@ -89,12 +85,8 @@ export class CategoriesController {
   @ApiNoAccessResponse()
   async getCategoriesDropdownList(
     @Query() queryParams: DropdownListQueryParams,
-    @Headers('accept-language') language: Language,
   ): Promise<DropdownListItem[]> {
-    return this.categoriesService.getCategoriesDropdownList(
-      language,
-      queryParams,
-    );
+    return this.categoriesService.getCategoriesDropdownList(queryParams);
   }
 
   @Get(GET_CATEGORY_BY_ID_PATH)

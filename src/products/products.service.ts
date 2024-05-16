@@ -16,9 +16,7 @@ import {
   PartialEntity,
 } from '../mongo/types/mongo-query.types';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
-import { Language } from '../common/types/i18n.types';
 import { PaginationData } from '../common/interfaces/pagination.interface';
-import { DEFAULT_LANGUAGE } from '../common/constants/internationalization.constants';
 import { BulkOperations } from '../mongo/types/colection-model.types';
 import { getPaginationPipeline } from '../common/utils/getPaginationPipeline';
 import { ERROR } from './constants/message';
@@ -31,9 +29,7 @@ export class ProductsService {
     private readonly attributesService: AttributesService,
   ) {}
 
-  private getAttributeIds(
-    products: IProductCreate[],
-  ): null | ObjectId[] {
+  private getAttributeIds(products: IProductCreate[]): null | ObjectId[] {
     if (products.length > 0 && products[0].attributes) {
       return products[0].attributes.map(
         (attribute) => new ObjectId(attribute.attributeId),
@@ -56,69 +52,63 @@ export class ProductsService {
       { projection: { name: 1, variants: { name: 1, variantId: 1 } } },
     );
 
-    const newProducts = products.reduce<INewProduct[]>(
-      (acc, product) => {
-        const { attributes: newProductAttributes, ...restProductValues } =
-          product;
+    const newProducts = products.reduce<INewProduct[]>((acc, product) => {
+      const { attributes: newProductAttributes, ...restProductValues } =
+        product;
 
-        const productAttributes: IProductAttribute[] = [];
+      const productAttributes: IProductAttribute[] = [];
 
-        if (
-          newProductAttributes &&
-          newProductAttributes?.length > 0
-        ) {
-          newProductAttributes.map((productAttribute) => {
-            const foundAttribute = attributes.find(
-              (attribute) =>
-                attribute._id.toString() === productAttribute.attributeId,
-            );
+      if (newProductAttributes && newProductAttributes?.length > 0) {
+        newProductAttributes.map((productAttribute) => {
+          const foundAttribute = attributes.find(
+            (attribute) =>
+              attribute._id.toString() === productAttribute.attributeId,
+          );
 
-            const productVariants: IProductVariant[] = [];
+          const productVariants: IProductVariant[] = [];
 
-            if (
-              foundAttribute &&
-              productAttribute.variants &&
-              productAttribute.variants?.length > 0
-            ) {
-              productAttribute.variants.forEach((productVariant) => {
-                const foundVariant = foundAttribute.variants.find((variant) => {
-                  return (
-                    variant.variantId.toString() === productVariant.variantId
-                  );
+          if (
+            foundAttribute &&
+            productAttribute.variants &&
+            productAttribute.variants?.length > 0
+          ) {
+            productAttribute.variants.forEach((productVariant) => {
+              const foundVariant = foundAttribute.variants.find((variant) => {
+                return (
+                  variant.variantId.toString() === productVariant.variantId
+                );
+              });
+
+              if (foundVariant) {
+                productVariants?.push({
+                  variantId: foundVariant.variantId.toString(),
+                  name: foundVariant.name,
                 });
+              }
+            });
 
-                if (foundVariant) {
-                  productVariants?.push({
-                    variantId: foundVariant.variantId.toString(),
-                    name: foundVariant.name,
-                  });
-                }
-              });
+            productAttributes?.push({
+              attributeId: foundAttribute._id.toString(),
+              name: foundAttribute.name,
+              variants: productVariants,
+            });
+          }
+        });
+      }
 
-              productAttributes?.push({
-                attributeId: foundAttribute._id.toString(),
-                name: foundAttribute.name,
-                variants: productVariants,
-              });
-            }
-          });
-        }
+      const updatedProduct: INewProduct = {
+        ...restProductValues,
+        attributes: productAttributes,
+        createdAt: currentDate,
+        supplyIds: [],
+        warehouses: [],
+        isDeleted: false,
+      };
 
-        const updatedProduct: INewProduct = {
-          ...restProductValues,
-          attributes: productAttributes,
-          createdAt: currentDate,
-          supplyIds: [],
-          warehouses: [],
-          isDeleted: false,
-        };
+      acc.push(updatedProduct);
 
-        acc.push(updatedProduct);
-
-        return acc;
-      },
-      [],
-    );
+      return acc;
+    }, []);
 
     return this.productCollection.createMany(newProducts);
   }
@@ -174,9 +164,7 @@ export class ProductsService {
     });
   }
 
-  async createProducts(
-    createProducts: IProductCreate[],
-  ): Promise<IProduct[]> {
+  async createProducts(createProducts: IProductCreate[]): Promise<IProduct[]> {
     const attributeIds = this.getAttributeIds(createProducts);
 
     if (attributeIds) {
