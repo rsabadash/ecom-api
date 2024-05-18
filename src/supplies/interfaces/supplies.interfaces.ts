@@ -1,6 +1,5 @@
 import { ObjectId } from 'mongodb';
 import { IProductWarehouses } from '../../products/interfaces/products.interfaces';
-import { Translations } from '../../common/types/i18n.types';
 import {
   ATTRIBUTE_IDS,
   SUPPLIER_ID,

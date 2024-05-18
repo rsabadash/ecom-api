@@ -3,9 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IProductWarehouses } from '../interfaces/products.interfaces';
 import { DECIMAL_TWO_SIGN } from '../../common/constants/reg-exp.contants';
 
-export class ProductWarehousesDto
-  implements IProductWarehouses
-{
+export class ProductWarehousesDto implements IProductWarehouses {
   @IsMongoId()
   @ApiProperty({
     description: 'Warehouse identifier',

@@ -1,10 +1,7 @@
 import { VariantDto } from './variant.dto';
 import { IVariantWithAttributeDto } from '../interfaces/variant-with-attribute.interfaces';
-import { IsMongoId, IsNotEmptyObject, ValidateNested } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { TranslationsDto } from '../../common/dto/translations.dto';
-import { Translations } from '../../common/types/i18n.types';
 
 export class VariantWithAttributeDto
   extends VariantDto
@@ -16,12 +13,10 @@ export class VariantWithAttributeDto
   })
   readonly attributeId: string;
 
-  @ValidateNested()
-  @IsNotEmptyObject()
-  @Type(() => TranslationsDto)
+  @IsString()
+  @IsNotEmpty()
   @ApiProperty({
-    type: TranslationsDto,
-    description: 'Attribute name translations',
+    description: 'Attribute name',
   })
-  readonly attributeName: Translations;
+  readonly attributeName: string;
 }

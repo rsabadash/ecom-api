@@ -1,16 +1,11 @@
 import {
   IsBoolean,
   IsMongoId,
-  IsNotEmptyObject,
   IsString,
-  ValidateNested,
   Matches,
   IsNotEmpty,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { TranslationsDto } from '../../common/dto/translations.dto';
-import { Translations } from '../../common/types/i18n.types';
 import { URL_SLUG } from '../../common/constants/reg-exp.contants';
 import { ICategoryDto } from '../interfaces/categories.interfaces';
 
@@ -21,14 +16,12 @@ export class CategoryDto implements ICategoryDto {
   })
   readonly _id: string;
 
-  @ValidateNested()
-  @IsNotEmptyObject()
-  @Type(() => TranslationsDto)
+  @IsString()
+  @IsNotEmpty()
   @ApiProperty({
-    type: TranslationsDto,
-    description: 'Category name translations',
+    description: 'Category name',
   })
-  readonly name: Translations;
+  readonly name: string;
 
   @IsString()
   @IsNotEmpty()
@@ -56,7 +49,8 @@ export class CategoryDto implements ICategoryDto {
 
   @IsMongoId({ each: true })
   @ApiProperty({
-    description: 'Parent category identifiers of the category in hierarchy order (index 0 - highest parent, last index - lowest parent)',
+    description:
+      'Parent category identifiers of the category in hierarchy order (index 0 - highest parent, last index - lowest parent)',
     default: [],
   })
   readonly parentIdsHierarchy: string[] = [];

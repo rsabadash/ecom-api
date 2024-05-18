@@ -4,14 +4,11 @@ import {
   IsEnum,
   IsMongoId,
   IsNotEmpty,
-  IsNotEmptyObject,
   IsString,
   ValidateNested,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { TranslationsDto } from '../../common/dto/translations.dto';
-import { Translations } from '../../common/types/i18n.types';
 import {
   IProductAttribute,
   IProductDto,

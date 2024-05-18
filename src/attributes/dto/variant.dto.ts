@@ -2,15 +2,10 @@ import {
   IsBoolean,
   IsMongoId,
   IsNotEmpty,
-  IsNotEmptyObject,
   IsString,
   Matches,
-  ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { TranslationsDto } from '../../common/dto/translations.dto';
-import { Translations } from '../../common/types/i18n.types';
 import { URL_SLUG } from '../../common/constants/reg-exp.contants';
 import { IVariant } from '../interfaces/variant.interfaces';
 
@@ -21,14 +16,12 @@ export class VariantDto implements IVariant {
   })
   readonly variantId: string;
 
-  @ValidateNested()
-  @IsNotEmptyObject()
-  @Type(() => TranslationsDto)
+  @IsString()
+  @IsNotEmpty()
   @ApiProperty({
-    type: TranslationsDto,
-    description: 'variant name translations',
+    description: 'Variant name',
   })
-  readonly name: Translations;
+  readonly name: string;
 
   @IsString()
   @IsNotEmpty()

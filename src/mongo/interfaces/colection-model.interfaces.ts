@@ -41,7 +41,7 @@ export interface ICollectionModel<Entity extends Document> {
   find(
     entityQuery?: PartialEntity<Entity>,
     options?: FindEntityOptions<Entity>,
-  ): Promise<EntityWithId<Entity>[] | []>;
+  ): Promise<EntityWithId<Entity>[]>;
 
   updateOne(
     entityQuery: PartialEntity<Entity>,
