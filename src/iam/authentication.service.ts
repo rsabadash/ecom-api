@@ -6,15 +6,22 @@ import {
 } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { SignUpDto } from './dto/sign-up.dto';
 import { HashingService } from './hashing.service';
-import { SignInDto } from './dto/sign-in.dto';
 import jwtConfig from './config/jwt.config';
-import { Tokens, JwtDecoded } from './interfaces/jwt.interfaces';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { UsersService } from '../users/users.service';
 import { IUserPublic } from '../users/interfaces/users.interfaces';
-import { SignUpData } from './interfaces/authentication.interfaces';
+import {
+  RefreshToken,
+  SignIn,
+  SignUp,
+  Tokens,
+  JwtDecoded,
+} from './interfaces/authentication.interface';
+import {
+  RefreshTokenResponse,
+  SignInResponse,
+  SignUpResponse,
+} from './interfaces/response.interface';
 
 @Injectable()
 export class AuthenticationService {
@@ -58,22 +65,27 @@ export class AuthenticationService {
     });
   }
 
-  async signUp(signUpDto: SignUpDto): Promise<IUserPublic> {
-    const hashedPassword = await this.hashingService.hash(signUpDto.password);
+  async signUp(signUp: SignUp): Promise<SignUpResponse> {
+    const hashedPassword = await this.hashingService.hash(signUp.password);
 
-    const user: SignUpData = {
-      ...signUpDto,
+    const user: SignUp = {
+      ...signUp,
       password: hashedPassword,
     };
 
-    return this.usersService.createUser(user);
+    const createdUser = await this.usersService.createUser(user);
+
+    return {
+      ...createdUser,
+      _id: createdUser._id.toString(),
+    };
   }
 
-  async signIn(signInDto: SignInDto): Promise<Tokens> {
+  async signIn(signInDto: SignIn): Promise<SignInResponse> {
     const user = await this.usersService.getUserByEmail(signInDto.email);
 
     if (!user) {
-      throw new UnauthorizedException('Email or password do not match');
+      throw new UnauthorizedException('User has not been found');
     }
 
     const isEqual = await this.hashingService.compare(
@@ -89,15 +101,15 @@ export class AuthenticationService {
   }
 
   async refreshToken(
-    @Body() refreshTokenDto: RefreshTokenDto,
-  ): Promise<Tokens> {
+    @Body() refreshToken: RefreshToken,
+  ): Promise<RefreshTokenResponse> {
     const { secret, audience, issuer } = this.jwtConfiguration;
     let userId: null | string = null;
 
     try {
       const decoded = await this.jwtService.verifyAsync<
         Pick<JwtDecoded, 'sub'>
-      >(refreshTokenDto.refreshToken, {
+      >(refreshToken.refreshToken, {
         secret,
         audience,
         issuer,

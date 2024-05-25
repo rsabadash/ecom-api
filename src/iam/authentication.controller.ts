@@ -15,72 +15,82 @@ import {
   SIGN_IN_PATH,
   SIGN_UP_PATH,
 } from './constants/route.constants';
-import { SignUpDto } from './dto/sign-up.dto';
-import { SignInDto } from './dto/sign-in.dto';
+import { SignUpDto } from './dto/validation/sign-up.dto';
+import { SignInDto } from './dto/validation/sign-in.dto';
 import { Auth } from './decorators/auth.decorator';
 import { AuthType } from './enums/auth-type.enum';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { IUserPublic } from '../users/interfaces/users.interfaces';
-import { Tokens } from './interfaces/jwt.interfaces';
-import { PublicUserDto } from '../users/dto/public-user.dto';
-import { TokensDto } from './dto/tokens-dto';
-import { AUTH_MODULE_NAME } from './constants/swagger.constants';
+import { RefreshTokenDto } from './dto/validation/refresh-token.dto';
+import { MODULE_NAME, SUCCESS, ERROR } from './constants/swagger.constants';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
 import { HttpErrorDto } from '../common/dto/response/http-error.dto';
+import { SignUpResponseDto } from './dto/response/sign-up-response.dto';
+import {
+  RefreshTokenResponse,
+  SignInResponse,
+  SignUpResponse,
+} from './interfaces/response.interface';
+import { SignInResponseDto } from './dto/response/sign-in-response.dto';
+import { RefreshTokenResponseDto } from './dto/response/refresh-token-response.dto';
 
 @Auth(AuthType.None)
 @Controller(AUTHENTICATION_ROUTE)
-@ApiTags(AUTH_MODULE_NAME)
+@ApiTags(MODULE_NAME)
 export class AuthenticationController {
   constructor(private readonly authService: AuthenticationService) {}
 
   @Post(SIGN_UP_PATH)
   @ApiCreatedResponse({
-    description: 'The user has been signed up',
-    type: PublicUserDto,
+    description: SUCCESS.SIGN_UP,
+    type: SignUpResponseDto,
   })
   @ApiConflictResponse({
-    description: 'User with the email already exists',
+    description: ERROR.SIGN_UP_EMAIL_EXISTS,
     type: HttpErrorDto,
   })
   @ApiBadRequestResponse({
-    description: 'The user has not been created',
+    description: ERROR.SIGN_UP_NOT_CREATED,
     type: HttpErrorDto,
   })
-  signUp(@Body() signUpDto: SignUpDto): Promise<IUserPublic> {
+  signUp(@Body() signUpDto: SignUpDto): Promise<SignUpResponse> {
     return this.authService.signUp(signUpDto);
   }
 
   @Post(SIGN_IN_PATH)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
-    description: 'The user has been signed in',
-    type: TokensDto,
+    description: SUCCESS.SIGN_IN,
+    type: SignInResponseDto,
   })
-  @ApiUnauthorizedResponse({
-    description: 'Email or password do not match',
+  @ApiNotFoundResponse({
+    description: ERROR.SIGN_IN_NOT_FOUND,
     type: HttpErrorDto,
   })
-  signIn(@Body() signInDto: SignInDto): Promise<Tokens> {
+  @ApiUnauthorizedResponse({
+    description: ERROR.SIGN_IN_NOT_AUTHORIZED,
+    type: HttpErrorDto,
+  })
+  signIn(@Body() signInDto: SignInDto): Promise<SignInResponse> {
     return this.authService.signIn(signInDto);
   }
 
   @Post(REFRESH_TOKEN_PATH)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
-    description: 'The user got a new pair of tokens',
-    type: TokensDto,
+    description: SUCCESS.REFRESH_TOKEN,
+    type: RefreshTokenResponseDto,
   })
   @ApiBadRequestResponse({
-    description: 'JWT malformed or invalid JWT options',
+    description: ERROR.TOKEN_MALFORMED,
     type: HttpErrorDto,
   })
   @ApiNotFoundResponse({
-    description: 'The user has not been found',
+    description: ERROR.SIGN_IN_NOT_FOUND,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
-  refreshToken(@Body() refreshTokenDto: RefreshTokenDto): Promise<Tokens> {
+  refreshToken(
+    @Body() refreshTokenDto: RefreshTokenDto,
+  ): Promise<RefreshTokenResponse> {
     return this.authService.refreshToken(refreshTokenDto);
   }
 }
