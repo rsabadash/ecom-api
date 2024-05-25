@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { Unit } from '../enums/unit.enums';
+import { Unit } from '../enums/unit.enum';
 import {
   ATTRIBUTE_ID,
   SUPPLY_IDS,
@@ -7,49 +7,46 @@ import {
   WAREHOUSE_ID,
 } from '../../common/constants/cross-entity-id.constants';
 
-export interface IProductVariant {
-  [VARIANT_ID]: string;
-  name: string;
-}
-
-export interface IProductAttribute {
-  [ATTRIBUTE_ID]: string;
-  name: string;
-  variants: IProductVariant[];
-}
-
-export interface IProductWarehouses {
-  [WAREHOUSE_ID]: string;
-  totalQuantity: string | null;
-}
-
-export interface IProduct {
+export interface ProductEntity {
   _id: ObjectId;
   name: string;
   sku: string;
   unit: Unit;
-  attributes: IProductAttribute[];
+  attributes: ProductAttribute[];
   createdAt: Date;
   [SUPPLY_IDS]: string[];
-  warehouses: IProductWarehouses[];
+  warehouses: ProductWarehouses[];
   isDeleted: boolean;
 }
 
-export interface IProductDto extends Omit<IProduct, '_id'> {
-  _id: string;
+export interface ProductVariant {
+  [VARIANT_ID]: string;
+  name: string;
 }
 
-export interface IProductCreate
-  extends Omit<
-    IProduct,
-    | '_id'
-    | 'createdAt'
-    | 'attributes'
-    | 'supplyIds'
-    | 'warehouses'
-    | 'isDeleted'
-  > {
-  attributes: null | Omit<IProductAttribute, 'name'>[];
+export interface CreateProductVariant extends ProductVariant {}
+
+export interface CreateProductAttribute {
+  [ATTRIBUTE_ID]: string;
+  variants: CreateProductVariant[];
 }
 
-export interface INewProduct extends Omit<IProduct, '_id'> {}
+export interface ProductAttribute {
+  [ATTRIBUTE_ID]: string;
+  name: string;
+  variants: ProductVariant[];
+}
+
+interface ProductWarehouses {
+  [WAREHOUSE_ID]: string;
+  totalQuantity: string | null;
+}
+
+export interface CreateProduct {
+  name: string;
+  sku: string;
+  unit: Unit;
+  attributes: CreateProductAttribute[] | null;
+}
+
+export interface NewProduct extends Omit<ProductEntity, '_id'> {}

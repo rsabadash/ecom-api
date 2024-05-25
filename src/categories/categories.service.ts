@@ -24,10 +24,7 @@ import {
   FindEntityOptions,
   PartialEntity,
 } from '../mongo/types/mongo-query.types';
-import {
-  DropdownListItem,
-  DropdownListQuery,
-} from '../common/interfaces/dropdown-list.interface';
+import { DropdownListQuery } from '../common/interfaces/dropdown-list.interface';
 import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
 import { ERROR } from './constants/swagger.constants';
 import { getPaginationPipeline } from '../common/utils/getPaginationPipeline';
@@ -37,6 +34,7 @@ import {
 } from './interfaces/query.interface';
 import { ParentIds } from './enums/parent-ids.enum';
 import {
+  CategoryDropdownListItem,
   CategoryEntityResponse,
   CreateCategoryResponse,
   GetCategoriesResponse,
@@ -98,6 +96,7 @@ export class CategoriesService {
       },
     });
 
+    // _id typed as string, but actual type is ObjectId
     const paginatedData =
       await this.categoryCollection.aggregate<GetCategoriesResponse>(pipeline);
 
@@ -106,7 +105,7 @@ export class CategoriesService {
 
   async getCategoriesDropdownList(
     parameters: DropdownListQuery = {},
-  ): Promise<DropdownListItem[]> {
+  ): Promise<CategoryDropdownListItem[]> {
     let query: PartialEntity<CategoryEntity> = {};
 
     if (parameters._id) {

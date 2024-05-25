@@ -24,7 +24,6 @@ import {
   GET_CATEGORY_BY_ID_PATH,
 } from './constants/route.constants';
 import { CATEGORY_ID_PARAM } from './constants/param.constants';
-import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 import { DROPDOWN_LIST_PATH } from '../common/constants/path.constants';
 import { Roles } from '../iam/decorators/roles.decorator';
 import { Role } from '../iam/enums/role.enums';
@@ -40,6 +39,7 @@ import { CreateCategoryDto } from './dto/validation/create-category.dto';
 import { UpdateCategoryDto } from './dto/validation/update-category.dto';
 import { DeleteCategoryDto } from './dto/validation/delete-category.dto';
 import {
+  CategoryDropdownListItem,
   CreateCategoryResponse,
   GetCategoriesResponse,
   GetCategoryResponse,
@@ -82,7 +82,7 @@ export class CategoriesController {
   @ApiNoAccessResponse()
   async getCategoriesDropdownList(
     @Query() query: DropdownListQueryDto,
-  ): Promise<DropdownListItem[]> {
+  ): Promise<CategoryDropdownListItem[]> {
     return this.categoriesService.getCategoriesDropdownList(query);
   }
 

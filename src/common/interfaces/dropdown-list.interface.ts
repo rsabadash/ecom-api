@@ -4,12 +4,12 @@ export interface DropdownListQuery {
 
 export type DropdownMetaValue = string | number | boolean | null;
 
-export interface DropdownMeta {
+export type DropdownMeta<M> = M & {
   [key: string]: DropdownMetaValue;
-}
+};
 
-export interface DropdownListItem {
+export interface DropdownListItem<M = Record<string, DropdownMetaValue>> {
   id: string;
   value: string;
-  meta?: DropdownMeta | null;
+  meta?: DropdownMeta<M> | null;
 }

@@ -4,32 +4,35 @@ import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
 import { PRODUCTS_COLLECTION } from '../common/constants/collections.constants';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
 import {
-  IProductCreate,
-  INewProduct,
-  IProduct,
-  IProductAttribute,
-  IProductVariant,
+  NewProduct,
+  ProductEntity,
+  ProductAttribute,
+  ProductVariant,
+  CreateProduct,
 } from './interfaces/products.interfaces';
 import { AttributesService } from '../attributes/attributes.service';
 import {
   FindEntityOptions,
   PartialEntity,
 } from '../mongo/types/mongo-query.types';
-import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
-import { PaginationData } from '../common/interfaces/pagination.interface';
 import { BulkOperations } from '../mongo/types/colection-model.types';
 import { getPaginationPipeline } from '../common/utils/getPaginationPipeline';
-import { ERROR } from './constants/message';
+import { ERROR } from './constants/swagger.constants';
+import {
+  CreateProductsResponse,
+  GetProductsResponse,
+  ProductDropdownListItem,
+} from './interfaces/response.interface';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectCollectionModel(PRODUCTS_COLLECTION)
-    private readonly productCollection: ICollectionModel<IProduct>,
+    private readonly productCollection: ICollectionModel<ProductEntity>,
     private readonly attributesService: AttributesService,
   ) {}
 
-  private getAttributeIds(products: IProductCreate[]): null | ObjectId[] {
+  private getAttributeIds(products: CreateProduct[]): null | ObjectId[] {
     if (products.length > 0 && products[0].attributes) {
       return products[0].attributes.map(
         (attribute) => new ObjectId(attribute.attributeId),
@@ -39,10 +42,45 @@ export class ProductsService {
     return null;
   }
 
+  async getProducts(
+    query: PartialEntity<ProductEntity> = {},
+    options: FindEntityOptions<ProductEntity> = {},
+  ): Promise<GetProductsResponse> {
+    const { skip, limit } = options;
+
+    const pipeline = getPaginationPipeline<ProductEntity>({
+      query,
+      filter: {
+        skip,
+        limit,
+      },
+    });
+
+    // _id typed as string, but actual type is ObjectId
+    const paginatedData =
+      await this.productCollection.aggregate<GetProductsResponse>(pipeline);
+
+    return paginatedData[0];
+  }
+
+  async getProductsDropdownList(): Promise<ProductDropdownListItem[]> {
+    const products = await this.productCollection.find();
+
+    return products.map((product) => {
+      return {
+        id: product._id.toString(),
+        value: product.name,
+        meta: {
+          unit: product.unit,
+        },
+      };
+    });
+  }
+
   private async createProductsWithAttributes(
-    products: IProductCreate[],
+    products: CreateProduct[],
     attributeIds: ObjectId[],
-  ): Promise<IProduct[] | null> {
+  ): Promise<ProductEntity[] | null> {
     const currentDate = new Date();
 
     const attributes = await this.attributesService.getAttributes2(
@@ -52,11 +90,11 @@ export class ProductsService {
       { projection: { name: 1, variants: { name: 1, variantId: 1 } } },
     );
 
-    const newProducts = products.reduce<INewProduct[]>((acc, product) => {
+    const newProducts = products.reduce<NewProduct[]>((acc, product) => {
       const { attributes: newProductAttributes, ...restProductValues } =
         product;
 
-      const productAttributes: IProductAttribute[] = [];
+      const productAttributes: ProductAttribute[] = [];
 
       if (newProductAttributes && newProductAttributes?.length > 0) {
         newProductAttributes.map((productAttribute) => {
@@ -65,7 +103,7 @@ export class ProductsService {
               attribute._id.toString() === productAttribute.attributeId,
           );
 
-          const productVariants: IProductVariant[] = [];
+          const productVariants: ProductVariant[] = [];
 
           if (
             foundAttribute &&
@@ -96,7 +134,7 @@ export class ProductsService {
         });
       }
 
-      const updatedProduct: INewProduct = {
+      const updatedProduct: NewProduct = {
         ...restProductValues,
         attributes: productAttributes,
         createdAt: currentDate,
@@ -113,44 +151,9 @@ export class ProductsService {
     return this.productCollection.createMany(newProducts);
   }
 
-  async getProducts(
-    query: PartialEntity<IProduct> = {},
-    options: FindEntityOptions<IProduct> = {},
-  ): Promise<PaginationData<IProduct>> {
-    const { skip, limit } = options;
-
-    const pipeline = getPaginationPipeline<IProduct>({
-      query,
-      filter: {
-        skip,
-        limit,
-      },
-    });
-
-    const paginatedData = await this.productCollection.aggregate<
-      PaginationData<IProduct>
-    >(pipeline);
-
-    return paginatedData[0];
-  }
-
-  async getProductsDropdownList(): Promise<DropdownListItem[]> {
-    const products = await this.productCollection.find();
-
-    return products.map((product) => {
-      return {
-        id: product._id.toString(),
-        value: product.name,
-        meta: {
-          unit: product.unit,
-        },
-      };
-    });
-  }
-
   private async createProductWithoutAttributes(
-    products: IProductCreate[],
-  ): Promise<IProduct | null> {
+    products: CreateProduct[],
+  ): Promise<ProductEntity | null> {
     const product = products[0];
     const currentDate = new Date();
 
@@ -164,7 +167,9 @@ export class ProductsService {
     });
   }
 
-  async createProducts(createProducts: IProductCreate[]): Promise<IProduct[]> {
+  async createProducts(
+    createProducts: CreateProduct[],
+  ): Promise<CreateProductsResponse[]> {
     const attributeIds = this.getAttributeIds(createProducts);
 
     if (attributeIds) {
@@ -192,7 +197,7 @@ export class ProductsService {
   }
 
   async bulkWrite(
-    operations: BulkOperations<IProduct>[],
+    operations: BulkOperations<ProductEntity>[],
     options: BulkWriteOptions,
   ): Promise<BulkWriteResult> {
     return this.productCollection.bulkWrite(operations, options);
