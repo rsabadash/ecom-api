@@ -231,14 +231,13 @@ export class CategoriesService {
       ? [
           {
             ...parent,
-            _id: parent._id.toString(),
             childrenIds: [...parent.childrenIds, _id.toString()],
           },
         ]
       : [];
 
     return {
-      _id: _id.toString(),
+      _id,
       name,
       seoName,
       parents,
