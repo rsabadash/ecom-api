@@ -1,5 +1,5 @@
 import { PipeTransform, Injectable } from '@nestjs/common';
-import { QueryWithPagination, QueryWithPaginationParsed } from '../types/query.types';
+import { PaginationQuery, PaginationParsedQuery } from '../types/query.types';
 import {
   DEFAULT_LIMIT_PAGINATION,
   DEFAULT_SKIP_PAGINATION,
@@ -7,7 +7,7 @@ import {
 
 @Injectable()
 export class ParsePaginationPipe implements PipeTransform {
-  transform(value: QueryWithPagination): QueryWithPaginationParsed {
+  transform(value: PaginationQuery): PaginationParsedQuery {
     let skipValue = DEFAULT_SKIP_PAGINATION;
     let limitValue = DEFAULT_LIMIT_PAGINATION;
 

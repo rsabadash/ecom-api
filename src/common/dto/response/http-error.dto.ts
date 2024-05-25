@@ -7,6 +7,6 @@ export class HttpErrorDto {
   @ApiProperty({ description: 'Message' })
   readonly message: string;
 
-  @ApiPropertyOptional({ description: 'Error itself' })
+  @ApiPropertyOptional({ description: 'Error data' })
   readonly error: string;
 }

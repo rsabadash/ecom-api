@@ -1,9 +1,9 @@
-export type QueryWithPagination<Q extends Record<string, any> = {}> = Q &  {
-    page?: string;
-    limit?: string;
+export type PaginationQuery<Q extends Record<string, any> = any> = Q & {
+  page?: string;
+  limit?: string;
 };
 
-export type QueryWithPaginationParsed<Q extends Record<string, any> = {}> = Q &  {
-    page: number;
-    limit: number;
+export type PaginationParsedQuery<Q extends Record<string, any> = any> = Q & {
+  page?: number;
+  limit?: number;
 };

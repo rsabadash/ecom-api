@@ -12,13 +12,12 @@ import {
 import { CATEGORIES_COLLECTION } from '../common/constants/collections.constants';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
 import {
-  ICategory,
-  ICategoryCreate,
-  ICategoryDelete,
-  ICategoryUpdate,
+  CategoryEntity,
+  CreateCategory,
+  DeleteCategory,
   GetCategoryParameters,
-  ICategoryWithFullParents,
-} from './interfaces/categories.interfaces';
+  UpdateCategory,
+} from './interfaces/category.interface';
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
 import {
   ClientsMap,
@@ -27,25 +26,29 @@ import {
 } from '../mongo/types/mongo-query.types';
 import {
   DropdownListItem,
-  DropdownListQueryParams,
+  DropdownListQuery,
 } from '../common/interfaces/dropdown-list.interface';
-import { CompareFieldsService } from '../common/services/compare-fields.service';
 import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
 import { ERROR } from './constants/message.constants';
 import { getPaginationPipeline } from '../common/utils/getPaginationPipeline';
-import { PaginationData } from '../common/interfaces/pagination.interface';
 import {
-  IQueryCategory,
   IQueryPipelineCategory,
+  GetCategoriseParameters,
 } from './interfaces/query.interface';
+import { ParentIds } from './enums/parent-ids.enum';
+import {
+  CategoryEntityResponse,
+  CreateCategoryResponse,
+  GetCategoriesResponse,
+  GetCategoryResponse,
+} from './interfaces/response.interface';
 
 @Injectable()
 export class CategoriesService {
   private client: MongoClient;
   constructor(
-    private readonly compareFieldsService: CompareFieldsService,
     @InjectCollectionModel(CATEGORIES_COLLECTION)
-    private readonly categoryCollection: ICollectionModel<ICategory>,
+    private readonly categoryCollection: ICollectionModel<CategoryEntity>,
     @InjectClients(CONNECTION_DB_NAME)
     private readonly clients: ClientsMap,
   ) {
@@ -61,9 +64,9 @@ export class CategoriesService {
   }
 
   async getCategories(
-    query: IQueryCategory = {},
-    options: FindEntityOptions<ICategory> = {},
-  ): Promise<PaginationData<ICategory>> {
+    query: GetCategoriseParameters = {},
+    options: FindEntityOptions<CategoryEntity> = {},
+  ): Promise<GetCategoriesResponse> {
     const { skip, limit } = options;
 
     const pipelineMatchQuery: IQueryPipelineCategory = {
@@ -71,7 +74,7 @@ export class CategoriesService {
     };
 
     if (query.parentIds) {
-      if (query.parentIds === 'root') {
+      if (query.parentIds === ParentIds.Root) {
         pipelineMatchQuery.$and.push({ parentIdsHierarchy: [] });
       }
     }
@@ -95,21 +98,20 @@ export class CategoriesService {
       },
     });
 
-    const paginatedData = await this.categoryCollection.aggregate<
-      PaginationData<ICategory>
-    >(pipeline);
+    const paginatedData =
+      await this.categoryCollection.aggregate<GetCategoriesResponse>(pipeline);
 
     return paginatedData[0];
   }
 
   async getCategoriesDropdownList(
-    queryParams: DropdownListQueryParams = {},
+    parameters: DropdownListQuery = {},
   ): Promise<DropdownListItem[]> {
-    let query: PartialEntity<ICategory> = {};
+    let query: PartialEntity<CategoryEntity> = {};
 
-    if (queryParams._id) {
+    if (parameters._id) {
       query = {
-        _id: { $not: { $eq: new ObjectId(queryParams._id) } },
+        _id: { $not: { $eq: new ObjectId(parameters._id) } },
       };
     }
 
@@ -125,7 +127,7 @@ export class CategoriesService {
 
   async getCategory(
     parameters: GetCategoryParameters,
-  ): Promise<ICategoryWithFullParents> {
+  ): Promise<GetCategoryResponse> {
     const pipeline = [
       { $match: { _id: new ObjectId(parameters.categoryId) } },
       {
@@ -161,9 +163,7 @@ export class CategoriesService {
     ];
 
     const category =
-      await this.categoryCollection.aggregate<ICategoryWithFullParents>(
-        pipeline,
-      );
+      await this.categoryCollection.aggregate<GetCategoryResponse>(pipeline);
 
     if (!category.length) {
       throw new EntityNotFoundException(ERROR.CATEGORY_NOT_FOUND);
@@ -173,9 +173,9 @@ export class CategoriesService {
   }
 
   async createCategory(
-    createCategory: ICategoryCreate,
-  ): Promise<ICategoryWithFullParents> {
-    let parent: ICategory | null = null;
+    createCategory: CreateCategory,
+  ): Promise<CreateCategoryResponse> {
+    let parent: CategoryEntity | null = null;
     const { parentId, ...restCreateCategory } = createCategory;
 
     if (parentId) {
@@ -197,7 +197,7 @@ export class CategoriesService {
       ? [...higherParentIds, parentId]
       : [];
 
-    const newCategoryData: Omit<ICategory, '_id'> = {
+    const newCategoryData: Omit<CategoryEntity, '_id'> = {
       ...restCreateCategory,
       childrenIds: [],
       parentIdsHierarchy: newParentIdsHierarchy,
@@ -211,7 +211,7 @@ export class CategoriesService {
 
     if (parent) {
       // add the new category as a child to the direct parent
-      const updatedFields: Partial<ICategory> = {
+      const updatedFields: Partial<CategoryEntity> = {
         childrenIds: [...parent.childrenIds, newCategory._id.toString()],
       };
 
@@ -227,17 +227,19 @@ export class CategoriesService {
     }
 
     const { _id, name, seoName, isActive, childrenIds } = newCategory;
-    const parents: ICategory[] = parent
+
+    const parents: CategoryEntityResponse[] = parent
       ? [
           {
             ...parent,
+            _id: parent._id.toString(),
             childrenIds: [...parent.childrenIds, _id.toString()],
           },
         ]
       : [];
 
     return {
-      _id,
+      _id: _id.toString(),
       name,
       seoName,
       parents,
@@ -246,7 +248,7 @@ export class CategoriesService {
     };
   }
 
-  async updateCategory(updateCategory: ICategoryUpdate): Promise<void> {
+  async updateCategory(updateCategory: UpdateCategory): Promise<void> {
     const {
       parentId: newParentId,
       id: currentCategoryId,
@@ -262,7 +264,7 @@ export class CategoriesService {
       throw new EntityNotFoundException(ERROR.CATEGORY_NOT_FOUND);
     }
 
-    let parent: ICategory | null = null;
+    let parent: CategoryEntity | null = null;
 
     const { parentIdsHierarchy: parentCurrentIdsHierarchy } = category;
     const hasCurrentParentIds = parentCurrentIdsHierarchy.length > 0;
@@ -409,7 +411,7 @@ export class CategoriesService {
     }
   }
 
-  async deleteCategory(deleteCategory: ICategoryDelete): Promise<void> {
+  async deleteCategory(deleteCategory: DeleteCategory): Promise<void> {
     const { id: deleteCategoryId } = deleteCategory;
     const deleteCategoryObjectId = new ObjectId(deleteCategoryId);
 

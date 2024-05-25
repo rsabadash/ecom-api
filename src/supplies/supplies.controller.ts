@@ -18,13 +18,13 @@ import { SuppliesService } from './supplies.service';
 import { ISupply } from './interfaces/supplies.interfaces';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
 import { PaginationData } from '../common/interfaces/pagination.interface';
-import { QueryWithPaginationParsed } from '../common/types/query.types';
+import { PaginationParsedQuery } from '../common/types/query.types';
 import { SUPPLY_ID_PARAM } from './constants/param.constants';
 import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
 import { SupplyDto } from './dto/supply.dto';
-import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
+import { HttpErrorDto } from '../common/dto/response/http-error.dto';
 import { CreateSupplyDto } from './dto/create-supply.dto';
 import { PaginationSupplyDto } from './dto/pagination-supply.dto';
 
@@ -42,7 +42,7 @@ export class SuppliesController {
   })
   @ApiNoAccessResponse()
   async getSupplies(
-    @Query(ParsePaginationPipe) query: QueryWithPaginationParsed,
+    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
   ): Promise<PaginationData<ISupply>> {
     const { page, limit } = query;
 

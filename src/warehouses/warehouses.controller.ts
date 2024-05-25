@@ -21,7 +21,7 @@ import { WarehousesService } from './warehouses.service';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
 import { WarehouseDto } from './dto/warehouse.dto';
 import { IWarehouse } from './interfaces/warehouses.interfaces';
-import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
+import { HttpErrorDto } from '../common/dto/response/http-error.dto';
 import { CreateWarehouseDto } from './dto/create-warehouse.dto';
 import {
   GET_WAREHOUSE_BY_ID_PATH,
@@ -35,7 +35,7 @@ import { AuthType } from '../iam/enums/auth-type.enum';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
 import { DeleteWarehouseDto } from './dto/delete-warehouse.dto';
 import { DROPDOWN_LIST_PATH } from '../common/constants/path.constants';
-import { DropdownListDto } from '../common/dto/dropdown-list.dto';
+import { DropdownListDto } from '../common/dto/response/dropdown-list.dto';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
 import { MODULE_NAME } from '../common/constants/swagger.constants';

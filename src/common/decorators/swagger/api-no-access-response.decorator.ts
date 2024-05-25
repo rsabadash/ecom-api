@@ -1,7 +1,7 @@
 import { applyDecorators, HttpStatus } from '@nestjs/common';
 import { ApiForbiddenResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { HttpStatusMessage } from '../../constants/swagger.constants';
-import { HttpErrorDto } from '../../dto/swagger/http-error.dto';
+import { HttpErrorDto } from '../../dto/response/http-error.dto';
 
 export const ApiNoAccessResponse = () => {
   const desc401 = `

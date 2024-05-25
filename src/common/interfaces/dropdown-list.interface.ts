@@ -1,4 +1,4 @@
-export interface DropdownListQueryParams {
+export interface DropdownListQuery {
   _id?: string;
 }
 
