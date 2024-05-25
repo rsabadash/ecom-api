@@ -26,7 +26,7 @@ import { PublicUserDto } from '../users/dto/public-user.dto';
 import { TokensDto } from './dto/tokens-dto';
 import { AUTH_MODULE_NAME } from './constants/swagger.constants';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
-import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
+import { HttpErrorDto } from '../common/dto/response/http-error.dto';
 
 @Auth(AuthType.None)
 @Controller(AUTHENTICATION_ROUTE)

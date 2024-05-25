@@ -31,7 +31,7 @@ import { AttributesService } from './attributes.service';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { IAttribute } from './interfaces/attribute.interfaces';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
-import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
+import { HttpErrorDto } from '../common/dto/response/http-error.dto';
 import {
   ATTRIBUTE_ID_PARAM,
   VARIANT_ID_PARAM,
@@ -54,7 +54,7 @@ import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
 import { PaginationData } from '../common/interfaces/pagination.interface';
-import { QueryWithPaginationParsed } from '../common/types/query.types';
+import { PaginationParsedQuery } from '../common/types/query.types';
 import { PaginationAttributeDto } from './dto/pagination-attribute.dto';
 import { PaginationVariantWithAttributeDto } from './dto/pagination-variant-with-attribute.dto';
 
@@ -72,7 +72,7 @@ export class AttributesController {
   })
   @ApiNoAccessResponse()
   async getAttributes(
-    @Query(ParsePaginationPipe) query: QueryWithPaginationParsed,
+    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
   ): Promise<PaginationData<IAttribute>> {
     const { page, limit } = query;
 
@@ -92,7 +92,7 @@ export class AttributesController {
   })
   @ApiNoAccessResponse()
   async getVariants(
-    @Query(ParsePaginationPipe) query: QueryWithPaginationParsed,
+    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
   ): Promise<PaginationData<IVariantWithAttribute>> {
     const { page, limit } = query;
 

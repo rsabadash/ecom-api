@@ -35,15 +35,15 @@ import { Role } from '../iam/enums/role.enums';
 import { Auth } from '../iam/decorators/auth.decorator';
 import { AuthType } from '../iam/enums/auth-type.enum';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
-import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
+import { HttpErrorDto } from '../common/dto/response/http-error.dto';
 import { DROPDOWN_LIST_PATH } from '../common/constants/path.constants';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
-import { DropdownListDto } from '../common/dto/dropdown-list.dto';
+import { DropdownListDto } from '../common/dto/response/dropdown-list.dto';
 import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
 import { PaginationData } from '../common/interfaces/pagination.interface';
-import { QueryWithPaginationParsed } from '../common/types/query.types';
+import { PaginationParsedQuery } from '../common/types/query.types';
 import { PaginationSupplierDto } from './dto/pagination-supplier.dto';
 
 @Roles(Role.Admin)
@@ -60,7 +60,7 @@ export class SuppliersController {
   })
   @ApiNoAccessResponse()
   async getSuppliers(
-    @Query(ParsePaginationPipe) query: QueryWithPaginationParsed,
+    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
   ): Promise<PaginationData<ISupplier>> {
     const { page, limit } = query;
 

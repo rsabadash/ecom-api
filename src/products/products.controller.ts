@@ -15,12 +15,12 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { IProduct } from './interfaces/products.interfaces';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
 import { ProductDto } from './dto/product.dto';
-import { HttpErrorDto } from '../common/dto/swagger/http-error.dto';
+import { HttpErrorDto } from '../common/dto/response/http-error.dto';
 import { DROPDOWN_LIST_PATH } from '../common/constants/path.constants';
-import { DropdownListDto } from '../common/dto/dropdown-list.dto';
+import { DropdownListDto } from '../common/dto/response/dropdown-list.dto';
 import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 import { PaginationData } from '../common/interfaces/pagination.interface';
-import { QueryWithPaginationParsed } from '../common/types/query.types';
+import { PaginationParsedQuery } from '../common/types/query.types';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
 import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message';
@@ -31,9 +31,7 @@ import { PaginationProductDto } from './dto/pagination-product.dto';
 @Controller(PRODUCTS_ROUTE)
 @ApiTags(MODULE_NAME.PRODUCTS)
 export class ProductsController {
-  constructor(
-    private readonly productsService: ProductsService,
-  ) {}
+  constructor(private readonly productsService: ProductsService) {}
 
   @Get()
   @ApiOkResponse({
@@ -42,7 +40,7 @@ export class ProductsController {
   })
   @ApiNoAccessResponse()
   async getProducts(
-    @Query(ParsePaginationPipe) query: QueryWithPaginationParsed,
+    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
   ): Promise<PaginationData<IProduct>> {
     const { page, limit } = query;
 
@@ -78,8 +76,6 @@ export class ProductsController {
   async createProducts(
     @Body() createProductsDto: CreateProductDto[],
   ): Promise<IProduct[]> {
-    return this.productsService.createProducts(
-      createProductsDto,
-    );
+    return this.productsService.createProducts(createProductsDto);
   }
 }

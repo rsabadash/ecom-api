@@ -1,3 +1,5 @@
+export const MODULE_NAME = 'Categories module';
+
 export const ERROR = {
   CATEGORY_NOT_FOUND: 'Category has not been found',
   CATEGORY_NOT_CREATED: 'Category has not been created',
@@ -6,7 +8,7 @@ export const ERROR = {
   CATEGORY_NOT_UPDATED: 'Category has not been updated',
 };
 
-export const SWAGGER_DESCRIPTION = {
+export const SUCCESS = {
   GET_CATEGORIES: 'Pagination list of categories',
   GET_CATEGORY: 'Category data',
   CREATE_CATEGORY: 'Category has been created',
