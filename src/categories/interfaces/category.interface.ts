@@ -27,7 +27,3 @@ export interface UpdateCategory {
 export interface DeleteCategory {
   id: string;
 }
-
-export interface GetCategoryParameters {
-  categoryId: string;
-}

@@ -13,7 +13,6 @@ export class GetCategoriesResponseDto
   @ApiProperty({
     type: [CategoryResponseDto],
     description: 'List of categories',
-    default: [],
   })
   readonly data: CategoryEntityResponse[];
 }

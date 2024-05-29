@@ -4,7 +4,6 @@ import { CATEGORIES_COLLECTION } from '../common/constants/collections.constants
 import { CategoriesController } from './categories.controller';
 import { CategoriesService } from './categories.service';
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
-import { CompareFieldsService } from '../common/services/compare-fields.service';
 
 @Module({
   imports: [
@@ -16,6 +15,6 @@ import { CompareFieldsService } from '../common/services/compare-fields.service'
     ),
   ],
   controllers: [CategoriesController],
-  providers: [CategoriesService, CompareFieldsService],
+  providers: [CategoriesService],
 })
 export class CategoriesModule {}

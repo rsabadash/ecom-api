@@ -1,29 +1,24 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CategoryEntityResponse } from '../../interfaces/response.interface';
+import { ObjectId } from 'mongodb';
+import { DESCRIPTION } from '../../constants/swagger.constants';
 
 export class CategoryResponseDto implements CategoryEntityResponse {
-  @ApiProperty({ description: 'Category identifier' })
-  readonly _id: string;
+  @ApiProperty(DESCRIPTION.ID)
+  readonly _id: ObjectId;
 
-  @ApiProperty({ description: 'Category name' })
+  @ApiProperty(DESCRIPTION.NAME)
   readonly name: string;
 
-  @ApiProperty({ description: 'Search engine optimization category name' })
+  @ApiProperty(DESCRIPTION.SEO_NAME)
   readonly seoName: string;
 
-  @ApiProperty({ description: 'Is category visible for public users' })
+  @ApiProperty(DESCRIPTION.IS_ACTIVE)
   readonly isActive: boolean;
 
-  @ApiProperty({
-    description: 'Children category identifiers of the category',
-    default: [],
-  })
+  @ApiProperty(DESCRIPTION.CHILDREN_IDS)
   readonly childrenIds: string[];
 
-  @ApiProperty({
-    description:
-      'Parent category identifiers of the category in hierarchy order (index 0 - highest parent, last index - lowest parent)',
-    default: [],
-  })
+  @ApiProperty(DESCRIPTION.PARENT_IDS_HIERARCHY)
   readonly parentIdsHierarchy: string[];
 }

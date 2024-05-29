@@ -22,8 +22,8 @@ import { ProductsService } from '../products/products.service';
 import { MathService } from '../common/services/math.service';
 import { SuppliersService } from '../suppliers/suppliers.service';
 import {
-  IProduct,
-  IProductWarehouses,
+  ProductEntity,
+  ProductWarehouses,
 } from '../products/interfaces/products.interfaces';
 import { BulkResult } from '../mongo/types/colection-model.types';
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
@@ -36,6 +36,7 @@ import { PaginationData } from '../common/interfaces/pagination.interface';
 import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
 import { getPaginationPipeline } from '../common/utils/getPaginationPipeline';
 import { ERROR } from './constants/message.constants';
+import { ProductEntityResponse } from '../products/interfaces/response.interface';
 
 @Injectable()
 export class SuppliesService {
@@ -62,24 +63,23 @@ export class SuppliesService {
 
   private async getProductsToAdd(
     products: ISupplyProductToCreate[],
-  ): Promise<IProduct[]> {
+  ): Promise<ProductEntityResponse[]> {
     const productToAddIds = products.map((product) => {
       return new ObjectId(product.productId);
     });
 
-    const productsPagination =
-      await this.productsService.getProducts(
-        {
-          _id: { $in: productToAddIds },
-        },
-        { skip: 0, limit: productToAddIds.length },
-      );
+    const productsPagination = await this.productsService.getProducts(
+      {
+        _id: { $in: productToAddIds },
+      },
+      { skip: 0, limit: productToAddIds.length },
+    );
 
     return productsPagination.data;
   }
 
   private addVariationsToSupplyProducts(
-    products: IProduct[],
+    products: ProductEntityResponse[],
     productsToAdd: ISupplyProductToCreate[],
   ): ISupplyProduct[] {
     const productsToSupplyCollection: ISupplyProduct[] = [];
@@ -93,10 +93,7 @@ export class SuppliesService {
         let productAttributeIds: string[] = [];
         let productVariantIds: string[] = [];
 
-        if (
-          product.attributes &&
-          product.attributes?.length > 0
-        ) {
+        if (product.attributes && product.attributes?.length > 0) {
           const productAttributeIdsSet = new Set<string>();
           const productVariantIdsSet = new Set<string>();
 
@@ -127,12 +124,12 @@ export class SuppliesService {
   }
 
   private updateProductsList(
-    products: IProduct[],
+    products: ProductEntity[],
     productsToAdd: ISupplyProductToCreate[],
     warehouseIdToAdd: string,
     supplyIdToAdd: string,
-  ): IProduct[] {
-    const updateProductsList: IProduct[] = [];
+  ): ProductEntityResponse[] {
+    const updateProductsList: ProductEntityResponse[] = [];
 
     products.forEach((product) => {
       const productToAdd = productsToAdd.find((productToAdd) => {
@@ -144,7 +141,7 @@ export class SuppliesService {
       });
 
       if (productToAdd) {
-        let updatedWarehouses: IProductWarehouses[];
+        let updatedWarehouses: ProductWarehouses[];
 
         if (hasWarehouse) {
           updatedWarehouses = product.warehouses.map((warehouse) => {
@@ -190,11 +187,11 @@ export class SuppliesService {
   }
 
   private async bulkProductsUpdate(
-    productsToUpdate: IProduct[],
+    productsToUpdate: ProductEntity[],
     options: BulkWriteOptions,
   ): Promise<BulkResult> {
-    const preparedBulkUpdateFilter: BulkUpdateFilter[] =
-      productsToUpdate.map(({ _id, supplyIds, warehouses }) => {
+    const preparedBulkUpdateFilter: BulkUpdateFilter[] = productsToUpdate.map(
+      ({ _id, supplyIds, warehouses }) => {
         return {
           updateOne: {
             filter: { _id },
@@ -206,12 +203,10 @@ export class SuppliesService {
             },
           },
         };
-      });
-
-    return this.productsService.bulkWrite(
-      preparedBulkUpdateFilter,
-      options,
+      },
     );
+
+    return this.productsService.bulkWrite(preparedBulkUpdateFilter, options);
   }
 
   async getSupplies(
@@ -251,8 +246,9 @@ export class SuppliesService {
     // TODO check duplication
     const productsToAdd: ISupplyProductToCreate[] = createSupply.products;
 
-    const products: IProduct[] =
-      await this.getProductsToAdd(productsToAdd);
+    const products: ProductEntityResponse[] = await this.getProductsToAdd(
+      productsToAdd,
+    );
 
     if (products.length < 1) {
       throw new BadRequestException(ERROR.NO_PRODUCTS_FOUND);
@@ -284,7 +280,7 @@ export class SuppliesService {
           throw new BadRequestException(ERROR.SUPPLY_NOT_CREATED);
         }
 
-        const updatedProducts: IProduct[] =
+        const updatedProducts: ProductEntityResponse[] =
           this.updateProductsList(
             products,
             productsToAdd,
@@ -296,10 +292,9 @@ export class SuppliesService {
           throw new BadRequestException(ERROR.NO_PRODUCTS_TO_UPDATE);
         }
 
-        const result = await this.bulkProductsUpdate(
-          updatedProducts,
-          { session },
-        );
+        const result = await this.bulkProductsUpdate(updatedProducts, {
+          session,
+        });
 
         if (result.nModified < 1) {
           throw new BadRequestException(ERROR.NO_PRODUCTS_WERE_UPDATED);

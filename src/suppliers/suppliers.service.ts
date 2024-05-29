@@ -3,39 +3,41 @@ import { ObjectId } from 'mongodb';
 import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
 import { SUPPLIERS_COLLECTION } from '../common/constants/collections.constants';
 import {
+  CreateSupplier,
+  DeleteSupplier,
   GetSupplierParameters,
-  ISupplier,
-  ISupplierCreate,
-  ISupplierDelete,
-  ISupplierUpdate,
-} from './interfaces/suppliers.interfaces';
+  SupplierEntity,
+  UpdateSupplier,
+} from './interfaces/supplier.interface';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
 import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
-import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
-import { ERROR } from './constants/message.constants';
-import { PaginationData } from '../common/interfaces/pagination.interface';
+import { ERROR } from './constants/swagger.constants';
 import { getPaginationPipeline } from '../common/utils/getPaginationPipeline';
+import { FindEntityOptions } from '../mongo/types/mongo-query.types';
 import {
-  FindEntityOptions,
-  PartialEntity,
-} from '../mongo/types/mongo-query.types';
+  CreateSupplierResponse,
+  GetSupplierResponse,
+  GetSuppliersResponse,
+  SupplierDropdownListItem,
+} from './interfaces/response.interface';
+import { GetSuppliersParameters } from './interfaces/query.interface';
 
 @Injectable()
 export class SuppliersService {
   constructor(
     private readonly compareFieldsService: CompareFieldsService,
     @InjectCollectionModel(SUPPLIERS_COLLECTION)
-    private readonly supplierCollection: ICollectionModel<ISupplier>,
+    private readonly supplierCollection: ICollectionModel<SupplierEntity>,
   ) {}
 
   async getSuppliers(
-    query: PartialEntity<ISupplier> = {},
-    options: FindEntityOptions<ISupplier> = {},
-  ): Promise<PaginationData<ISupplier>> {
+    query: GetSuppliersParameters = {},
+    options: FindEntityOptions<SupplierEntity> = {},
+  ): Promise<GetSuppliersResponse> {
     const { skip, limit } = options;
 
-    const pipeline = getPaginationPipeline<ISupplier>({
+    const pipeline = getPaginationPipeline<GetSuppliersParameters>({
       query,
       filter: {
         skip,
@@ -43,14 +45,13 @@ export class SuppliersService {
       },
     });
 
-    const paginatedData = await this.supplierCollection.aggregate<
-      PaginationData<ISupplier>
-    >(pipeline);
+    const paginatedData =
+      await this.supplierCollection.aggregate<GetSuppliersResponse>(pipeline);
 
     return paginatedData[0];
   }
 
-  async getSuppliersDropdownList(): Promise<DropdownListItem[]> {
+  async getSuppliersDropdownList(): Promise<SupplierDropdownListItem[]> {
     const suppliers = await this.supplierCollection.find();
 
     return suppliers.map((supplier) => {
@@ -61,7 +62,9 @@ export class SuppliersService {
     });
   }
 
-  async getSupplier(parameters: GetSupplierParameters): Promise<ISupplier> {
+  async getSupplier(
+    parameters: GetSupplierParameters,
+  ): Promise<GetSupplierResponse> {
     const supplier = await this.supplierCollection.findOne({
       _id: new ObjectId(parameters.supplierId),
     });
@@ -73,7 +76,9 @@ export class SuppliersService {
     return supplier;
   }
 
-  async createSupplier(createSupplier: ISupplierCreate): Promise<ISupplier> {
+  async createSupplier(
+    createSupplier: CreateSupplier,
+  ): Promise<CreateSupplierResponse> {
     const newSupplier = await this.supplierCollection.create(createSupplier);
 
     if (!newSupplier) {
@@ -83,15 +88,16 @@ export class SuppliersService {
     return newSupplier;
   }
 
-  async updateSupplier(updateSupplier: ISupplierUpdate): Promise<void> {
+  async updateSupplier(updateSupplier: UpdateSupplier): Promise<void> {
     const supplier = await this.getSupplier({
       supplierId: updateSupplier.id,
     });
 
-    const { _id, updatedFields } = this.compareFieldsService.compare<ISupplier>(
-      updateSupplier,
-      supplier,
-    );
+    const { _id, updatedFields } =
+      this.compareFieldsService.compare<SupplierEntity>(
+        updateSupplier,
+        supplier,
+      );
 
     const updateResult = await this.supplierCollection.updateOne(
       { _id },
@@ -103,7 +109,7 @@ export class SuppliersService {
     }
   }
 
-  async deleteSupplier(deleteSupplier: ISupplierDelete): Promise<void> {
+  async deleteSupplier(deleteSupplier: DeleteSupplier): Promise<void> {
     await this.supplierCollection.deleteOne({
       _id: new ObjectId(deleteSupplier.id),
     });

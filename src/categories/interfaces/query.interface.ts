@@ -2,13 +2,13 @@ import { PaginationParsedQuery } from '../../common/types/query.types';
 import { ParentIds } from '../enums/parent-ids.enum';
 import { ObjectId } from 'mongodb';
 
-export interface GetCategoriseParameters {
+export interface GetCategoriesParameters {
   ids?: string;
   parentIds?: ParentIds.Root;
 }
 
 export interface GetCategoriseQuery
-  extends PaginationParsedQuery<GetCategoriseParameters> {}
+  extends PaginationParsedQuery<GetCategoriesParameters> {}
 
 type QueryPipelineCategoryItem =
   | { _id?: ObjectId | { $in: ObjectId[] } }
@@ -16,4 +16,8 @@ type QueryPipelineCategoryItem =
 
 export interface IQueryPipelineCategory {
   $and: QueryPipelineCategoryItem[];
+}
+
+export interface GetCategoryParameters {
+  categoryId: string;
 }

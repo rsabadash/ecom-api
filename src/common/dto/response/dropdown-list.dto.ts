@@ -13,11 +13,13 @@ export class DropdownListDto implements DropdownListItem {
 
   @ApiPropertyOptional({
     type: 'object',
-    additionalProperties: {
-      anyOf: [{ type: 'string' }, { type: 'number' }, { type: 'boolean' }],
+    example: {
+      someProperty1: 123,
+      someProperty2: 'test',
+      someProperty3: true,
+      someProperty4: null,
     },
     description: 'Additional data related to the dropdown item',
-    default: null,
   })
-  readonly meta: null | Record<string, DropdownMetaValue> = null;
+  readonly meta: Record<string, DropdownMetaValue> | null = null;
 }

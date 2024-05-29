@@ -37,7 +37,7 @@ export interface ProductAttribute {
   variants: ProductVariant[];
 }
 
-interface ProductWarehouses {
+export interface ProductWarehouses {
   [WAREHOUSE_ID]: string;
   totalQuantity: string | null;
 }

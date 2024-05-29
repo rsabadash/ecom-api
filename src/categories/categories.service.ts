@@ -15,9 +15,9 @@ import {
   CategoryEntity,
   CreateCategory,
   DeleteCategory,
-  GetCategoryParameters,
   UpdateCategory,
 } from './interfaces/category.interface';
+import { GetCategoryParameters } from './interfaces/query.interface';
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
 import {
   ClientsMap,
@@ -30,7 +30,7 @@ import { ERROR } from './constants/swagger.constants';
 import { getPaginationPipeline } from '../common/utils/getPaginationPipeline';
 import {
   IQueryPipelineCategory,
-  GetCategoriseParameters,
+  GetCategoriesParameters,
 } from './interfaces/query.interface';
 import { ParentIds } from './enums/parent-ids.enum';
 import {
@@ -62,7 +62,7 @@ export class CategoriesService {
   }
 
   async getCategories(
-    query: GetCategoriseParameters = {},
+    query: GetCategoriesParameters = {},
     options: FindEntityOptions<CategoryEntity> = {},
   ): Promise<GetCategoriesResponse> {
     const { skip, limit } = options;

@@ -10,6 +10,15 @@ export const MODULE_NAME = {
   WAREHOUSES: 'Warehouses module',
 };
 
+export const DESCRIPTION_COMMON = {
+  LIMIT: {
+    description: 'Number of items that return',
+  },
+  PAGE: {
+    description: 'Number of limits that should be skipped',
+  },
+};
+
 export const HttpStatusMessage = {
   [HttpStatus.CONTINUE]: 'Continue',
   [HttpStatus.SWITCHING_PROTOCOLS]: 'Switching Protocols',

@@ -14,7 +14,6 @@ export class SignUpResponseDto implements SignUpResponse {
   @ApiProperty({
     description: 'User roles',
     enum: Role,
-    isArray: true,
     example: [Role.Admin, Role.ContentManager],
   })
   readonly roles: Role[];

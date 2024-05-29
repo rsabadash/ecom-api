@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { IProductWarehouses } from '../../products/interfaces/products.interfaces';
+import { ProductWarehouses } from '../../products/interfaces/products.interfaces';
 import {
   ATTRIBUTE_IDS,
   SUPPLIER_ID,
@@ -54,7 +54,7 @@ export interface BulkUpdateFilter {
     update: {
       $set: {
         supplyIds: string[];
-        warehouses: IProductWarehouses[];
+        warehouses: ProductWarehouses[];
       };
     };
   };

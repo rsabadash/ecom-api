@@ -11,8 +11,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { SuppliersService } from './suppliers.service';
-import { CreateSupplierDto } from './dto/create-supplier.dto';
-import { SupplierDto } from './dto/supplier.dto';
+import { CreateSupplierDto } from './dto/request/create-supplier.dto';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -27,9 +26,8 @@ import {
   SUPPLIERS_ROUTE,
 } from './constants/route.constants';
 import { SUPPLIER_ID_PARAM } from './constants/param.constants';
-import { UpdateSupplierDto } from './dto/update-supplier.dto';
-import { DeleteSupplierDto } from './dto/delete-supplier.dto';
-import { ISupplier } from './interfaces/suppliers.interfaces';
+import { UpdateSupplierDto } from './dto/request/update-supplier.dto';
+import { DeleteSupplierDto } from './dto/request/delete-supplier.dto';
 import { Roles } from '../iam/decorators/roles.decorator';
 import { Role } from '../iam/enums/role.enums';
 import { Auth } from '../iam/decorators/auth.decorator';
@@ -37,31 +35,37 @@ import { AuthType } from '../iam/enums/auth-type.enum';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
 import { HttpErrorDto } from '../common/dto/response/http-error.dto';
 import { DROPDOWN_LIST_PATH } from '../common/constants/path.constants';
-import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
 import { DropdownListDto } from '../common/dto/response/dropdown-list.dto';
-import { MODULE_NAME } from '../common/constants/swagger.constants';
-import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
+import { MODULE_NAME } from './constants/swagger.constants';
+import { ERROR, SUCCESS } from './constants/swagger.constants';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
-import { PaginationData } from '../common/interfaces/pagination.interface';
 import { PaginationParsedQuery } from '../common/types/query.types';
-import { PaginationSupplierDto } from './dto/pagination-supplier.dto';
+import {
+  CreateSupplierResponse,
+  GetSupplierResponse,
+  GetSuppliersResponse,
+  SupplierDropdownListItem,
+} from './interfaces/response.interface';
+import { GetSuppliersResponseDto } from './dto/response/get-suppliers-response.dto';
+import { GetSupplierResponseDto } from './dto/response/get-supplier-response.dto';
+import { CreateSupplierResponseDto } from './dto/response/create-supplier-response.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
 @Controller(SUPPLIERS_ROUTE)
-@ApiTags(MODULE_NAME.SUPPLIERS)
+@ApiTags(MODULE_NAME)
 export class SuppliersController {
   constructor(private readonly suppliersService: SuppliersService) {}
 
   @Get()
   @ApiOkResponse({
-    description: SWAGGER_DESCRIPTION.GET_SUPPLIERS,
-    type: [PaginationSupplierDto],
+    description: SUCCESS.GET_SUPPLIERS,
+    type: GetSuppliersResponseDto,
   })
   @ApiNoAccessResponse()
   async getSuppliers(
     @Query(ParsePaginationPipe) query: PaginationParsedQuery,
-  ): Promise<PaginationData<ISupplier>> {
+  ): Promise<GetSuppliersResponse> {
     const { page, limit } = query;
 
     return this.suppliersService.getSuppliers(
@@ -75,18 +79,18 @@ export class SuppliersController {
 
   @Get(DROPDOWN_LIST_PATH)
   @ApiOkResponse({
-    description: SWAGGER_DESCRIPTION.DROPDOWN_LIST,
+    description: SUCCESS.DROPDOWN_LIST,
     type: DropdownListDto,
   })
   @ApiNoAccessResponse()
-  async getSuppliersDropdownList(): Promise<DropdownListItem[]> {
+  async getSuppliersDropdownList(): Promise<SupplierDropdownListItem[]> {
     return this.suppliersService.getSuppliersDropdownList();
   }
 
   @Get(GET_SUPPLIER_BY_ID_PATH)
   @ApiOkResponse({
-    description: SWAGGER_DESCRIPTION.GET_SUPPLIER,
-    type: SupplierDto,
+    description: SUCCESS.GET_SUPPLIER,
+    type: GetSupplierResponseDto,
   })
   @ApiNotFoundResponse({
     description: ERROR.SUPPLIER_NOT_FOUND,
@@ -95,14 +99,14 @@ export class SuppliersController {
   @ApiNoAccessResponse()
   async getSupplier(
     @Param(SUPPLIER_ID_PARAM) supplierId: string,
-  ): Promise<ISupplier> {
+  ): Promise<GetSupplierResponse> {
     return this.suppliersService.getSupplier({ supplierId });
   }
 
   @Post()
   @ApiCreatedResponse({
-    description: SWAGGER_DESCRIPTION.CREATE_SUPPLIER,
-    type: SupplierDto,
+    description: SUCCESS.CREATE_SUPPLIER,
+    type: CreateSupplierResponseDto,
   })
   @ApiBadRequestResponse({
     description: ERROR.SUPPLIER_NOT_CREATED,
@@ -111,14 +115,14 @@ export class SuppliersController {
   @ApiNoAccessResponse()
   async createSupplier(
     @Body() createSupplierDto: CreateSupplierDto,
-  ): Promise<ISupplier> {
+  ): Promise<CreateSupplierResponse> {
     return this.suppliersService.createSupplier(createSupplierDto);
   }
 
   @Patch()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
-    description: SWAGGER_DESCRIPTION.UPDATE_SUPPLIER,
+    description: SUCCESS.UPDATE_SUPPLIER,
   })
   @ApiNotFoundResponse({
     description: ERROR.SUPPLIER_NOT_FOUND,
@@ -138,7 +142,7 @@ export class SuppliersController {
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
-    description: SWAGGER_DESCRIPTION.DELETE_SUPPLIER,
+    description: SUCCESS.DELETE_SUPPLIER,
   })
   @ApiNoAccessResponse()
   async deleteSupplier(

@@ -34,10 +34,10 @@ import { HttpErrorDto } from '../common/dto/response/http-error.dto';
 import { DropdownListDto } from '../common/dto/response/dropdown-list.dto';
 import { ERROR, SUCCESS, MODULE_NAME } from './constants/swagger.constants';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
-import { GetCategoriseQueryDto } from './dto/validation/get-categorise-query.dto';
-import { CreateCategoryDto } from './dto/validation/create-category.dto';
-import { UpdateCategoryDto } from './dto/validation/update-category.dto';
-import { DeleteCategoryDto } from './dto/validation/delete-category.dto';
+import { GetCategoriesQueryDto } from './dto/request/get-categoreis-query.dto';
+import { CreateCategoryDto } from './dto/request/create-category.dto';
+import { UpdateCategoryDto } from './dto/request/update-category.dto';
+import { DeleteCategoryDto } from './dto/request/delete-category.dto';
 import {
   CategoryDropdownListItem,
   CreateCategoryResponse,
@@ -59,12 +59,12 @@ export class CategoriesController {
   @Get()
   @ApiOkResponse({
     description: SUCCESS.GET_CATEGORIES,
-    type: [GetCategoriesResponseDto],
+    type: GetCategoriesResponseDto,
   })
   @ApiNoAccessResponse()
   async getCategories(
     @Query(ParsePaginationPipe)
-    query: GetCategoriseQueryDto,
+    query: GetCategoriesQueryDto,
   ): Promise<GetCategoriesResponse> {
     const { page, limit, ...restQuery } = query;
 

@@ -1,18 +1,31 @@
-import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   CategoryEntityResponse,
   GetCategoryResponse,
 } from '../../interfaces/response.interface';
 import { CategoryResponseDto } from './category-response.dto';
+import { ObjectId } from 'mongodb';
+import { DESCRIPTION } from '../../constants/swagger.constants';
 
-export class GetCategoryResponseDto
-  extends OmitType(CategoryResponseDto, ['parentIdsHierarchy'] as const)
-  implements GetCategoryResponse
-{
+export class GetCategoryResponseDto implements GetCategoryResponse {
+  @ApiProperty(DESCRIPTION.ID)
+  readonly _id: ObjectId;
+
+  @ApiProperty(DESCRIPTION.NAME)
+  readonly name: string;
+
+  @ApiProperty(DESCRIPTION.SEO_NAME)
+  readonly seoName: string;
+
+  @ApiProperty(DESCRIPTION.IS_ACTIVE)
+  readonly isActive: boolean;
+
+  @ApiProperty(DESCRIPTION.CHILDREN_IDS)
+  readonly childrenIds: string[];
+
   @ApiProperty({
+    ...DESCRIPTION.PARENTS,
     type: [CategoryResponseDto],
-    description: 'Parent categories with full data in hierarchy order',
-    default: [],
   })
   readonly parents: CategoryEntityResponse[];
 }
