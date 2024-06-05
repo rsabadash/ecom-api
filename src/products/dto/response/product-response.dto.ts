@@ -6,63 +6,39 @@ import {
   ProductWarehouseResponse,
 } from '../../interfaces/response.interface';
 import { ProductWarehouseResponseDto } from './product-warehouse-response.dto';
+import { DESCRIPTION } from '../../constants/swagger.constants';
 
 export class ProductResponseDto {
-  @ApiProperty({ description: 'Product identifier' })
+  @ApiProperty(DESCRIPTION.ID)
   readonly _id: string;
 
-  @ApiProperty({ description: 'Product name' })
+  @ApiProperty(DESCRIPTION.NAME)
   readonly name: string;
 
-  @ApiProperty({ description: 'Unique SKU identifier of product' })
+  @ApiProperty(DESCRIPTION.SKU)
   readonly sku: string;
 
-  @ApiProperty({
-    description: 'Product measurement unit',
-    enum: Unit,
-    example: [
-      Unit.Meter,
-      Unit.Centimetre,
-      Unit.Millimetre,
-      Unit.Liter,
-      Unit.Milliliter,
-      Unit.Kilogram,
-      Unit.Gram,
-      Unit.Milligram,
-      Unit.Item,
-    ],
-  })
+  @ApiProperty(DESCRIPTION.UNIT)
   readonly unit: Unit;
 
   @ApiProperty({
+    ...DESCRIPTION.ATTRIBUTES,
     type: [ProductAttributeResponseDto],
-    description: 'Product attributes',
-    nullable: true,
-    default: [],
   })
   readonly attributes: ProductAttributeResponse[] | null;
 
-  @ApiProperty({ description: 'Product creation date' })
+  @ApiProperty(DESCRIPTION.CREATED_AT)
   readonly createdAt: Date;
 
-  @ApiProperty({
-    description: 'Supply identifiers that is related to product',
-    nullable: true,
-    default: [],
-  })
+  @ApiProperty(DESCRIPTION.SUPPLY_IDS)
   readonly supplyIds: string[] | null;
 
   @ApiProperty({
+    ...DESCRIPTION.WAREHOUSES,
     type: [ProductWarehouseResponseDto],
-    description: 'List of warehouses where the product is located',
-    nullable: true,
-    default: [],
   })
   readonly warehouses: ProductWarehouseResponse[] | null;
 
-  @ApiProperty({
-    description: 'Is product logically deleted',
-    default: false,
-  })
+  @ApiProperty(DESCRIPTION.IS_DELETED)
   readonly isDeleted: boolean;
 }

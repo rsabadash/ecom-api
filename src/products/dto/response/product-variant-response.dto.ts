@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ProductVariantResponse } from '../../interfaces/response.interface';
+import { DESCRIPTION } from '../../constants/swagger.constants';
 
 export class ProductVariantResponseDto implements ProductVariantResponse {
-  @ApiProperty({ description: 'Variant identifier related to product' })
+  @ApiProperty(DESCRIPTION.VARIANT_ID)
   readonly variantId: string;
 
-  @ApiProperty({ description: 'Variant name related to product' })
+  @ApiProperty(DESCRIPTION.VARIANT_NAME)
   readonly name: string;
 }

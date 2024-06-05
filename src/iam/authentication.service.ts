@@ -73,12 +73,7 @@ export class AuthenticationService {
       password: hashedPassword,
     };
 
-    const createdUser = await this.usersService.createUser(user);
-
-    return {
-      ...createdUser,
-      _id: createdUser._id.toString(),
-    };
+    return this.usersService.createUser(user);
   }
 
   async signIn(signInDto: SignIn): Promise<SignInResponse> {

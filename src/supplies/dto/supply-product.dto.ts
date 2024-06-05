@@ -54,7 +54,6 @@ export class SupplyProductDto implements ISupplyProduct {
   @ApiProperty({
     description: 'Attribute identifiers that are related to product',
     nullable: true,
-    default: [],
   })
   readonly attributeIds: string[] = [];
 
@@ -62,7 +61,6 @@ export class SupplyProductDto implements ISupplyProduct {
   @ApiProperty({
     description: 'Variant identifiers that are related to product',
     nullable: true,
-    default: [],
   })
   readonly variantIds: string[] = [];
 }

@@ -48,7 +48,6 @@ export class AttributeDto implements IAttributeDto {
   @ApiProperty({
     description: 'Attribute variants',
     nullable: true,
-    default: [],
   })
   readonly variants: IVariant[] = [];
 }

@@ -1,3 +1,5 @@
+import { Role } from '../enums/role.enums';
+
 export const MODULE_NAME = 'Auth module';
 
 export const ERROR = {
@@ -12,4 +14,26 @@ export const SUCCESS = {
   SIGN_UP: 'User has been signed up',
   SIGN_IN: 'User has been signed in',
   REFRESH_TOKEN: 'User received a new pair of tokens',
+};
+
+export const DESCRIPTION = {
+  ID: {
+    type: 'string',
+    description: 'User identifier',
+  },
+  EMAIL: {
+    description: 'User email',
+  },
+  PASSWORD: {
+    description: 'User password',
+  },
+  ROLES: {
+    description: 'User roles',
+    enum: Role,
+    example: [Role.Admin, Role.ContentManager],
+  },
+  ACCESS_TOKEN: { description: 'Access token' },
+  REFRESH_TOKEN: {
+    description: 'Refresh token to sign a new access token',
+  },
 };

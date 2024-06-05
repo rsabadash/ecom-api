@@ -1,20 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '../../enums/role.enums';
 import { SignUpResponse } from '../../interfaces/response.interface';
+import { DESCRIPTION } from '../../constants/swagger.constants';
+import { ObjectId } from 'mongodb';
 
 export class SignUpResponseDto implements SignUpResponse {
-  @ApiProperty({
-    description: 'User identifier (returned as ObjectId)',
-  })
-  readonly _id: string;
+  @ApiProperty(DESCRIPTION.ID)
+  readonly _id: ObjectId;
 
-  @ApiProperty({ description: 'User email' })
+  @ApiProperty(DESCRIPTION.EMAIL)
   readonly email: string;
 
-  @ApiProperty({
-    description: 'User roles',
-    enum: Role,
-    example: [Role.Admin, Role.ContentManager],
-  })
+  @ApiProperty(DESCRIPTION.ROLES)
   readonly roles: Role[];
 }

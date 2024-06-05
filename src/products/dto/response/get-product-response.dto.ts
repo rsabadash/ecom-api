@@ -13,7 +13,6 @@ export class GetProductsResponseDto
   @ApiProperty({
     type: [ProductResponseDto],
     description: 'List of products',
-    default: [],
   })
   readonly data: ProductEntityResponse[];
 }

@@ -4,17 +4,18 @@ import {
   ProductVariantResponse,
 } from '../../interfaces/response.interface';
 import { ProductVariantResponseDto } from './product-variant-response.dto';
+import { DESCRIPTION } from '../../constants/swagger.constants';
 
 export class ProductAttributeResponseDto implements ProductAttributeResponse {
-  @ApiProperty({ description: 'Attribute identifier related to product' })
+  @ApiProperty(DESCRIPTION.ATTRIBUTE_ID)
   readonly attributeId: string;
 
-  @ApiProperty({ description: 'Attribute name related to product' })
+  @ApiProperty(DESCRIPTION.ATTRIBUTE_NAME)
   readonly name: string;
 
   @ApiProperty({
+    ...DESCRIPTION.VARIANTS,
     type: [ProductVariantResponseDto],
-    description: 'Product variants',
   })
   readonly variants: ProductVariantResponse[];
 }

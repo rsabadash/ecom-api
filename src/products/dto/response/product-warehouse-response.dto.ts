@@ -1,14 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ProductWarehouseResponse } from '../../interfaces/response.interface';
+import { DESCRIPTION } from '../../constants/swagger.constants';
 
 export class ProductWarehouseResponseDto implements ProductWarehouseResponse {
-  @ApiProperty({ description: 'Warehouse identifier' })
+  @ApiProperty(DESCRIPTION.WAREHOUSE_ID)
   readonly warehouseId: string;
 
-  @ApiProperty({
-    description: 'Quantity of product in warehouse',
-    nullable: true,
-    default: null,
-  })
-  readonly totalQuantity: null | string = null;
+  @ApiProperty(DESCRIPTION.TOTAL_QUANTITY)
+  readonly totalQuantity: string | null;
 }

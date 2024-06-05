@@ -15,11 +15,11 @@ import {
   SIGN_IN_PATH,
   SIGN_UP_PATH,
 } from './constants/route.constants';
-import { SignUpDto } from './dto/validation/sign-up.dto';
-import { SignInDto } from './dto/validation/sign-in.dto';
+import { SignUpDto } from './dto/request/sign-up.dto';
+import { SignInDto } from './dto/request/sign-in.dto';
 import { Auth } from './decorators/auth.decorator';
 import { AuthType } from './enums/auth-type.enum';
-import { RefreshTokenDto } from './dto/validation/refresh-token.dto';
+import { RefreshTokenDto } from './dto/request/refresh-token.dto';
 import { MODULE_NAME, SUCCESS, ERROR } from './constants/swagger.constants';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
 import { HttpErrorDto } from '../common/dto/response/http-error.dto';
