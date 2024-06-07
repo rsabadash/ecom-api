@@ -1,4 +1,4 @@
-import { IsOptional, IsString, Matches } from 'class-validator';
+import { IsOptional, IsString, Matches, ValidateIf } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EMPTY_SPACE } from '../constants/reg-exp.contants';
 
@@ -14,10 +14,11 @@ export class TranslationsDto {
 
   @IsString()
   @IsOptional()
+  @ValidateIf((_, value) => value !== null)
   @ApiPropertyOptional({
     description: 'English translation',
     nullable: true,
     default: null,
   })
-  readonly en: null | string = null;
+  readonly en: string | null = null;
 }

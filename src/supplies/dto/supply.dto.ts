@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
   Matches,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
@@ -23,12 +24,13 @@ export class SupplyDto implements ISupplyDto {
 
   @IsString()
   @IsOptional()
+  @ValidateIf((_, value) => value !== null)
   @ApiProperty({
     description: 'Supply name',
     nullable: true,
     default: null,
   })
-  readonly name: null | string = null;
+  readonly name: string | null = null;
 
   @ArrayNotEmpty()
   @ValidateNested({ each: true })

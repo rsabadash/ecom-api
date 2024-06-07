@@ -6,15 +6,19 @@ import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces
 import {
   IWarehouse,
   GetWarehouseParameters,
-  IWarehouseCreate,
-  IWarehouseUpdate,
-  IWarehouseDelete,
-} from './interfaces/warehouses.interfaces';
-import { PartialEntity } from '../mongo/types/mongo-query.types';
+  WarehouseUpdate,
+  WarehouseDelete,
+  WarehouseCreate,
+} from './interface/warehouses.interface';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
 import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
-import { DropdownListItem } from '../common/interfaces/dropdown-list.interface';
-import { ERROR } from './constants/message.constants';
+import { ERROR } from './constants/swagger.constants';
+import {
+  CreateWarehouseResponse,
+  GetWarehouseResponse,
+  GetWarehousesResponse,
+  WarehouseDropdownListItem,
+} from './interface/response.interface';
 
 @Injectable()
 export class WarehousesService {
@@ -24,13 +28,11 @@ export class WarehousesService {
     private readonly warehousesCollection: ICollectionModel<IWarehouse>,
   ) {}
 
-  async getWarehouses(
-    query: PartialEntity<IWarehouse> = {},
-  ): Promise<IWarehouse[]> {
-    return this.warehousesCollection.find(query);
+  async getWarehouses(): Promise<GetWarehousesResponse[]> {
+    return this.warehousesCollection.find();
   }
 
-  async getWarehousesDropdownList(): Promise<DropdownListItem[]> {
+  async getWarehousesDropdownList(): Promise<WarehouseDropdownListItem[]> {
     const warehouses = await this.getWarehouses();
 
     return warehouses.map((warehouse) => {
@@ -41,7 +43,9 @@ export class WarehousesService {
     });
   }
 
-  async getWarehouse(parameters: GetWarehouseParameters): Promise<IWarehouse> {
+  async getWarehouse(
+    parameters: GetWarehouseParameters,
+  ): Promise<GetWarehouseResponse> {
     const warehouse = await this.warehousesCollection.findOne({
       _id: new ObjectId(parameters.warehouseId),
     });
@@ -54,8 +58,8 @@ export class WarehousesService {
   }
 
   async createWarehouse(
-    createWarehouse: IWarehouseCreate,
-  ): Promise<IWarehouse> {
+    createWarehouse: WarehouseCreate,
+  ): Promise<CreateWarehouseResponse> {
     const newWarehouse = await this.warehousesCollection.create(
       createWarehouse,
     );
@@ -67,7 +71,7 @@ export class WarehousesService {
     return newWarehouse;
   }
 
-  async updateWarehouse(updateWarehouse: IWarehouseUpdate): Promise<void> {
+  async updateWarehouse(updateWarehouse: WarehouseUpdate): Promise<void> {
     const warehouse = await this.getWarehouse({
       warehouseId: updateWarehouse.id,
     });
@@ -85,7 +89,7 @@ export class WarehousesService {
     }
   }
 
-  async deleteWarehouse(deleteWarehouse: IWarehouseDelete): Promise<void> {
+  async deleteWarehouse(deleteWarehouse: WarehouseDelete): Promise<void> {
     await this.warehousesCollection.deleteOne({
       _id: new ObjectId(deleteWarehouse.id),
     });
