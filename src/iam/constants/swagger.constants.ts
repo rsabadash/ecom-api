@@ -1,4 +1,4 @@
-import { Role } from '../enums/role.enums';
+import { Role } from '../../users/enums/role.enum';
 
 export const MODULE_NAME = 'Auth module';
 

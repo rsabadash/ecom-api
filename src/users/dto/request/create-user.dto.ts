@@ -1,10 +1,10 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { Role } from '../../../users/enums/role.enum';
-import { SignUp } from '../../interfaces/authentication.interface';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { Role } from '../../enums/role.enum';
 import { DESCRIPTION } from '../../constants/swagger.constants';
+import { CreateUser } from '../../interfaces/user.interface';
 
-export class SignUpDto implements SignUp {
+export class CreateUserDto implements CreateUser {
   @IsEmail()
   @ApiProperty(DESCRIPTION.EMAIL)
   readonly email: string;

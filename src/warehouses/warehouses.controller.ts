@@ -27,7 +27,7 @@ import {
 } from './constants/route.constants';
 import { WAREHOUSE_ID_PARAM } from './constants/param.constants';
 import { Roles } from '../iam/decorators/roles.decorator';
-import { Role } from '../iam/enums/role.enums';
+import { Role } from '../users/enums/role.enum';
 import { Auth } from '../iam/decorators/auth.decorator';
 import { AuthType } from '../iam/enums/auth-type.enum';
 import { UpdateWarehouseDto } from './dto/request/update-warehouse.dto';

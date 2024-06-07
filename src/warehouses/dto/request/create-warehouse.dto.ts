@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { WarehouseCreate } from '../../interface/warehouses.interface';
+import { CreateWarehouse } from '../../interface/warehouse.interface';
 import { IsEnum, IsNotEmpty, IsString, ValidateIf } from 'class-validator';
 import { DESCRIPTION } from '../../constants/swagger.constants';
-import { WarehouseType } from '../../enums/warehouse-types';
+import { WarehouseType } from '../../enums/warehouse-types.enum';
 
-export class CreateWarehouseDto implements WarehouseCreate {
+export class CreateWarehouseDto implements CreateWarehouse {
   @IsString()
   @IsNotEmpty()
   @ApiProperty(DESCRIPTION.NAME)

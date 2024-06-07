@@ -1,11 +1,11 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
-import { Role } from '../enums/role.enums';
+import { Role } from '../../users/enums/role.enum';
 import { UsersService } from '../../users/users.service';
 import { RequestExtended } from '../../common/interfaces/request.interface';
 import { REQUEST_USER_KEY } from '../../common/constants/request.constants';
-import { IUserPublic } from '../../users/interfaces/users.interfaces';
+import { UserData } from '../interfaces/authentication.interface';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -14,7 +14,7 @@ export class RolesGuard implements CanActivate {
     private readonly usersService: UsersService,
   ) {}
 
-  private hasAllAccesses(user: IUserPublic): boolean {
+  private hasAllAccesses(user: UserData): boolean {
     return !!user.roles.find((role) => role === Role.Admin);
   }
 

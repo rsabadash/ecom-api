@@ -9,13 +9,13 @@ import { JwtService } from '@nestjs/jwt';
 import { HashingService } from './hashing.service';
 import jwtConfig from './config/jwt.config';
 import { UsersService } from '../users/users.service';
-import { IUserPublic } from '../users/interfaces/users.interfaces';
 import {
   RefreshToken,
   SignIn,
   SignUp,
   Tokens,
   JwtDecoded,
+  UserData,
 } from './interfaces/authentication.interface';
 import {
   RefreshTokenResponse,
@@ -32,7 +32,7 @@ export class AuthenticationService {
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
     private readonly usersService: UsersService,
   ) {}
-  private async generateTokens(user: IUserPublic): Promise<Tokens> {
+  private async generateTokens(user: UserData): Promise<Tokens> {
     const { accessTokenTtl, refreshTokenTtl } = this.jwtConfiguration;
 
     const aToken = this.signToken(String(user._id), accessTokenTtl);

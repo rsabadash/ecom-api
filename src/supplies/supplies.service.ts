@@ -24,7 +24,7 @@ import { SuppliersService } from '../suppliers/suppliers.service';
 import {
   ProductEntity,
   ProductWarehouses,
-} from '../products/interfaces/products.interfaces';
+} from '../products/interfaces/product.interfaces';
 import { BulkResult } from '../mongo/types/colection-model.types';
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
 import {

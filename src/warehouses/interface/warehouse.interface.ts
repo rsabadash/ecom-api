@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { WarehouseType } from '../enums/warehouse-types';
+import { WarehouseType } from '../enums/warehouse-types.enum';
 
 export interface WarehouseEntity {
   _id: ObjectId;
@@ -8,24 +8,20 @@ export interface WarehouseEntity {
   address: string | null;
 }
 
-export interface WarehouseCreate
-  extends Pick<WarehouseEntity, 'name' | 'type' | 'address'> {}
-
-export interface IWarehouse {
-  _id: ObjectId;
+export interface CreateWarehouse {
   name: string;
   type: WarehouseType;
   address: string | null;
 }
 
-export interface WarehouseUpdate {
+export interface UpdateWarehouse {
   id: string;
   name?: string;
   type?: WarehouseType;
   address?: string | null;
 }
 
-export interface WarehouseDelete {
+export interface DeleteWarehouse {
   id: string;
 }
 

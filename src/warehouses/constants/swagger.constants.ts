@@ -1,4 +1,4 @@
-import { WarehouseType } from '../enums/warehouse-types';
+import { WarehouseType } from '../enums/warehouse-types.enum';
 
 export const MODULE_NAME = 'Warehouses module';
 

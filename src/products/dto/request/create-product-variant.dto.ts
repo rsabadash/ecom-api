@@ -1,5 +1,5 @@
 import { IsMongoId, IsNotEmpty, IsString } from 'class-validator';
-import { CreateProductVariant } from '../../interfaces/products.interfaces';
+import { CreateProductVariant } from '../../interfaces/product.interfaces';
 import { ApiProperty } from '@nestjs/swagger';
 import { DESCRIPTION } from '../../constants/swagger.constants';
 

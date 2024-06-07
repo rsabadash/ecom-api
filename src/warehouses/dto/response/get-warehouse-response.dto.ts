@@ -1,6 +1,6 @@
 import { IsEnum, IsMongoId, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { WarehouseType } from '../../enums/warehouse-types';
+import { WarehouseType } from '../../enums/warehouse-types.enum';
 import { GetWarehouseResponse } from '../../interface/response.interface';
 import { ObjectId } from 'mongodb';
 import { DESCRIPTION } from '../../constants/swagger.constants';

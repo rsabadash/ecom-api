@@ -9,7 +9,7 @@ import {
   ProductAttribute,
   ProductVariant,
   CreateProduct,
-} from './interfaces/products.interfaces';
+} from './interfaces/product.interfaces';
 import { AttributesService } from '../attributes/attributes.service';
 import {
   FindEntityOptions,

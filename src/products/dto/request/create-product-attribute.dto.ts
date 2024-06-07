@@ -3,7 +3,7 @@ import { Type } from 'class-transformer';
 import {
   CreateProductAttribute,
   CreateProductVariant,
-} from '../../interfaces/products.interfaces';
+} from '../../interfaces/product.interfaces';
 import { CreateProductVariantDto } from './create-product-variant.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { DESCRIPTION } from '../../constants/swagger.constants';

@@ -3,7 +3,6 @@ import { HttpStatus } from '@nestjs/common';
 export const MODULE_NAME = {
   ATTRIBUTES: 'Attributes module',
   SUPPLIES: 'Supplies module',
-  USERS: 'Users module',
 };
 
 export const DESCRIPTION_COMMON = {

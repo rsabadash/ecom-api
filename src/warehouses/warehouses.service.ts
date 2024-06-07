@@ -4,12 +4,12 @@ import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
 import { WAREHOUSES_COLLECTION } from '../common/constants/collections.constants';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
 import {
-  IWarehouse,
+  WarehouseEntity,
   GetWarehouseParameters,
-  WarehouseUpdate,
-  WarehouseDelete,
-  WarehouseCreate,
-} from './interface/warehouses.interface';
+  CreateWarehouse,
+  UpdateWarehouse,
+  DeleteWarehouse,
+} from './interface/warehouse.interface';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
 import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
 import { ERROR } from './constants/swagger.constants';
@@ -25,7 +25,7 @@ export class WarehousesService {
   constructor(
     private readonly compareFieldsService: CompareFieldsService,
     @InjectCollectionModel(WAREHOUSES_COLLECTION)
-    private readonly warehousesCollection: ICollectionModel<IWarehouse>,
+    private readonly warehousesCollection: ICollectionModel<WarehouseEntity>,
   ) {}
 
   async getWarehouses(): Promise<GetWarehousesResponse[]> {
@@ -58,7 +58,7 @@ export class WarehousesService {
   }
 
   async createWarehouse(
-    createWarehouse: WarehouseCreate,
+    createWarehouse: CreateWarehouse,
   ): Promise<CreateWarehouseResponse> {
     const newWarehouse = await this.warehousesCollection.create(
       createWarehouse,
@@ -71,13 +71,16 @@ export class WarehousesService {
     return newWarehouse;
   }
 
-  async updateWarehouse(updateWarehouse: WarehouseUpdate): Promise<void> {
+  async updateWarehouse(updateWarehouse: UpdateWarehouse): Promise<void> {
     const warehouse = await this.getWarehouse({
       warehouseId: updateWarehouse.id,
     });
 
     const { _id, updatedFields } =
-      this.compareFieldsService.compare<IWarehouse>(updateWarehouse, warehouse);
+      this.compareFieldsService.compare<WarehouseEntity>(
+        updateWarehouse,
+        warehouse,
+      );
 
     const updatedResult = await this.warehousesCollection.updateOne(
       { _id },
@@ -89,7 +92,7 @@ export class WarehousesService {
     }
   }
 
-  async deleteWarehouse(deleteWarehouse: WarehouseDelete): Promise<void> {
+  async deleteWarehouse(deleteWarehouse: DeleteWarehouse): Promise<void> {
     await this.warehousesCollection.deleteOne({
       _id: new ObjectId(deleteWarehouse.id),
     });

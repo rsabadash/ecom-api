@@ -1,4 +1,4 @@
-import { ProductEntity } from './products.interfaces';
+import { ProductEntity } from './product.interfaces';
 import { PaginationData } from '../../common/interfaces/pagination.interface';
 import {
   ATTRIBUTE_ID,

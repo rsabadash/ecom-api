@@ -1,4 +1,4 @@
-import { Role } from '../enums/role.enums';
+import { Role } from '../../users/enums/role.enum';
 import { Tokens } from './authentication.interface';
 import { ObjectId } from 'mongodb';
 

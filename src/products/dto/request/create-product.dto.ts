@@ -9,7 +9,7 @@ import { Type } from 'class-transformer';
 import {
   CreateProductAttribute,
   CreateProduct,
-} from '../../interfaces/products.interfaces';
+} from '../../interfaces/product.interfaces';
 import { Unit } from '../../enums/unit.enum';
 import { CreateProductAttributeDto } from './create-product-attribute.dto';
 import { ApiProperty } from '@nestjs/swagger';

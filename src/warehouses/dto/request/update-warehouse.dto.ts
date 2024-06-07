@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { WarehouseUpdate } from '../../interface/warehouses.interface';
+import { UpdateWarehouse } from '../../interface/warehouse.interface';
 import {
   IsEnum,
   IsMongoId,
@@ -9,9 +9,9 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { DESCRIPTION } from '../../constants/swagger.constants';
-import { WarehouseType } from '../../enums/warehouse-types';
+import { WarehouseType } from '../../enums/warehouse-types.enum';
 
-export class UpdateWarehouseDto implements WarehouseUpdate {
+export class UpdateWarehouseDto implements UpdateWarehouse {
   @IsMongoId()
   @ApiProperty(DESCRIPTION.ID)
   readonly id: string;

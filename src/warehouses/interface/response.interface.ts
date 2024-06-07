@@ -1,4 +1,4 @@
-import { WarehouseEntity } from './warehouses.interface';
+import { WarehouseEntity } from './warehouse.interface';
 import { DropdownListItem } from '../../common/interfaces/dropdown-list.interface';
 
 export interface WarehouseResponseEntity extends WarehouseEntity {}

@@ -1,4 +1,5 @@
-import { Role } from '../enums/role.enums';
+import { Role } from '../../users/enums/role.enum';
+import { UserEntity } from '../../users/interfaces/user.interface';
 
 export interface SignUp {
   email: string;
@@ -25,3 +26,5 @@ export interface JwtDecoded {
   aud: string;
   iss: string;
 }
+
+export interface UserData extends Omit<UserEntity, 'password'> {}

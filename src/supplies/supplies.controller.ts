@@ -7,7 +7,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Roles } from '../iam/decorators/roles.decorator';
-import { Role } from '../iam/enums/role.enums';
+import { Role } from '../users/enums/role.enum';
 import { Auth } from '../iam/decorators/auth.decorator';
 import { AuthType } from '../iam/enums/auth-type.enum';
 import {

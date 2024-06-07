@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Role } from '../../../users/enums/role.enum';
-import { SignUpResponse } from '../../interfaces/response.interface';
-import { DESCRIPTION } from '../../constants/swagger.constants';
+import { Role } from '../../enums/role.enum';
 import { ObjectId } from 'mongodb';
+import { GetUsersResponse } from '../../interfaces/response.interface';
+import { DESCRIPTION } from '../../constants/swagger.constants';
 
-export class SignUpResponseDto implements SignUpResponse {
+export class GetUsersResponseDto implements GetUsersResponse {
   @ApiProperty(DESCRIPTION.ID)
   readonly _id: ObjectId;
 

@@ -48,7 +48,7 @@ import { DeleteVariantDto } from './dto/delete-variant.dto';
 import { AttributeDto } from './dto/attribute.dto';
 import { VariantDto } from './dto/variant.dto';
 import { Roles } from '../iam/decorators/roles.decorator';
-import { Role } from '../iam/enums/role.enums';
+import { Role } from '../users/enums/role.enum';
 import { IVariantWithAttribute } from './interfaces/variant-with-attribute.interfaces';
 import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';

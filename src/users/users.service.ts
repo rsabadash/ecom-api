@@ -9,29 +9,34 @@ import { ObjectId } from 'mongodb';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
 import {
   GetUserParameters,
-  IUser,
-  IUserCreate,
-  IUserPublic,
-  IUserUpdate,
-} from './interfaces/users.interfaces';
+  UserEntity,
+  UpdateUser,
+  CreateUser,
+} from './interfaces/user.interface';
 import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
 import { USERS_COLLECTION } from '../common/constants/collections.constants';
 import { CompareFieldsService } from '../common/services/compare-fields.service';
-import { ERROR } from './constants/message.constants';
+import { ERROR } from './constants/swagger.constants';
+import {
+  CreateUserResponse,
+  GetUserResponse,
+  GetUsersResponse,
+  UserEntityResponse,
+} from './interfaces/response.interface';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly compareFieldsService: CompareFieldsService,
     @InjectCollectionModel(USERS_COLLECTION)
-    private readonly usersCollection: ICollectionModel<IUser>,
+    private readonly usersCollection: ICollectionModel<UserEntity>,
   ) {}
 
-  async getUsers(): Promise<IUserPublic[]> {
+  async getUsers(): Promise<GetUsersResponse[]> {
     return this.usersCollection.find({}, { projection: { password: 0 } });
   }
 
-  async getUser(parameters: GetUserParameters): Promise<IUserPublic> {
+  async getUser(parameters: GetUserParameters): Promise<GetUserResponse> {
     const user = await this.usersCollection.findOne(
       { _id: new ObjectId(parameters.userId) },
       { projection: { password: 0 } },
@@ -44,12 +49,12 @@ export class UsersService {
     return user;
   }
 
-  async getUserByEmail(email: string): Promise<IUser | null> {
-    // No Found did not handle as in different scenarios it handled in a different way
+  async getUserByEmail(email: string): Promise<UserEntityResponse | null> {
+    // Not found is not handled as it is handled differently in different scenarios
     return this.usersCollection.findOne({ email });
   }
 
-  async createUser(createUser: IUserCreate): Promise<IUserPublic> {
+  async createUser(createUser: CreateUser): Promise<CreateUserResponse> {
     const isUserWithEmailExist = await this.getUserByEmail(createUser.email);
 
     if (isUserWithEmailExist) {
@@ -69,7 +74,7 @@ export class UsersService {
     };
   }
 
-  async updateUser(updateUser: IUserUpdate): Promise<void> {
+  async updateUser(updateUser: UpdateUser): Promise<void> {
     const user = await this.getUser({ userId: updateUser.id });
 
     if (updateUser.email) {
@@ -81,7 +86,7 @@ export class UsersService {
     }
 
     const { _id, updatedFields } =
-      this.compareFieldsService.compare<IUserPublic>(updateUser, user);
+      this.compareFieldsService.compare<UserEntity>(updateUser, user);
 
     const updateResult = await this.usersCollection.updateOne(
       { _id },

@@ -1,9 +1,9 @@
 import { IsMongoId } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { WarehouseDelete } from '../../interface/warehouses.interface';
+import { DeleteWarehouse } from '../../interface/warehouse.interface';
 import { DESCRIPTION } from '../../constants/swagger.constants';
 
-export class DeleteWarehouseDto implements WarehouseDelete {
+export class DeleteWarehouseDto implements DeleteWarehouse {
   @IsMongoId()
   @ApiProperty(DESCRIPTION.ID)
   readonly id: string;
