@@ -5,45 +5,52 @@ import { InjectCollectionModel } from '../mongo/decorators/mongo.decorators';
 import { ATTRIBUTES_COLLECTION } from '../common/constants/collections.constants';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
 import {
-  IAttribute,
-  IAttributeCreate,
-  IAttributeDelete,
-  IAttributeUpdate,
   GetAttributeParameters,
-} from './interfaces/attribute.interfaces';
+  AttributeEntity,
+  CreateAttribute,
+  UpdateAttribute,
+  DeleteAttribute,
+} from './interfaces/attribute.interface';
 import {
   IVariant,
-  IVariantCreate,
-  IVariantDelete,
-  IVariantUpdate,
   GetVariantParameters,
-  IVariantWithAttributeId,
-} from './interfaces/variant.interfaces';
-import { IVariantWithAttribute } from './interfaces/variant-with-attribute.interfaces';
+  VariantEntity,
+  CreateVariant,
+  UpdateVariant,
+  DeleteVariant,
+} from './interfaces/variant.interface';
 import {
   FindEntityOptions,
   PartialEntity,
 } from '../mongo/types/mongo-query.types';
 import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
-import { ERROR } from './constants/message.constants';
+import { ERROR } from './constants/swagger.constants';
 import { getPaginationPipeline } from '../common/utils/getPaginationPipeline';
 import { PaginationData } from '../common/interfaces/pagination.interface';
+import {
+  CreateAttributeResponse,
+  CreateVariantResponse,
+  GetAttributeResponse,
+  GetAttributesResponse,
+  GetVariantResponse,
+  GetVariantsResponse,
+} from './interfaces/response.interface';
 
 @Injectable()
 export class AttributesService {
   constructor(
     private readonly compareFieldsService: CompareFieldsService,
     @InjectCollectionModel(ATTRIBUTES_COLLECTION)
-    private readonly attributeCollection: ICollectionModel<IAttribute>,
+    private readonly attributeCollection: ICollectionModel<AttributeEntity>,
   ) {}
 
   async getAttributes(
-    query: PartialEntity<IAttribute> = {},
-    options: FindEntityOptions<IAttribute>,
-  ): Promise<PaginationData<IAttribute>> {
+    query: Record<string, string> = {},
+    options: FindEntityOptions<AttributeEntity> = {},
+  ): Promise<GetAttributesResponse> {
     const { skip, limit } = options;
 
-    const pipeline = getPaginationPipeline<IAttribute>({
+    const pipeline = getPaginationPipeline<AttributeEntity>({
       query,
       filter: {
         skip,
@@ -52,26 +59,27 @@ export class AttributesService {
     });
 
     const paginatedData = await this.attributeCollection.aggregate<
-      PaginationData<IAttribute>
+      PaginationData<AttributeEntity>
     >(pipeline);
 
     return paginatedData[0];
   }
 
+  // TODO Unify for attribute and product controller
   async getAttributes2(
-    query: PartialEntity<IAttribute> = {},
-    options: FindEntityOptions<IAttribute>,
-  ): Promise<IAttribute[]> {
+    query: PartialEntity<AttributeEntity> = {},
+    options: FindEntityOptions<AttributeEntity>,
+  ): Promise<AttributeEntity[]> {
     return this.attributeCollection.find(query, options);
   }
 
   async getVariants(
-    query: PartialEntity<IVariantWithAttribute> = {},
-    options: FindEntityOptions<IVariantWithAttribute>,
-  ): Promise<PaginationData<IVariantWithAttribute>> {
+    query: Record<string, string> = {},
+    options: FindEntityOptions<VariantEntity>,
+  ): Promise<GetVariantsResponse> {
     const { skip, limit } = options;
 
-    const paginationPipeline = getPaginationPipeline<IVariantWithAttribute>({
+    const paginationPipeline = getPaginationPipeline<VariantEntity>({
       query,
       filter: {
         skip,
@@ -104,17 +112,16 @@ export class AttributesService {
       ...restPipeline,
     ];
 
-    const paginatedData = await this.attributeCollection.aggregate<
-      PaginationData<IVariantWithAttribute>
-    >(pipeline);
+    const paginatedData =
+      await this.attributeCollection.aggregate<GetVariantsResponse>(pipeline);
 
     return paginatedData[0];
   }
 
   async getAttribute(
     parameters: GetAttributeParameters,
-    options: FindEntityOptions<IAttribute> = {},
-  ): Promise<IAttribute> {
+    options: FindEntityOptions<AttributeEntity> = {},
+  ): Promise<GetAttributeResponse> {
     const attribute = await this.attributeCollection.findOne(
       {
         _id: new ObjectId(parameters.attributeId),
@@ -128,7 +135,9 @@ export class AttributesService {
     return attribute;
   }
 
-  async getVariant(parameters: GetVariantParameters): Promise<IVariant> {
+  async getVariant(
+    parameters: GetVariantParameters,
+  ): Promise<GetVariantResponse> {
     const pipeline = [
       { $match: { _id: new ObjectId(parameters.attributeId) } },
       { $unwind: '$variants' },
@@ -156,8 +165,8 @@ export class AttributesService {
   }
 
   async createAttribute(
-    createAttribute: IAttributeCreate,
-  ): Promise<IAttribute> {
+    createAttribute: CreateAttribute,
+  ): Promise<CreateAttributeResponse> {
     const newAttribute = await this.attributeCollection.create(createAttribute);
 
     if (!newAttribute) {
@@ -167,7 +176,7 @@ export class AttributesService {
     return newAttribute;
   }
 
-  async updateAttribute(updateAttributes: IAttributeUpdate): Promise<void> {
+  async updateAttribute(updateAttributes: UpdateAttribute): Promise<void> {
     const attribute = await this.getAttribute(
       {
         attributeId: updateAttributes.id,
@@ -176,7 +185,7 @@ export class AttributesService {
     );
 
     const { _id, updatedFields } =
-      this.compareFieldsService.compare<IAttribute>(
+      this.compareFieldsService.compare<AttributeEntity>(
         updateAttributes,
         attribute,
       );
@@ -191,15 +200,15 @@ export class AttributesService {
     }
   }
 
-  async deleteAttribute(deleteAttribute: IAttributeDelete): Promise<void> {
+  async deleteAttribute(deleteAttribute: DeleteAttribute): Promise<void> {
     await this.attributeCollection.deleteOne({
       _id: new ObjectId(deleteAttribute.id),
     });
   }
 
   async createVariant(
-    createVariant: IVariantCreate,
-  ): Promise<IVariantWithAttributeId> {
+    createVariant: CreateVariant,
+  ): Promise<CreateVariantResponse> {
     const { attributeId, ...rest } = createVariant;
 
     const variant: IVariant = {
@@ -226,7 +235,7 @@ export class AttributesService {
     };
   }
 
-  async updateVariant(updateAttributeVariant: IVariantUpdate): Promise<void> {
+  async updateVariant(updateAttributeVariant: UpdateVariant): Promise<void> {
     const variant = await this.getVariant({
       attributeId: updateAttributeVariant.attributeId,
       variantId: updateAttributeVariant.variantId,
@@ -252,7 +261,7 @@ export class AttributesService {
     }
   }
 
-  async deleteVariant(deleteAttributeVariant: IVariantDelete): Promise<void> {
+  async deleteVariant(deleteAttributeVariant: DeleteVariant): Promise<void> {
     await this.attributeCollection.updateWithOperator(
       {
         _id: new ObjectId(deleteAttributeVariant.attributeId),

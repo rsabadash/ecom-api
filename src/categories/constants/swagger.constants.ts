@@ -25,7 +25,7 @@ export const DESCRIPTION = {
   NAME: { description: 'Category name' },
   SEO_NAME: {
     description:
-      'Search engine optimization category name (only numbers and lowercase Latin letters separated by a hyphen are allowed)',
+      'Search engine optimization name (only numbers and lowercase Latin letters separated by a hyphen are allowed)',
     example: 'test-category-name-123',
   },
   IS_ACTIVE: {

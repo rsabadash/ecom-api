@@ -7,7 +7,7 @@ export interface GetCategoriesParameters {
   parentIds?: ParentIds.Root;
 }
 
-export interface GetCategoriseQuery
+export interface GetCategoriesQuery
   extends PaginationParsedQuery<GetCategoriesParameters> {}
 
 type QueryPipelineCategoryItem =

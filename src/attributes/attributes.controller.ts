@@ -28,52 +28,57 @@ import {
 import { Auth } from '../iam/decorators/auth.decorator';
 import { AuthType } from '../iam/enums/auth-type.enum';
 import { AttributesService } from './attributes.service';
-import { CreateAttributeDto } from './dto/create-attribute.dto';
-import { IAttribute } from './interfaces/attribute.interfaces';
+import { CreateAttributeDto } from './dto/request/create-attribute.dto';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
 import { HttpErrorDto } from '../common/dto/response/http-error.dto';
 import {
   ATTRIBUTE_ID_PARAM,
   VARIANT_ID_PARAM,
 } from './constants/param.constants';
-import { DeleteAttributeDto } from './dto/delete-attribute.dto';
-import { UpdateAttributeDto } from './dto/update-attribute.dto';
-import { UpdateVariantDto } from './dto/update-variant.dto';
-import { CreateVariantDto } from './dto/create-variant.dto';
-import {
-  IVariant,
-  IVariantWithAttributeId,
-} from './interfaces/variant.interfaces';
-import { DeleteVariantDto } from './dto/delete-variant.dto';
-import { AttributeDto } from './dto/attribute.dto';
-import { VariantDto } from './dto/variant.dto';
+import { DeleteAttributeDto } from './dto/request/delete-attribute.dto';
+import { UpdateAttributeDto } from './dto/request/update-attribute.dto';
+import { UpdateVariantDto } from './dto/request/update-variant.dto';
+import { CreateVariantDto } from './dto/request/create-variant.dto';
+import { DeleteVariantDto } from './dto/request/delete-variant.dto';
 import { Roles } from '../iam/decorators/roles.decorator';
 import { Role } from '../users/enums/role.enum';
-import { IVariantWithAttribute } from './interfaces/variant-with-attribute.interfaces';
-import { MODULE_NAME } from '../common/constants/swagger.constants';
-import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
+import { ERROR, SUCCESS, MODULE_NAME } from './constants/swagger.constants';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
-import { PaginationData } from '../common/interfaces/pagination.interface';
-import { PaginationParsedQuery } from '../common/types/query.types';
-import { PaginationAttributeDto } from './dto/pagination-attribute.dto';
-import { PaginationVariantWithAttributeDto } from './dto/pagination-variant-with-attribute.dto';
+import { GetAttributesResponseDto } from './dto/response/get-attributes-response.dto';
+import {
+  GetAttributesQuery,
+  GetVariantsQuery,
+} from './interfaces/query.interface';
+import {
+  CreateAttributeResponse,
+  CreateVariantResponse,
+  GetAttributeResponse,
+  GetAttributesResponse,
+  GetVariantResponse,
+  GetVariantsResponse,
+} from './interfaces/response.interface';
+import { GetVariantsResponseDto } from './dto/response/get-variants-response.dto';
+import { GetAttributeResponseDto } from './dto/response/get-attribute-response.dto';
+import { GetVariantResponseDto } from './dto/response/get-variant-response.dto';
+import { CreateAttributeResponseDto } from './dto/response/create-attribute-response.dto';
+import { CreateVariantResponseDto } from './dto/response/create-variant-response.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
 @Controller(ATTRIBUTES_ROUTE)
-@ApiTags(MODULE_NAME.ATTRIBUTES)
+@ApiTags(MODULE_NAME)
 export class AttributesController {
   constructor(private readonly attributesService: AttributesService) {}
 
   @Get()
   @ApiOkResponse({
-    description: SWAGGER_DESCRIPTION.GET_ATTRIBUTES,
-    type: [PaginationAttributeDto],
+    description: SUCCESS.GET_ATTRIBUTES,
+    type: GetAttributesResponseDto,
   })
   @ApiNoAccessResponse()
   async getAttributes(
-    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
-  ): Promise<PaginationData<IAttribute>> {
+    @Query(ParsePaginationPipe) query: GetAttributesQuery,
+  ): Promise<GetAttributesResponse> {
     const { page, limit } = query;
 
     return this.attributesService.getAttributes(
@@ -87,13 +92,13 @@ export class AttributesController {
 
   @Get(VARIANTS_PATH)
   @ApiOkResponse({
-    description: SWAGGER_DESCRIPTION.GET_VARIANTS,
-    type: [PaginationVariantWithAttributeDto],
+    description: SUCCESS.GET_VARIANTS,
+    type: GetVariantsResponseDto,
   })
   @ApiNoAccessResponse()
   async getVariants(
-    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
-  ): Promise<PaginationData<IVariantWithAttribute>> {
+    @Query(ParsePaginationPipe) query: GetVariantsQuery,
+  ): Promise<GetVariantsResponse> {
     const { page, limit } = query;
 
     return this.attributesService.getVariants(
@@ -107,8 +112,8 @@ export class AttributesController {
 
   @Get(GET_ATTRIBUTE_BY_ID_PATH)
   @ApiOkResponse({
-    description: SWAGGER_DESCRIPTION.GET_ATTRIBUTE,
-    type: AttributeDto,
+    description: SUCCESS.GET_ATTRIBUTE,
+    type: GetAttributeResponseDto,
   })
   @ApiNotFoundResponse({
     description: ERROR.ATTRIBUTE_NOT_FOUND,
@@ -117,14 +122,14 @@ export class AttributesController {
   @ApiNoAccessResponse()
   async getAttribute(
     @Param(ATTRIBUTE_ID_PARAM) attributeId: string,
-  ): Promise<IAttribute> {
+  ): Promise<GetAttributeResponse> {
     return this.attributesService.getAttribute({ attributeId });
   }
 
   @Get(`${GET_ATTRIBUTE_BY_ID_PATH}${VARIANTS_PATH}${GET_VARIANT_BY_ID_PATH}`)
   @ApiOkResponse({
-    description: SWAGGER_DESCRIPTION.GET_VARIANT,
-    type: VariantDto,
+    description: SUCCESS.GET_VARIANT,
+    type: GetVariantResponseDto,
   })
   @ApiNotFoundResponse({
     description: ERROR.VARIANT_NOT_FOUND,
@@ -134,14 +139,14 @@ export class AttributesController {
   async getVariant(
     @Param(ATTRIBUTE_ID_PARAM) attributeId: string,
     @Param(VARIANT_ID_PARAM) variantId: string,
-  ): Promise<IVariant> {
+  ): Promise<GetVariantResponse> {
     return this.attributesService.getVariant({ attributeId, variantId });
   }
 
   @Post()
   @ApiCreatedResponse({
-    description: SWAGGER_DESCRIPTION.CREATE_ATTRIBUTE,
-    type: AttributeDto,
+    description: SUCCESS.CREATE_ATTRIBUTE,
+    type: CreateAttributeResponseDto,
   })
   @ApiBadRequestResponse({
     description: ERROR.ATTRIBUTE_NOT_CREATED,
@@ -150,14 +155,14 @@ export class AttributesController {
   @ApiNoAccessResponse()
   async createAttribute(
     @Body() createAttributeDto: CreateAttributeDto,
-  ): Promise<IAttribute> {
+  ): Promise<CreateAttributeResponse> {
     return this.attributesService.createAttribute(createAttributeDto);
   }
 
   @Patch()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
-    description: SWAGGER_DESCRIPTION.UPDATE_ATTRIBUTE,
+    description: SUCCESS.UPDATE_ATTRIBUTE,
   })
   @ApiNotFoundResponse({
     description: ERROR.ATTRIBUTE_NOT_FOUND,
@@ -177,7 +182,7 @@ export class AttributesController {
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
-    description: SWAGGER_DESCRIPTION.DELETE_ATTRIBUTE,
+    description: SUCCESS.DELETE_ATTRIBUTE,
   })
   @ApiNoAccessResponse()
   async deleteAttribute(
@@ -188,8 +193,8 @@ export class AttributesController {
 
   @Post(VARIANTS_PATH)
   @ApiCreatedResponse({
-    description: SWAGGER_DESCRIPTION.CREATE_VARIANT,
-    type: AttributeDto,
+    description: SUCCESS.CREATE_VARIANT,
+    type: CreateVariantResponseDto,
   })
   @ApiBadRequestResponse({
     description: ERROR.VARIANT_NOT_CREATED,
@@ -198,14 +203,14 @@ export class AttributesController {
   @ApiNoAccessResponse()
   async createVariant(
     @Body() createVariantDto: CreateVariantDto,
-  ): Promise<IVariantWithAttributeId> {
+  ): Promise<CreateVariantResponse> {
     return this.attributesService.createVariant(createVariantDto);
   }
 
   @Patch(VARIANTS_PATH)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
-    description: SWAGGER_DESCRIPTION.UPDATE_VARIANT,
+    description: SUCCESS.UPDATE_VARIANT,
   })
   @ApiNotFoundResponse({
     description: ERROR.VARIANT_NOT_FOUND,
@@ -225,7 +230,7 @@ export class AttributesController {
   @Delete(VARIANTS_PATH)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
-    description: SWAGGER_DESCRIPTION.DELETE_VARIANT,
+    description: SUCCESS.DELETE_VARIANT,
   })
   @ApiNoAccessResponse()
   async deleteVariant(

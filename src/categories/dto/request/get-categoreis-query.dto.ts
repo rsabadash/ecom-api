@@ -1,11 +1,11 @@
-import { GetCategoriseQuery } from '../../interfaces/query.interface';
+import { GetCategoriesQuery } from '../../interfaces/query.interface';
 import { IsNumber, IsString, IsEnum, IsOptional } from 'class-validator';
 import { ParentIds } from '../../enums/parent-ids.enum';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { DESCRIPTION_COMMON } from '../../../common/constants/swagger.constants';
 
-export class GetCategoriesQueryDto implements GetCategoriseQuery {
+export class GetCategoriesQueryDto implements GetCategoriesQuery {
   @IsNumber()
   @Type(() => Number)
   @IsOptional()
