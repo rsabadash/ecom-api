@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
-import { SuppliersModule } from './suppliers/suppliers.module';
-import { SuppliesModule } from './supplies/supplies.module';
-import { CategoriesModule } from './categories/categories.module';
-import { AttributesModule } from './attributes/attributes.module';
-import { UsersModule } from './users/users.module';
-import { IamModule } from './iam/iam.module';
-import { ProductsModule } from './products/products.module';
-import { WarehousesModule } from './warehouses/warehouses.module';
+import { SuppliersModule } from './modules/suppliers/suppliers.module';
+import { SuppliesModule } from './modules/supplies/supplies.module';
+import { CategoriesModule } from './modules/categories/categories.module';
+import { AttributesModule } from './modules/attributes/attributes.module';
+import { UsersModule } from './modules/users/users.module';
+import { IamModule } from './modules/iam/iam.module';
+import { ProductsModule } from './modules/products/products.module';
+import { WarehousesModule } from './modules/warehouses/warehouses.module';
 import { getEnvPath } from './common/utils/env.utils';
 
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
