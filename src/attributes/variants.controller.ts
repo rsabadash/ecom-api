@@ -41,7 +41,6 @@ import { Roles } from '../iam/decorators/roles.decorator';
 import { Role } from '../users/enums/role.enum';
 import { ERROR, SUCCESS, MODULE_NAME } from './constants/swagger.constants';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
-import { GetVariantsQuery } from './interfaces/query.interface';
 import {
   CreateVariantResponse,
   GetVariantResponse,
@@ -50,6 +49,7 @@ import {
 import { GetVariantsResponseDto } from './dto/response/get-variants-response.dto';
 import { GetVariantResponseDto } from './dto/response/get-variant-response.dto';
 import { CreateVariantResponseDto } from './dto/response/create-variant-response.dto';
+import { GetVariantsQueryDto } from './dto/request/get-variants-query.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -65,7 +65,7 @@ export class VariantsController {
   })
   @ApiNoAccessResponse()
   async getVariants(
-    @Query(ParsePaginationPipe) query: GetVariantsQuery,
+    @Query(ParsePaginationPipe) query: GetVariantsQueryDto,
   ): Promise<GetVariantsResponse> {
     const { page, limit } = query;
 

@@ -15,35 +15,38 @@ import {
   SUPPLIES_ROUTE,
 } from './constants/route.constants';
 import { SuppliesService } from './supplies.service';
-import { ISupply } from './interfaces/supplies.interfaces';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
-import { PaginationData } from '../common/interfaces/pagination.interface';
-import { PaginationParsedQuery } from '../common/types/query.types';
 import { SUPPLY_ID_PARAM } from './constants/param.constants';
-import { MODULE_NAME } from '../common/constants/swagger.constants';
 import { ApiNoAccessResponse } from '../common/decorators/swagger/api-no-access-response.decorator';
-import { ERROR, SWAGGER_DESCRIPTION } from './constants/message.constants';
-import { SupplyDto } from './dto/supply.dto';
+import { ERROR, SUCCESS, MODULE_NAME } from './constants/swagger.constants';
 import { HttpErrorDto } from '../common/dto/response/http-error.dto';
-import { CreateSupplyDto } from './dto/create-supply.dto';
-import { PaginationSupplyDto } from './dto/pagination-supply.dto';
+import { CreateSupplyDto } from './dto/request/create-supply.dto';
+import { GetSuppliesResponseDto } from './dto/response/get-supplies-response.dto';
+import {
+  CreateSupplyResponse,
+  GetSuppliesResponse,
+  GetSupplyResponse,
+} from './interfaces/response.interface';
+import { GetSuppliesQueryDto } from './dto/request/get-supplies-query.dto';
+import { GetSupplyResponseDto } from './dto/response/get-supply-response.dto';
+import { CreateSupplyResponseDto } from './dto/response/create-supply-response.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
 @Controller(SUPPLIES_ROUTE)
-@ApiTags(MODULE_NAME.SUPPLIES)
+@ApiTags(MODULE_NAME)
 export class SuppliesController {
   constructor(private readonly suppliesService: SuppliesService) {}
 
   @Get()
   @ApiOkResponse({
-    description: SWAGGER_DESCRIPTION.GET_SUPPLIES,
-    type: [PaginationSupplyDto],
+    description: SUCCESS.GET_SUPPLIES,
+    type: GetSuppliesResponseDto,
   })
   @ApiNoAccessResponse()
   async getSupplies(
-    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
-  ): Promise<PaginationData<ISupply>> {
+    @Query(ParsePaginationPipe) query: GetSuppliesQueryDto,
+  ): Promise<GetSuppliesResponse> {
     const { page, limit } = query;
 
     return this.suppliesService.getSupplies(
@@ -57,22 +60,24 @@ export class SuppliesController {
 
   @Get(GET_SUPPLY_BY_ID_PATH)
   @ApiOkResponse({
-    description: SWAGGER_DESCRIPTION.GET_SUPPLY,
-    type: SupplyDto,
+    description: SUCCESS.GET_SUPPLY,
+    type: GetSupplyResponseDto,
   })
   @ApiNotFoundResponse({
     description: ERROR.SUPPLY_NOT_FOUND,
     type: HttpErrorDto,
   })
   @ApiNoAccessResponse()
-  async getSupply(@Param(SUPPLY_ID_PARAM) supplyId: string): Promise<ISupply> {
+  async getSupply(
+    @Param(SUPPLY_ID_PARAM) supplyId: string,
+  ): Promise<GetSupplyResponse> {
     return this.suppliesService.getSupply({ supplyId });
   }
 
   @Post()
   @ApiCreatedResponse({
-    description: SWAGGER_DESCRIPTION.CREATE_SUPPLY,
-    type: SupplyDto,
+    description: SUCCESS.CREATE_SUPPLY,
+    type: CreateSupplyResponseDto,
   })
   @ApiBadRequestResponse({
     description: ERROR.NO_PRODUCTS_FOUND,
@@ -92,7 +97,7 @@ export class SuppliesController {
   @ApiNoAccessResponse()
   async createSupply(
     @Body() createSupplyDto: CreateSupplyDto,
-  ): Promise<ISupply> {
+  ): Promise<CreateSupplyResponse> {
     return this.suppliesService.createSupply(createSupplyDto);
   }
 }

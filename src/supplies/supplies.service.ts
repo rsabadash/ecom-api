@@ -12,38 +12,38 @@ import { SUPPLIES_COLLECTION } from '../common/constants/collections.constants';
 import { ICollectionModel } from '../mongo/interfaces/colection-model.interfaces';
 import {
   BulkUpdateFilter,
+  CreateSupply,
+  CreateSupplyProduct,
   GetSupplyParameters,
-  ISupply,
-  ISupplyCreate,
   ISupplyProduct,
-  ISupplyProductToCreate,
+  SupplyEntity,
 } from './interfaces/supplies.interfaces';
 import { ProductsService } from '../products/products.service';
 import { MathService } from '../common/services/math.service';
 import { SuppliersService } from '../suppliers/suppliers.service';
-import {
-  ProductEntity,
-  ProductWarehouses,
-} from '../products/interfaces/product.interfaces';
+import { ProductWarehouses } from '../products/interfaces/product.interfaces';
 import { BulkResult } from '../mongo/types/colection-model.types';
 import { CONNECTION_DB_NAME } from '../common/constants/database.contants';
 import {
   ClientsMap,
   FindEntityOptions,
-  PartialEntity,
 } from '../mongo/types/mongo-query.types';
-import { PaginationData } from '../common/interfaces/pagination.interface';
 import { EntityNotFoundException } from '../common/exeptions/entity-not-found.exception';
 import { getPaginationPipeline } from '../common/utils/getPaginationPipeline';
-import { ERROR } from './constants/message.constants';
+import { ERROR } from './constants/swagger.constants';
 import { ProductEntityResponse } from '../products/interfaces/response.interface';
+import {
+  CreateSupplyResponse,
+  GetSuppliesResponse,
+  GetSupplyResponse,
+} from './interfaces/response.interface';
 
 @Injectable()
 export class SuppliesService {
   private client: MongoClient;
   constructor(
     @InjectCollectionModel(SUPPLIES_COLLECTION)
-    private readonly supplyCollection: ICollectionModel<ISupply>,
+    private readonly supplyCollection: ICollectionModel<SupplyEntity>,
     private readonly productsService: ProductsService,
     private readonly suppliersService: SuppliersService,
     private readonly mathService: MathService,
@@ -62,7 +62,7 @@ export class SuppliesService {
   }
 
   private async getProductsToAdd(
-    products: ISupplyProductToCreate[],
+    products: CreateSupplyProduct[],
   ): Promise<ProductEntityResponse[]> {
     const productToAddIds = products.map((product) => {
       return new ObjectId(product.productId);
@@ -80,7 +80,7 @@ export class SuppliesService {
 
   private addVariationsToSupplyProducts(
     products: ProductEntityResponse[],
-    productsToAdd: ISupplyProductToCreate[],
+    productsToAdd: CreateSupplyProduct[],
   ): ISupplyProduct[] {
     const productsToSupplyCollection: ISupplyProduct[] = [];
 
@@ -124,8 +124,8 @@ export class SuppliesService {
   }
 
   private updateProductsList(
-    products: ProductEntity[],
-    productsToAdd: ISupplyProductToCreate[],
+    products: ProductEntityResponse[],
+    productsToAdd: CreateSupplyProduct[],
     warehouseIdToAdd: string,
     supplyIdToAdd: string,
   ): ProductEntityResponse[] {
@@ -187,7 +187,7 @@ export class SuppliesService {
   }
 
   private async bulkProductsUpdate(
-    productsToUpdate: ProductEntity[],
+    productsToUpdate: ProductEntityResponse[],
     options: BulkWriteOptions,
   ): Promise<BulkResult> {
     const preparedBulkUpdateFilter: BulkUpdateFilter[] = productsToUpdate.map(
@@ -210,9 +210,9 @@ export class SuppliesService {
   }
 
   async getSupplies(
-    query: PartialEntity<ISupply> = {},
-    options: FindEntityOptions<ISupply> = {},
-  ): Promise<PaginationData<ISupply>> {
+    query: Record<string, string> = {},
+    options: FindEntityOptions<SupplyEntity> = {},
+  ): Promise<GetSuppliesResponse> {
     const { skip, limit } = options;
 
     const pipeline = getPaginationPipeline({
@@ -223,14 +223,13 @@ export class SuppliesService {
       },
     });
 
-    const paginatedData = await this.supplyCollection.aggregate<
-      PaginationData<ISupply>
-    >(pipeline);
+    const paginatedData =
+      await this.supplyCollection.aggregate<GetSuppliesResponse>(pipeline);
 
     return paginatedData[0];
   }
 
-  async getSupply(parameters: GetSupplyParameters): Promise<ISupply> {
+  async getSupply(parameters: GetSupplyParameters): Promise<GetSupplyResponse> {
     const supply = await this.supplyCollection.findOne({
       _id: new ObjectId(parameters.supplyId),
     });
@@ -242,9 +241,11 @@ export class SuppliesService {
     return supply;
   }
 
-  async createSupply(createSupply: ISupplyCreate): Promise<ISupply> {
+  async createSupply(
+    createSupply: CreateSupply,
+  ): Promise<CreateSupplyResponse> {
     // TODO check duplication
-    const productsToAdd: ISupplyProductToCreate[] = createSupply.products;
+    const productsToAdd: CreateSupplyProduct[] = createSupply.products;
 
     const products: ProductEntityResponse[] = await this.getProductsToAdd(
       productsToAdd,
@@ -263,7 +264,7 @@ export class SuppliesService {
 
     const session = this.client.startSession();
 
-    let newSupply: ISupply | null = null;
+    let newSupply: SupplyEntity | null = null;
 
     try {
       await session.withTransaction(async () => {

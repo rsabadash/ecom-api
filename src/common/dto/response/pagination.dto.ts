@@ -1,7 +1,7 @@
 import {
   PaginationData,
   PaginationMetaData,
-} from '../interfaces/pagination.interface';
+} from '../../interfaces/pagination.interface';
 import { ApiProperty } from '@nestjs/swagger';
 
 class PaginationMetaDto implements PaginationMetaData {

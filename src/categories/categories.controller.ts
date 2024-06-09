@@ -45,7 +45,7 @@ import {
   GetCategoryResponse,
 } from './interfaces/response.interface';
 import { GetCategoriesResponseDto } from './dto/response/get-categories-response.dto';
-import { DropdownListQueryDto } from '../common/dto/validations/dropdown-list.dto';
+import { DropdownListQueryDto } from '../common/dto/request/dropdown-list.dto';
 import { CreateCategoryResponseDto } from './dto/response/create-category-response.dto';
 import { GetCategoryResponseDto } from './dto/response/get-category-response.dto';
 

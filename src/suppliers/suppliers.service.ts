@@ -21,7 +21,6 @@ import {
   GetSuppliersResponse,
   SupplierDropdownListItem,
 } from './interfaces/response.interface';
-import { GetSuppliersParameters } from './interfaces/query.interface';
 
 @Injectable()
 export class SuppliersService {
@@ -32,12 +31,12 @@ export class SuppliersService {
   ) {}
 
   async getSuppliers(
-    query: GetSuppliersParameters = {},
+    query: Record<string, string> = {},
     options: FindEntityOptions<SupplierEntity> = {},
   ): Promise<GetSuppliersResponse> {
     const { skip, limit } = options;
 
-    const pipeline = getPaginationPipeline<GetSuppliersParameters>({
+    const pipeline = getPaginationPipeline({
       query,
       filter: {
         skip,

@@ -1,23 +1,13 @@
 import { GetCategoriesQuery } from '../../interfaces/query.interface';
-import { IsNumber, IsString, IsEnum, IsOptional } from 'class-validator';
+import { IsString, IsEnum, IsOptional } from 'class-validator';
 import { ParentIds } from '../../enums/parent-ids.enum';
-import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { DESCRIPTION_COMMON } from '../../../common/constants/swagger.constants';
+import { PaginationParsedQueryDto } from '../../../common/dto/request/pagination-parsed-query.dto';
 
-export class GetCategoriesQueryDto implements GetCategoriesQuery {
-  @IsNumber()
-  @Type(() => Number)
-  @IsOptional()
-  @ApiPropertyOptional(DESCRIPTION_COMMON.LIMIT)
-  readonly limit?: number;
-
-  @IsNumber()
-  @Type(() => Number)
-  @IsOptional()
-  @ApiPropertyOptional(DESCRIPTION_COMMON.PAGE)
-  readonly page?: number;
-
+export class GetCategoriesQueryDto
+  extends PaginationParsedQueryDto
+  implements GetCategoriesQuery
+{
   @IsString()
   @IsOptional()
   @ApiPropertyOptional({

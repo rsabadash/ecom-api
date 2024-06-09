@@ -25,7 +25,7 @@ import {
   GetProductsResponse,
   ProductDropdownListItem,
 } from './interfaces/response.interface';
-import { GetProductsQuery } from './interfaces/query.interface';
+import { GetProductsQueryDto } from './dto/request/get-products-query.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -41,7 +41,7 @@ export class ProductsController {
   })
   @ApiNoAccessResponse()
   async getProducts(
-    @Query(ParsePaginationPipe) query: GetProductsQuery,
+    @Query(ParsePaginationPipe) query: GetProductsQueryDto,
   ): Promise<GetProductsResponse> {
     const { page, limit } = query;
 

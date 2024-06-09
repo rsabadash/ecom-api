@@ -8,7 +8,7 @@ import {
   WAREHOUSE_PRODUCT_ID,
 } from '../../common/constants/cross-entity-id.constants';
 
-export interface ISupply {
+export interface SupplyEntity {
   _id: ObjectId;
   name: null | string;
   products: ISupplyProduct[];
@@ -16,10 +16,6 @@ export interface ISupply {
   [SUPPLIER_ID]: string;
   [WAREHOUSE_ID]: string;
   createdAt: Date;
-}
-
-export interface ISupplyDto extends Omit<ISupply, '_id'> {
-  _id: string;
 }
 
 export interface ISupplyProduct {
@@ -32,18 +28,19 @@ export interface ISupplyProduct {
   [VARIANT_IDS]: string[];
 }
 
-export interface ISupplyProductToCreate
-  extends Pick<
-    ISupplyProduct,
-    'productId' | 'quantity' | 'price' | 'totalCost'
-  > {}
+export interface CreateSupplyProduct {
+  productId: string;
+  quantity: string;
+  price: string;
+  totalCost: string;
+}
 
-export interface ISupplyCreate
-  extends Pick<
-    ISupply,
-    'name' | 'productsTotalCost' | 'supplierId' | 'warehouseId'
-  > {
-  products: ISupplyProductToCreate[];
+export interface CreateSupply {
+  name: string | null;
+  productsTotalCost: string;
+  [SUPPLIER_ID]: string;
+  [WAREHOUSE_ID]: string;
+  products: CreateSupplyProduct[];
 }
 
 export interface BulkUpdateFilter {

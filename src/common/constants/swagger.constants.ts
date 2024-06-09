@@ -1,9 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
 
-export const MODULE_NAME = {
-  SUPPLIES: 'Supplies module',
-};
-
 export const DESCRIPTION_COMMON = {
   LIMIT: {
     description: 'Number of items that return',

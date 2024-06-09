@@ -39,7 +39,6 @@ import { DropdownListDto } from '../common/dto/response/dropdown-list.dto';
 import { MODULE_NAME } from './constants/swagger.constants';
 import { ERROR, SUCCESS } from './constants/swagger.constants';
 import { ParsePaginationPipe } from '../common/pipes/parse-pagination.pipe';
-import { PaginationParsedQuery } from '../common/types/query.types';
 import {
   CreateSupplierResponse,
   GetSupplierResponse,
@@ -49,6 +48,7 @@ import {
 import { GetSuppliersResponseDto } from './dto/response/get-suppliers-response.dto';
 import { GetSupplierResponseDto } from './dto/response/get-supplier-response.dto';
 import { CreateSupplierResponseDto } from './dto/response/create-supplier-response.dto';
+import { GetSuppliersQueryDto } from './dto/request/get-suppliers-query.dto';
 
 @Roles(Role.Admin)
 @Auth(AuthType.Bearer)
@@ -64,7 +64,7 @@ export class SuppliersController {
   })
   @ApiNoAccessResponse()
   async getSuppliers(
-    @Query(ParsePaginationPipe) query: PaginationParsedQuery,
+    @Query(ParsePaginationPipe) query: GetSuppliersQueryDto,
   ): Promise<GetSuppliersResponse> {
     const { page, limit } = query;
 
