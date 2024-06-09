@@ -111,7 +111,7 @@ export class ProductsService {
             productAttribute.variants?.length > 0
           ) {
             productAttribute.variants.forEach((productVariant) => {
-              const foundVariant = foundAttribute.variants.find((variant) => {
+              const foundVariant = foundAttribute.variants?.find((variant) => {
                 return (
                   variant.variantId.toString() === productVariant.variantId
                 );
